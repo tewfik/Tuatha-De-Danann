@@ -28,7 +28,7 @@ class World(object):
         - `entities`: A list which represent entities' positions which can behave in the world. A list following the format [(pos_x1, pos_y1), ...]
         - `entitites_pos`: Represent entities [object1, ...].
         """
-        
+
         #TODO(tewfik): random for debug, change with config file reading
         self.map = [ [random.randint(0,1) for j in xrange(100)] for i in xrange(100) ]
         self.entities = []
@@ -38,26 +38,32 @@ class World(object):
     def get_objet_by_position(self, position):
         """
         Get an object which is on a given position.
-        
+
         Arguments:
         - `position`: tuple following the format (pos_x, pos_y)
 
         Return: an entity object.
         """
-        #search stuff
-        pass
+        return self.entities[self.entities_pos.index(position)]
+
 
     def get_position_by_object_id(self, id):
         """
         Retrieve the position of a given object.
-        
+
         Arguments:
         - `id`: unique entity identifier.
 
         Return: position of the given entity. tuple (x, y).
         """
-        #search stuff
-        pass
+        object = None
+        for entity in self.entities:
+            if entity.get_id() == id:
+                object = entity
+                break
+        if object == None:
+            raise ValueError
+        return object
 
 
     def register(self, entity):
@@ -72,7 +78,7 @@ class World(object):
         pos_y = 0
         self.entities.append([pos_x, pos_y, entity])
 
-    
+
     def unregister(self, entity_id):
         """
         Delete an entity from the world.
@@ -85,7 +91,7 @@ class World(object):
     def square_available(self, x, y):
         """
         Check that an entity can move on a given square.
-        
+
         Arguments:
         - `x`: abcisses.
         - `y`: ordonnees
@@ -106,7 +112,7 @@ class World(object):
     def move(self, id, dest_x, dest_y):
         """
         An entity ask to move.
-        
+
         Arguments:
         - `id`: unique object identifier of the entity.
         - `dest_x`: destination's x.
