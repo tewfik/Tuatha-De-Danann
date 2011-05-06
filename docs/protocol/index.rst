@@ -1,9 +1,12 @@
-==================
-Dana documentation
-==================
+======================
+Protocol documentation
+======================
 
-This documentation cover Dana architecture.
-Dana is the server which support connexion of players and which maintain a representation of the virtual world.
+This documentation cover network protocol which is used in Dana (server) and Etain (client) communication.
+
+step 1 : the client register at Dana which assign it a client unique identifier
+step 2 : the client open two communication channel : (1) receive, (2) send
+step 3 : the client send data in the "send channel" and receive data in the "receive channel" in parallel. The client have to react to request of the server in real time.
 
 .. toctree::
    :maxdepth: 2
