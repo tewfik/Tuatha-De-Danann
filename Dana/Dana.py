@@ -23,6 +23,7 @@ class TCPHandler(SocketServer.BaseRequestHandler):
 
     def send_loop(self, client_id):
         """
+        Dana send data to the client.
         """
         # main loop
         while True:
@@ -37,6 +38,7 @@ class TCPHandler(SocketServer.BaseRequestHandler):
 
     def receive_loop(self, client_id):
         """
+        Dana receives data from the client, parses it and reacts to it.
         """
         # main loop
         while True:
@@ -54,8 +56,11 @@ class TCPHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
         """
+        Handle requests and allocate them to the concerned handle function.
+        => register function : client connexion and identifier attribution
+        => send_loop function : server send data to client
+        => receive_loop funciton : server receive data from the client and reacts.
         """
-        #TODO(tewfik): gérer l'enregistrement des clients
         #TODO(tewfik): gérer la connexion des clients (login/pass)
 
         # choose between send connection and receive connection
@@ -84,6 +89,7 @@ def main(port):
 
 
 if __name__ == '__main__':
+    # command line argument management
     if(len(sys.argv) >= 2):
         port = sys.argv[1]
     else:
