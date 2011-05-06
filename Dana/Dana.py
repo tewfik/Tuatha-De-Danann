@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import SocketServer
 
 class ThreadingTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer): pass
@@ -69,12 +70,23 @@ class TCPHandler(SocketServer.BaseRequestHandler):
             self.request.send("vtff")
 
 
-def main():
-    HOST, PORT = 'localhost', 1338
+def main(port):
+    """
+    Main program.
+
+    Attributes:
+    - `port`: port which Dana listen.
+    """
+    HOST, PORT = 'localhost', port
 
     server = ThreadingTCPServer((HOST, PORT), TCPHandler)
     server.serve_forever()
 
 
 if __name__ == '__main__':
-    main()
+    if(len(sys.argv) >= 2):
+        port = sys.argv[1]
+    else:
+        port = 1337
+
+    main(port)
