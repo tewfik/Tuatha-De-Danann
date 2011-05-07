@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: UTF8 -*-
 
 import sys
 import SocketServer
@@ -9,7 +10,7 @@ class ThreadingTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer): p
 class TCPHandler(SocketServer.BaseRequestHandler):
     """
     """
-    
+
     def register_query(self):
         """
         A client ask for an unique identifier.
@@ -91,7 +92,7 @@ def main(port):
 if __name__ == '__main__':
     # command line argument management
     if(len(sys.argv) >= 2):
-        port = sys.argv[1]
+        port = int(sys.argv[1])
     else:
         port = 1337
 
