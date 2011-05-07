@@ -72,8 +72,8 @@ class TCPHandler(SocketServer.BaseRequestHandler):
             self.send_loop(client_id)
         elif connection_type == "receive":
             self.receive_loop(client_id)
-	elif connection_type == "register":
-	    self.register()
+        elif connection_type == "register":
+            self.register()
         else:
             self.request.send("vtff")
 
