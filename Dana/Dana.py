@@ -11,15 +11,16 @@ class TCPHandler(SocketServer.BaseRequestHandler):
     """
     """
 
-    def register_query(self):
+    def register(self):
         """
         A client ask for an unique identifier.
         The server has to register the client id, his login and his (hashed) pass.
         """
         #get login/pass
         #client_id = AccountManagement.get_next_client_id()
-        #send(client_id)
-        pass
+        global lastId
+        lastId += 1
+        self.request.send(str(lastId))
 
 
     def send_loop(self, client_id):
@@ -97,5 +98,6 @@ if __name__ == '__main__':
         port = int(sys.argv[1])
     else:
         port = 1337
+    lastId = 0
 
     main(port)
