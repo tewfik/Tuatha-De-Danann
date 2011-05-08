@@ -69,9 +69,9 @@ class TCPHandler(SocketServer.BaseRequestHandler):
         data = self.request.recv(1024).strip()
         connection_type, client_id = data.split(" ")
 
-        if connection_type  == "send":
+        if connection_type  == "receive":
             self.send_loop(client_id)
-        elif connection_type == "receive":
+        elif connection_type == "send":
             self.receive_loop(client_id)
         elif connection_type == "register":
             self.register()
