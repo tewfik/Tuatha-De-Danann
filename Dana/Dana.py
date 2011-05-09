@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import socket
 import SocketServer
 
 class ThreadingTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer): pass
@@ -20,7 +21,17 @@ class TCPHandler(SocketServer.BaseRequestHandler):
         #client_id = AccountManagement.get_next_client_id()
         global last_id
         last_id += 1
-        self.request.send(str(last_id))
+        try:
+            self.request.send(str(last_id))
+        except socket.error:
+            print e
+        except IOError as e:
+            if e.errno == errno.EPIPE:
+                # broken pipe
+                print e
+            else:
+                # other error
+                print e
 
 
     def send_loop(self, client_id):
@@ -30,12 +41,26 @@ class TCPHandler(SocketServer.BaseRequestHandler):
         # main loop
         while True:
             # wait for a Queue event
-            ##
+            # TODO(tewfik): complete
+
             # send a client request
-            self.request.send(data.upper())
-            # wait for confirmation
-            data = self.request.recv(1024).strip()
-            # response management
+            try:
+                self.request.send("coucou from server")
+            except socket.error as e:
+                print e
+                self.end_connection()
+            except IOError as e:
+                if e.errno == errno.EPIPE:
+                    # broken pipe
+                    print e
+                    self.end_connection()
+                else:
+                    # other error
+                    print e
+                    self.end_connection()
+
+            import time # DEBUG
+            time.sleep(1)
 
 
     def receive_loop(self, client_id):
@@ -45,28 +70,52 @@ class TCPHandler(SocketServer.BaseRequestHandler):
         # main loop
         while True:
             # wait for request
-            data = self.request.recv(1024).strip()
-            print "%s wrote: %s" % (self.client_address[0], data)
-
             try:
-                response = controller_stuff(self.data)
-            except(ValueError):
-                response = 'vtff' # le signaler au client
+                data = self.request.recv(1024).strip()
+            except socket.error as e:
+                print e
+                data = ""
+            except IOError as e:
+                if e.errno == errno.EPIPE:
+                    # broken pipe
+                    data = ""
+                    print e
+                else:
+                    # other error
+                    data = ""
+                    print e
 
-            self.request.send(response)
+            if(not data):
+                self.end_connection()
+                break
+            print "%s wrote: %s" % (self.client_address[0], data)
 
 
     def handle(self):
         """
         Handle requests and allocate them to the concerned handle function.
-        => register function : client connexion and identifier attribution
+        => register function : client connection and identifier attribution
         => send_loop function : server send data to client
         => receive_loop funciton : server receive data from the client and reacts.
         """
         #TODO(tewfik): gérer la connexion des clients (login/pass)
 
         # choose between send connection and receive connection
-        data = self.request.recv(1024).strip()
+        try:
+            data = self.request.recv(1024).strip()
+        except socket.error as e:
+            print e
+            raise
+        except IOError as e:
+            if e.errno == errno.EPIPE:
+                # broken pipe
+                print e
+                raise
+            else:
+                # other error
+                print e
+                raise
+
         connection_type, client_id = data.split(" ")
 
         if connection_type  == "receive":
@@ -79,6 +128,13 @@ class TCPHandler(SocketServer.BaseRequestHandler):
             self.request.send("vtff")
 
 
+    def end_connection(self):
+        """
+        """
+        pass
+
+
+
 def main(port):
     """
     Main program.
@@ -89,7 +145,13 @@ def main(port):
     HOST, PORT = 'localhost', port
 
     server = ThreadingTCPServer((HOST, PORT), TCPHandler)
-    server.serve_forever()
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt as ki:
+        # BUG: les thread en cours ne se terminent pas
+        print "KeybordInterrupt: server shutdown"
+        server.shutdown()
 
 
 if __name__ == '__main__':
