@@ -3,6 +3,7 @@
 
 import sys
 import socket
+import threading
 import SocketServer
 
 class ThreadingTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer): pass
@@ -150,8 +151,13 @@ def main(port):
 
     server = ThreadingTCPServer((HOST, PORT), TCPHandler)
 
+    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread.daemon = True
+    server_thread.start()
     try:
-        server.serve_forever()
+        raw_input()
+        server.shutdown()
+        server_thread.join()
     except KeyboardInterrupt as ki:
         # BUG: les thread en cours ne se terminent pas
         print "KeybordInterrupt: server shutdown"
