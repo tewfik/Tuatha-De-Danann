@@ -9,14 +9,14 @@ class ThreadSend(threading.Thread):
     """
     """
 
-    def __init__(self, address, myId):
+    def __init__(self, address, my_id):
         threading.Thread.__init__(self)
-        self.myId = myId
+        self.my_id = my_id
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         close_connection = False
         try:
             self.sock.connect(address)
-            self.sock.send('send ' + self.myId)
+            self.sock.send('send ' + self.my_id)
         except socket.error as e:
             print 'Send socket failed to connect to ' + str(address[0]) + ':' + str(address[1])
             print e
@@ -70,13 +70,13 @@ class ThreadReceive(threading.Thread):
     """
     """
 
-    def __init__(self, address, myId):
+    def __init__(self, address, my_id):
         threading.Thread.__init__(self)
-        self.myId = myId
+        self.my_id = my_id
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.sock.connect(address)
-            self.sock.send('receive ' + self.myId)
+            self.sock.send('receive ' + self.my_id)
         except socket.error as e:
             print 'Receive socket failed to connect to ' + str(address[0]) + ':' + str(address[1])
             print e
@@ -130,13 +130,13 @@ def main(address):
 
     sock.connect(address)
     sock.send('register 0')
-    myId = sock.recv(1024).strip()
+    my_id = sock.recv(1024).strip()
     sock.close()
 
-    th_S = ThreadSend(address, myId)
+    th_S = ThreadSend(address, my_id)
     th_S.daemon = True
 
-    th_R = ThreadReceive(address, myId)
+    th_R = ThreadReceive(address, my_id)
     th_R.daemon = True
 
     th_S.start()
