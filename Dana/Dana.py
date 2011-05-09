@@ -39,7 +39,8 @@ class TCPHandler(SocketServer.BaseRequestHandler):
         Dana send data to the client.
         """
         # main loop
-        while True:
+        close_connection = False
+        while not close_connection:
             # wait for a Queue event
             # TODO(tewfik): complete
 
@@ -48,19 +49,22 @@ class TCPHandler(SocketServer.BaseRequestHandler):
                 self.request.send("coucou from server")
             except socket.error as e:
                 print e
-                self.end_connection()
+                close_connection = True
             except IOError as e:
                 if e.errno == errno.EPIPE:
                     # broken pipe
                     print e
-                    self.end_connection()
+                    close_connection = True
                 else:
                     # other error
                     print e
-                    self.end_connection()
+                    close_connection = True
+
+            if close_connection:
+                self.end_connection()
 
             import time # DEBUG
-            time.sleep(1)
+            time.sleep(1) # DEBUG
 
 
     def receive_loop(self, client_id):
