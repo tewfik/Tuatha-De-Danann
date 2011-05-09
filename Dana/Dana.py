@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: UTF8 -*-
+# -*- coding: utf-8 -*-
 
 import sys
 import SocketServer
@@ -18,9 +18,9 @@ class TCPHandler(SocketServer.BaseRequestHandler):
         """
         #get login/pass
         #client_id = AccountManagement.get_next_client_id()
-        global lastId
-        lastId += 1
-        self.request.send(str(lastId))
+        global last_id
+        last_id += 1
+        self.request.send(str(last_id))
 
 
     def send_loop(self, client_id):
@@ -98,6 +98,6 @@ if __name__ == '__main__':
         port = int(sys.argv[1])
     else:
         port = 1337
-    lastId = 0
+    last_id = 0
 
     main(port)

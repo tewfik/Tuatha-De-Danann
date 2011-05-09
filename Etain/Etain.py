@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: UTF8 -*-
+# -*- coding: utf-8 -*-
 
-import sys, socket, threading
+import sys
+import socket
+import threading
 
 class ThreadSend(threading.Thread):
     """
@@ -13,9 +15,9 @@ class ThreadSend(threading.Thread):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.sock.connect(address)
-            self.sock.send('send '+self.myId)
+            self.sock.send('send ' + self.myId)
         except socket.error:
-            print 'Send socket failed to connect to '+str(address[0])+':'+str(address[1])
+            print 'Send socket failed to connect to ' + str(address[0]) + ':' + str(address[1])
             sys.exit()
 
 
@@ -33,9 +35,9 @@ class ThreadReceive(threading.Thread):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.sock.connect(address)
-            self.sock.send('receive '+self.myId)
+            self.sock.send('receive ' + self.myId)
         except socket.error:
-            print 'Receive socket failed to connect to '+str(address[0])+':'+str(address[1])
+            print 'Receive socket failed to connect to ' + str(address[0]) + ':' + str(address[1])
             sys.exit()
 
 
