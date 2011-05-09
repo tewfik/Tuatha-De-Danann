@@ -50,8 +50,9 @@ def main(address):
     Main program.
 
     Attributes:
-    - `host`: address where Dana is hosted
-    - `port`: port which Dana listen.
+    - `address`: (host, port)
+        - `host`: address where Dana is hosted
+        - `port`: port which Dana listen.
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
