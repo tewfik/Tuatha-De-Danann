@@ -3,7 +3,7 @@ Dana documentation
 ==================
 
 This documentation cover Dana architecture.
-Dana is the server which support connexion of players and which maintain a representation of the virtual world.
+Dana is the server which support connection of players and which maintain a representation of the virtual world.
 
 .. toctree::
    :maxdepth: 2

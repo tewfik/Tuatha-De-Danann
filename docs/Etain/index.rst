@@ -2,8 +2,8 @@
 Etain documentation
 ===================
 
-This documentation cover Etain architecture.
-Etain is the client which support player's input and which is responsible of graphic display.
+This documentation covers Etain's architecture.
+Etain is the client which support player's inputs and which is responsible of graphic display.
 
 .. toctree::
    :maxdepth: 2
