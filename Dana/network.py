@@ -138,7 +138,7 @@ class TCPHandler(SocketServer.BaseRequestHandler):
     def end_connection(self):
         """
         """
-        pass
+        print "end connection"
 
 
 
