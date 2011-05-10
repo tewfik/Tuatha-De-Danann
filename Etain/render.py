@@ -8,9 +8,6 @@ from area import Area
 from pygame.locals import *
 
 SQUARE_SIZE = 32
-HEIGHT = 24
-WIDTH = 32
-TITLE = 'Tuatha Dé Danann'
 
 class Render():
     """
@@ -22,6 +19,7 @@ class Render():
         pygame.init()
         self.height = height
         self.width = width
+        self.entities = []
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
 
@@ -47,6 +45,8 @@ class Render():
                 elif event.type == KEYUP:
                     if event.key == K_LALT:
                         alt = False
+
+            self.draw_world()
             pygame.display.update()
             clock.tick(40)
 
@@ -63,7 +63,7 @@ class Render():
     def load_map(self, path):
         """
         """
-        f_map = open('forest_1.map', 'r')
+        f_map = open(path, 'r')
         self.area = pickle.load(f_map)
         self.area.load_tiles()
 
@@ -72,10 +72,3 @@ class Render():
         """
         """
         pygame.quit()
-
-
-if __name__ == '__main__':
-    display = Render(HEIGHT, WIDTH, 32, TITLE)
-    display.load_map('')
-    display.draw_world()
-    display.run()
