@@ -14,11 +14,15 @@ class Area():
     """
 
     def __init__(self):
+        """
+        """
         self.map = []
         self.tiles = [False]*128
 
 
     def load_tiles(self):
+        """
+        """
         for line in self.map:
             for tile in line:
                 if not self.tiles[tile]:
@@ -28,15 +32,16 @@ class Area():
 if __name__ == '__main__':
     pygame.init()
     area = Area()
+    if len(sys.argv) < 2:
+        print 'usage: ./area.py <source>'
+        sys.exit()
 
-    area.map = [[0]*WIDTH for x in xrange(0, HEIGHT)]
-    count = 0
-    for j in xrange(0, HEIGHT):
-        for i in xrange(0, WIDTH):
-            area.map[j][i] = count
-            count += 1
-            if count > 10:
-                count = 0
+    f = open(path, 'r')
+    area.map = [[0]*HEIGHT]
+    for i in xrange(0, HEIGHT):
+        line = f.readline()
+        area.map[i] = line.split(' ')
+    f.close()
 
     f_map = open('forest_1.map', 'w')
     pickle.dump(area, f_map)
