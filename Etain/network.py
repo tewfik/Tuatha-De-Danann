@@ -6,9 +6,17 @@ import threading
 
 class ThreadSend(threading.Thread):
     """
+    Thread sending command in the queue to the server
     """
 
     def __init__(self, address, my_id):
+        """
+        Initialize the send socket.
+
+        Attributes:
+        - `address`: a tuple (host, port) giving the address of Dana.
+        - `my_id`: unique id given by the server to identify the client.
+        """
         threading.Thread.__init__(self)
         self.my_id = my_id
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,6 +43,9 @@ class ThreadSend(threading.Thread):
 
 
     def run(self):
+        """
+        Main emission loop.
+        """
         while(True):
             import time # DEBUG
             time.sleep(1) # DEBUG
@@ -60,15 +71,26 @@ class ThreadSend(threading.Thread):
                 break
 
     def end_connection(self):
+        """
+        Close both send and receive's threads.
+        """
         # TODO(tewfik): close properly connection here
         print "end connection"
 
 
 class ThreadReceive(threading.Thread):
     """
+    Thread receiving command from server and storing them into a queue.
     """
 
     def __init__(self, address, my_id):
+        """
+        Initialize the receive socket.
+
+        Attributes:
+        - `address`: a tuple (host, port) giving the address of Dana.
+        - `my_id`: unique id given by the server to identify the client.
+        """
         threading.Thread.__init__(self)
         self.my_id = my_id
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -91,6 +113,9 @@ class ThreadReceive(threading.Thread):
 
 
     def run(self):
+        """
+        Main receive loop.
+        """
         close_connection = False
 
         while(True):
@@ -116,6 +141,9 @@ class ThreadReceive(threading.Thread):
 
 
     def end_connection(self):
+        """
+        Close both send and receive's threads.
+        """
         # TODO(tewfik): close properly connection here
         print "end connection"
 

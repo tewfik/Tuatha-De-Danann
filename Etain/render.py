@@ -11,10 +11,21 @@ SQUARE_SIZE = 32
 
 class Render():
     """
+    Render engine.
+
+    Display entities, map and catch mouse and keyboard input to transfer them to the event handler.
     """
 
     def __init__(self, height, width, depth, title, fps):
         """
+        Initialize the window's display.
+
+        Attributes:
+        - `height`: the height of the window (given in square, size in pixel of each square given by SQUARE_SIZE).
+        - `width`: the width of the window (given in square).
+        - `depth`: the color depth.
+        - `title`: set the caption in windowed mode.
+        - `fps`: set the frame rate (caution : increasing the frame rate increase the game's speed).
         """
         pygame.init()
         self.fps = fps
@@ -27,6 +38,7 @@ class Render():
 
     def run(self):
         """
+        Main programm's loop (currently run at 40Fps).
         """
         clock = pygame.time.Clock()
         alt = False
@@ -54,6 +66,9 @@ class Render():
 
 
     def draw_world(self):
+        """
+        Display the ground's tiles'.
+        """
         pos = pygame.Rect(0, 0, SQUARE_SIZE, SQUARE_SIZE)
         for j in xrange(0, self.height):
             pos.top = j * SQUARE_SIZE
@@ -62,8 +77,19 @@ class Render():
                 self.window.blit(self.area.tiles[self.area.map[j][i]], pos)
 
 
+    def draw_entities(self):
+        """
+        Draw every entities on the map in their current state of animation.
+        """
+        pass
+
+
     def load_map(self, path):
         """
+        Load the map and entities' informations from a file.
+
+        Attributes:
+        - `path`: the path to the save file of the map to load.
         """
         f_map = open(path, 'r')
         self.area = pickle.load(f_map)
@@ -72,5 +98,6 @@ class Render():
 
     def __del__(self):
         """
+        Unload the display and exit the programm.
         """
         pygame.quit()
