@@ -13,10 +13,11 @@ class Render():
     """
     """
 
-    def __init__(self, height, width, depth, title):
+    def __init__(self, height, width, depth, title, fps):
         """
         """
         pygame.init()
+        self.fps = fps
         self.height = height
         self.width = width
         self.entities = []
@@ -47,8 +48,9 @@ class Render():
                         alt = False
 
             self.draw_world()
+            self.draw_entities()
             pygame.display.update()
-            clock.tick(40)
+            clock.tick(self.fps)
 
 
     def draw_world(self):

@@ -9,6 +9,7 @@ from area import Area
 HEIGHT = 24
 WIDTH = 32
 TITLE = 'Tuatha dé Danann'
+FPS = 40
 
 if __name__ == '__main__':
     # command line argument management
@@ -23,6 +24,6 @@ if __name__ == '__main__':
         port = 1337
     network.connection_start((host,port))
 
-    display = render.Render(HEIGHT, WIDTH, 32, TITLE)
+    display = render.Render(HEIGHT, WIDTH, 32, TITLE, FPS)
     display.load_map('forest_1.map')
     display.run()
