@@ -3,9 +3,10 @@
 
 import sys
 import pygame
+from pygame.locals import *
 import pickle
 from area import Area
-from pygame.locals import *
+import entity
 
 SQUARE_SIZE = 32
 
@@ -31,7 +32,7 @@ class Render():
         self.fps = fps
         self.height = height
         self.width = width
-        self.entities = []
+        self.l_entities = EntitiesList()
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
 
@@ -76,12 +77,19 @@ class Render():
                 pos.left = i * SQUARE_SIZE
                 self.window.blit(self.area.tiles[self.area.map[j][i]], pos)
 
+    def register entity(self, pos, uid, anim_path):
+        """
+        Register a New graphic entity to the world.
+        """
+        self.l_entities.add_entity(self, pos, uid, anim_path)
+
 
     def draw_entities(self):
         """
         Draw every entities on the map in their current state of animation.
         """
-        pass
+        for entity in self.l_entities.entities:
+            self.window.blit(entity.update())
 
 
     def load_map(self, path):
