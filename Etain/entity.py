@@ -58,6 +58,7 @@ class Entity():
         self.width = width
         self.height = height
         self.current_anim = "idle"
+        self.default_anim = "idle"
 
 
     def get_hitbox(self):
@@ -87,6 +88,8 @@ class Entity():
         """
         Give a timer's tick to the entity so it redraw itself and pass it to the world.
         """
+        if self.animations[self.current_anim].end:
+            self.play_anim(self.default_anim)
         return self.animations[self.current_anim].next_frame()
 
 
@@ -122,14 +125,16 @@ class Animation():
         self.frame_elapsed = 0
         self.current_sprite = 0
         self.nb_sprites = len(sprites)
+        self.end = False
 
 
     def reset(self):
         """
         restart the animation.
         """
-        self.current_frame = 0
+        self.current_sprite = 0
         self.frame_elapsed = 0
+        self.end = False
 
 
     def next_frame(self):
@@ -142,5 +147,5 @@ class Animation():
             if self.current_sprite < self.nb_sprites - 1:
                 self.current_sprite += 1
             else:
-                self.reset()
+                self.end = True
         return self.sprites[self.current_sprite]
