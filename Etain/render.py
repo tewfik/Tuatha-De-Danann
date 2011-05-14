@@ -30,6 +30,7 @@ class Render():
         - `fps`: set the frame rate (caution : increasing the frame rate increase the game's speed).
         """
         pygame.init()
+        self.font = pygame.font.SysFont(None, 24)
         self.fps = fps
         self.height = height
         self.width = width
@@ -55,7 +56,6 @@ class Render():
                         alt = True
                     if event.key == K_RETURN:
                         if alt == True:
-                            print 'enter'
                             pygame.display.toggle_fullscreen()
                 elif event.type == KEYUP:
                     if event.key == K_LALT:
@@ -63,6 +63,12 @@ class Render():
 
             self.draw_world()
             self.draw_entities()
+            text = self.font.render(str(clock.get_fps()), False, (0, 0, 0))
+            text_Rect = text.get_rect()
+            text_Rect.right = self.width*SQUARE_SIZE - 10
+            text_Rect.top = 10
+            self.window.blit(text, text_Rect)
+
             pygame.display.update()
             clock.tick(self.fps)
 
