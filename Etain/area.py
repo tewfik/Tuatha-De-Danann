@@ -46,9 +46,7 @@ if __name__ == '__main__':
     area.map = [[0]* WIDTH for x in xrange(0,HEIGHT)]
     for i in xrange(0, HEIGHT):
         line = f.readline()[:-1]
-        print line
         row = line.split(' ')
-        print row
         for j in xrange(0, WIDTH):
             area.map[i][j] = int(row[j])
     f.close()

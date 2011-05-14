@@ -25,5 +25,5 @@ if __name__ == '__main__':
     network.connection_start((host,port))
 
     display = render.Render(HEIGHT, WIDTH, 32, TITLE, FPS)
-    display.load_map('data/forest_1.map')
+    display.load_map('data/etain.map')
     display.run()
