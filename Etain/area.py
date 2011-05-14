@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF8 -*-
 
+import sys
 import pickle
 import pygame
 from pygame.locals import *
@@ -41,13 +42,18 @@ if __name__ == '__main__':
         print 'usage: ./area.py <source>'
         sys.exit()
 
-    f = open(path, 'r')
-    area.map = [[0]*HEIGHT]
+    f = open(sys.argv[1], 'r')
+    area.map = [[0]* WIDTH for x in xrange(0,HEIGHT)]
     for i in xrange(0, HEIGHT):
-        line = f.readline()
-        area.map[i] = line.split(' ')
+        line = f.readline()[:-1]
+        print line
+        row = line.split(' ')
+        print row
+        for j in xrange(0, WIDTH):
+            area.map[i][j] = int(row[j])
     f.close()
 
-    f_map = open('forest_1.map', 'w')
+    mapname = raw_input("map name : ")
+    f_map = open(mapname+'.map', 'w')
     pickle.dump(area, f_map)
     f_map.close()
