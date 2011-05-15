@@ -5,8 +5,10 @@ import sys
 import pygame
 from pygame.locals import *
 import pickle
+sys.path.append("../shared/")
 from area import Area
 import entity
+import ui
 
 SQUARE_SIZE = 32
 
@@ -35,6 +37,7 @@ class Render():
         self.height = height
         self.width = width
         self.l_entities = entity.List()
+        self.UI = ui.UI(self, height, width)
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
 
@@ -44,22 +47,9 @@ class Render():
         Main programm's loop (currently run at 40Fps).
         """
         clock = pygame.time.Clock()
-        alt = False
-        ret = False
+
         while(True):
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    self.__del__()
-                    sys.exit()
-                elif event.type == KEYDOWN:
-                    if event.key == K_LALT:
-                        alt = True
-                    if event.key == K_RETURN:
-                        if alt == True:
-                            pygame.display.toggle_fullscreen()
-                elif event.type == KEYUP:
-                    if event.key == K_LALT:
-                        alt = False
+            self.UI.run()
 
             self.draw_world()
             self.draw_entities()
@@ -91,13 +81,19 @@ class Render():
         self.l_entities.add_entity(pos, width, height, uid, anim_path)
 
 
+    def remove_entity(self, uid):
+        """
+        """
+        self.l_entities.remove_entity(uid)
+
+
     def draw_entities(self):
         """
         Draw every entities on the map in their current state of animation.
         """
         for uid in self.l_entities.entities:
-            image = self.l_entities.entities[str(uid)].update()
-            pos = self.l_entities.entities[str(uid)].get_hitbox()
+            image = self.l_entities.entities[uid].update()
+            pos = self.l_entities.entities[uid].get_hitbox()
             self.window.blit(image, pos)
 
 
@@ -111,6 +107,20 @@ class Render():
         f_map = open(path, 'r')
         self.area = pickle.load(f_map)
         self.area.load_tiles()
+        f_map.close()
+
+
+    def play_music(self, path):
+        """
+        """
+        pygame.mixer.music.load(path)
+        pygame.mixer.music.play(-1)
+
+
+    def stop_music(self):
+        """
+        """
+        pygame.mixer.music.stop()
 
 
     def __del__(self):

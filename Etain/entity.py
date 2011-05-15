@@ -27,15 +27,22 @@ class List():
         - `uid`: an unique identifier (int).
         - `animate_path`: the path to the .anim file of the entity.
         """
-        self.entities[str(uid)] = Entity(pos, width, height)
+        self.entities[uid] = Entity(pos, width, height)
         try:
             f = open("data/"+anim_path, 'r')
         except:
             print "Can't load data/"+anim_path
         for line in f.readlines():
             line = line.split("**")
-            self.entities[str(uid)].add_animation(line[0], line[2:-1], int(line[1]))
+            self.entities[uid].add_animation(line[0], line[2:-1], int(line[1]))
         f.close()
+
+
+    def remove_entity(self, uid):
+        """
+        Remove an entity to free its memory.
+        """
+        del self.entities[uid]
 
 
 
@@ -59,6 +66,7 @@ class Entity():
         self.height = height
         self.current_anim = "idle"
         self.default_anim = "idle"
+        self.dest = [pos[0], pos[1]]
 
 
     def get_hitbox(self):
@@ -83,11 +91,29 @@ class Entity():
             sprites.append(sprite)
         self.animations[name] = Animation(name, sprites, period)
 
+    def move(self, pos, speed):
+        """
+        Move the entity to a new location at <speed> pixel per frame.
+        """
+        self.dest = [pos[0], pos[1]]
+        self.speed = speed
+
 
     def update(self):
         """
         Give a timer's tick to the entity so it redraw itself and pass it to the world.
         """
+        if self.dest != self.pos:
+            vect = (self.dest[0] - self.pos[0], self.dest[1] - self.pos[1])
+            norm = sqrt(vect[0]**2 + vect[1]**2)
+            vect = (speed * vect[0] / norm, speed * vect[1] / norm)
+            oldpos = pos
+            self.pos = [self.pos[0] + vect[0], self.pos[1] + vect[1]]
+            if (oldpos[0] < self.dest[0] < self.pos[0]) or (oldpos[0] > self.dest[0] > self.pos[0]):
+                self.pos[0] = self.dest[0]
+            if (oldpos[1] < self.dest[1] < self.pos[1]) or (oldpos[1] > self.dest[1] > self.pos[1]):
+                self.pos[1] = self.dest[1]
+
         if self.animations[self.current_anim].end:
             self.play_anim(self.default_anim)
         return self.animations[self.current_anim].next_frame()
