@@ -37,7 +37,7 @@ class Render():
         self.height = height
         self.width = width
         self.l_entities = entity.List()
-        self.UI = ui.UI(self, height, width)
+        self.UI = ui.UI(self)
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
 
