@@ -38,6 +38,13 @@ class List():
         f.close()
 
 
+    def remove_entity(self, uid):
+        """
+        Remove an entity to free its memory.
+        """
+        del self.entities[uid]
+
+
 
 class Entity():
     """

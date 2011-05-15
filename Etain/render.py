@@ -92,6 +92,12 @@ class Render():
         self.l_entities.add_entity(pos, width, height, uid, anim_path)
 
 
+    def remove_entity(self, uid):
+        """
+        """
+        self.l_entities.remove_entity(uid)
+
+
     def draw_entities(self):
         """
         Draw every entities on the map in their current state of animation.
