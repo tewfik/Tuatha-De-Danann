@@ -3,12 +3,12 @@
 
 import Entity
 
-class Player(LivingEntity):
+class Player(Entity.LivingEntity):
     """
     A player
     """
 
-    def __init__(self, ):
+    def __init__(self, id=None, hp=100, strength=0, intell=0, armor=0, mresist=0):
         """
         """
-        pass
+        Entity.LivingEntity.__init__(id, hp, strength, intell, armor, mresist)
