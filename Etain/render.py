@@ -121,6 +121,19 @@ class Render():
         f_map.close()
 
 
+    def play_music(self, path):
+        """
+        """
+        pygame.mixer.music.load(path)
+        pygame.mixer.music.play(-1)
+
+
+    def stop_music(self):
+        """
+        """
+        pygame.mixer.music.stop()
+
+
     def __del__(self):
         """
         Unload the display and exit the programm.
