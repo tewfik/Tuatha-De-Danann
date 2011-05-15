@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-class Player(Entity):
-    """A player
+import Entity
+
+class Player(LivingEntity):
     """
-    
+    A player
+    """
+
     def __init__(self, ):
         """
         """
