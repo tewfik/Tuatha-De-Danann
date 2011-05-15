@@ -8,6 +8,7 @@ import pickle
 sys.path.append("../shared/")
 from area import Area
 import entity
+import ui
 
 SQUARE_SIZE = 32
 
@@ -36,6 +37,7 @@ class Render():
         self.height = height
         self.width = width
         self.l_entities = entity.List()
+        self.UI = ui.UI(self, height, width)
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
 
@@ -45,22 +47,9 @@ class Render():
         Main programm's loop (currently run at 40Fps).
         """
         clock = pygame.time.Clock()
-        alt = False
-        ret = False
+
         while(True):
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    self.__del__()
-                    sys.exit()
-                elif event.type == KEYDOWN:
-                    if event.key == K_LALT:
-                        alt = True
-                    if event.key == K_RETURN:
-                        if alt == True:
-                            pygame.display.toggle_fullscreen()
-                elif event.type == KEYUP:
-                    if event.key == K_LALT:
-                        alt = False
+            self.UI.run()
 
             self.draw_world()
             self.draw_entities()
