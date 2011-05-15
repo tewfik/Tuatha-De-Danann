@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import random
+import pickle
+import sys
+sys.path.append("../../shared/")
+from area import Area
+
 
 # square states
 FREE = 0
@@ -28,9 +32,9 @@ class World(object):
         - `entities`: A list which represent entities' positions which can behave in the world. A list following the format [(pos_x1, pos_y1), ...]
         - `entitites_pos`: Represent entities [object1, ...].
         """
-
-        #TODO(tewfik): random for debug, change with config file reading
-        self.map = [ [random.randint(0,1) for j in xrange(100)] for i in xrange(100) ]
+        f_map = open('../../shared/etain.map')
+        self.map = pickle.load(f_map)
+        f_map.close()
         self.entities = []
         self.entities_pos = []
 
