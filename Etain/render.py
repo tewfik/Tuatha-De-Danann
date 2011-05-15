@@ -97,8 +97,8 @@ class Render():
         Draw every entities on the map in their current state of animation.
         """
         for uid in self.l_entities.entities:
-            image = self.l_entities.entities[str(uid)].update()
-            pos = self.l_entities.entities[str(uid)].get_hitbox()
+            image = self.l_entities.entities[uid].update()
+            pos = self.l_entities.entities[uid].get_hitbox()
             self.window.blit(image, pos)
 
 

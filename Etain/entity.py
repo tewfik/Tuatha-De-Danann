@@ -27,14 +27,14 @@ class List():
         - `uid`: an unique identifier (int).
         - `animate_path`: the path to the .anim file of the entity.
         """
-        self.entities[str(uid)] = Entity(pos, width, height)
+        self.entities[uid] = Entity(pos, width, height)
         try:
             f = open("data/"+anim_path, 'r')
         except:
             print "Can't load data/"+anim_path
         for line in f.readlines():
             line = line.split("**")
-            self.entities[str(uid)].add_animation(line[0], line[2:-1], int(line[1]))
+            self.entities[uid].add_animation(line[0], line[2:-1], int(line[1]))
         f.close()
 
 
