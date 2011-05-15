@@ -5,6 +5,7 @@ import sys
 import pygame
 from pygame.locals import *
 import pickle
+sys.path.append("../shared/")
 from area import Area
 import entity
 
@@ -111,6 +112,7 @@ class Render():
         f_map = open(path, 'r')
         self.area = pickle.load(f_map)
         self.area.load_tiles()
+        f_map.close()
 
 
     def __del__(self):
