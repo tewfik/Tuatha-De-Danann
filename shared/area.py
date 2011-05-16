@@ -24,7 +24,7 @@ class Area():
         - `tiles`: list of pygame Surface corresponding to the tiles' code.
         """
         self.map = []
-        self.tiles = [False]*128
+        self.tiles = {}
 
 
     def load_tiles(self):
@@ -33,7 +33,7 @@ class Area():
         """
         for line in self.map:
             for tile in line:
-                if not self.tiles[tile]:
+                if not tile in self.tiles:
                     self.tiles[tile] = pygame.image.load('tiles/'+str(tile)+'.png')
 
 

@@ -144,6 +144,7 @@ class Entity():
         self.animations[self.current_anim].reset()
 
 
+
 #TODO(Mika): add a sound effect for animation.
 class Animation():
     """
