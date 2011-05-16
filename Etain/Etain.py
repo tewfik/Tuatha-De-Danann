@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import threading
+
 import network
 import render
 from area import Area
@@ -22,10 +24,16 @@ if __name__ == '__main__':
     else:
         host = 'localhost'
         port = 1337
-    network.connection_start((host,port))
+
+    # queues initialization: communication between network threads and game logic thread (which is in render)
+    send_queue = threading.Queue()
+    receive_queue = threading.Queue()
+
+    # network connection
+    network.connection_start((host,port), send_queue, receive_queue)
     print('network engine is running')
 
     # render's operations have to be in the main thread.
-    display = render.Render(HEIGHT, WIDTH, 32, TITLE, FPS)
-    display.load_map('../shared/etain.map')
+    display = render.Render(HEIGHT, WIDTH, 32, TITLE, FPS, send_queue, receive_queue)
+    display.load_map('../shared/etain.map')  # TODO(mika): if we launch display.run() before load_map(), it may cause a crash
     display.run()
