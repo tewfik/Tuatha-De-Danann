@@ -8,6 +8,9 @@ import threading
 _client_id = None
 # event to report that the client_id has been initialized
 _client_id_is_set = threading.Event()
+# these queues are used in communication between game logic thread and networks threads
+_send_queue = None
+_receive_queue = None
 
 class ThreadSend(threading.Thread):
     """
@@ -52,6 +55,7 @@ class ThreadSend(threading.Thread):
         """
         global _client_id
         global _client_id_is_set
+        global _send_queue
 
         # waiting for a client_id
         print('Send thread is waiting for client_id')
@@ -59,11 +63,8 @@ class ThreadSend(threading.Thread):
 
         close_connection = False
         while(not close_connection):
-            import time # DEBUG
-            time.sleep(1) # DEBUG
-
             try:
-                msg = "%d:hi Dana !" % _client_id
+                msg = str(_client_id) + _send_queue.get()
                 self.sock.send(msg)
                 print('msg "%s" sent' % msg)
             except socket.error as e:
@@ -156,6 +157,8 @@ class ThreadReceive(threading.Thread):
         """
         Main receive loop.
         """
+        global _receive_queue
+
         # main receive loop 
         close_connection = False
         while not close_connection:
@@ -179,6 +182,7 @@ class ThreadReceive(threading.Thread):
                 close_connection = True
             else:
                 print("dana message: %s" % data)
+                _receive_queue.put(data)
 
         self.end_connection()
 
@@ -191,7 +195,7 @@ class ThreadReceive(threading.Thread):
         print("end connection")
 
 
-def connection_start(address):
+def connection_start(address, send_queue, receive_queue):
     """
     Main program.
 
@@ -199,7 +203,15 @@ def connection_start(address):
     - `address`: (host, port)
         - `host`: address where Dana is hosted
         - `port`: port which Dana listen.
+    - `send_queue`: queue which contains messages to send to Dana.
+    - `receive_queue`: queue which contains messages to receive from Dana.
     """
+    global _send_queue
+    global _receive_queue
+
+    _send_queue = send_queue
+    _receive_queue = receive_queue
+
     th_S = ThreadSend(address)
     th_S.daemon = True
 
