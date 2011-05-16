@@ -46,7 +46,8 @@ class Dana(threading.Thread):
         # check that the client id is registered
         elif self.clients_queues.has_key(client_id):
             # request processing
-            self.clients_queues[client_id].put('coucou')  # DEBUG
+            client_id, method = msg.split(':')
+            self.clients_queues[client_id].put('coucou %s' % client_id)  # DEBUG
         else:
             # error
             print('error: a request from an unregistered client has been received')
