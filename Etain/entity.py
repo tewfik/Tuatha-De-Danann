@@ -16,6 +16,12 @@ class List():
         self.entities = {}
 
 
+    def __getitem__(self, key):
+        """
+        """
+        return self.entities[key]
+
+
     def add_entity(self, pos, width, height, uid, anim_path):
         """
         Create a new entity and store it in the list with is uid.
@@ -38,7 +44,7 @@ class List():
         f.close()
 
 
-    def remove_entity(self, uid):
+    def __delitem__(self, uid):
         """
         Remove an entity to free its memory.
         """

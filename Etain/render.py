@@ -84,7 +84,7 @@ class Render():
     def remove_entity(self, uid):
         """
         """
-        self.l_entities.remove_entity(uid)
+        del self.l_entities[uid]
 
 
     def draw_entities(self):
@@ -92,8 +92,8 @@ class Render():
         Draw every entities on the map in their current state of animation.
         """
         for uid in self.l_entities.entities:
-            image = self.l_entities.entities[uid].update()
-            pos = self.l_entities.entities[uid].get_hitbox()
+            image = self.l_entities[uid].update()
+            pos = self.l_entities[uid].get_hitbox()
             self.window.blit(image, pos)
 
 
