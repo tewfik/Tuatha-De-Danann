@@ -12,11 +12,13 @@ HEIGHT = 24
 
 class Area():
     """
-    Object defining area of a map and the entities (NPC and non-living) on it.
+    Object defining area of a map.
     """
 
     def __init__(self):
         """
+        Area initialize it's internal representation of the map.
+
         Attributes:
         - `map`: array defining the map with the tiles' code.
         - `tiles`: list of pygame Surface corresponding to the tiles' code.

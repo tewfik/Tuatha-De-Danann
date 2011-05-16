@@ -14,6 +14,7 @@ BLOCK = 1
 # exceptions
 class ForbiddenMove(Exception):
     """
+    Exception raised when a player try to perform a forbidden move.
     """
     pass
 

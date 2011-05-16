@@ -16,10 +16,11 @@ class List():
         self.entities = {}
 
 
-    def __getitem__(self, key):
+    def __getitem__(self, uid):
         """
+        allow the user to get entity from the list with list_obj[uid].
         """
-        return self.entities[key]
+        return self.entities[uid]
 
 
     def add_entity(self, pos, width, height, uid, anim_path):
@@ -47,6 +48,9 @@ class List():
     def __delitem__(self, uid):
         """
         Remove an entity to free its memory.
+
+        Attributes:
+        - `uid`: the unique id (int) of the entity to delete.
         """
         del self.entities[uid]
 
@@ -99,7 +103,11 @@ class Entity():
 
     def move(self, pos, speed):
         """
-        Move the entity to a new location at <speed> pixel per frame.
+        Move the entity to a new location at a given speed.
+
+        Attributes:
+        - `pos`: a tuple (x, y) giving the destination's coordinates.
+        - `speed`: movespeed in pixel per frame.
         """
         self.dest = [pos[0], pos[1]]
         self.speed = speed
@@ -136,7 +144,7 @@ class Entity():
         self.animations[self.current_anim].reset()
 
 
-
+#TODO(Mika): add a sound effect for animation.
 class Animation():
     """
     Use to manipulate an entity's animation.

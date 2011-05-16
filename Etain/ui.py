@@ -7,10 +7,14 @@ from pygame.locals import *
 
 class UI():
     """
+    Class used for the User Interface.
+
+    its run() method take care of mouse and keayboard input.
     """
 
     def __init__(self, render):
         """
+        Initialize the UI and the Key which will bond to actions.
         """
         self.render = render
         self.alt = False
@@ -18,6 +22,7 @@ class UI():
 
     def run(self):
         """
+        Get the event currently in the queue.
         """
         for event in pygame.event.get():
             if event.type == QUIT:

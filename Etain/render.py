@@ -44,7 +44,7 @@ class Render():
 
     def run(self):
         """
-        Main programm's loop (currently run at 40Fps).
+        Main programm's loop (process, display and inputs).
         """
         clock = pygame.time.Clock()
 
@@ -77,12 +77,20 @@ class Render():
     def register_entity(self, pos, width, height, uid, anim_path):
         """
         Register a New graphic entity to the world.
+
+        Attributes:
+        - `pos`: a tuple (x, y) giving the coordinates where to spawn the entity.
+        - `width`: the width of the entity (used for display only).
+        - `height`: the height of the entity (used for display only).
+        - `uid`: the unique id of the entity (int).
+        - `anim_path`: the anim file of the entity.
         """
         self.l_entities.add_entity(pos, width, height, uid, anim_path)
 
 
     def remove_entity(self, uid):
         """
+        Remove a graphical entity from the world.
         """
         del self.l_entities[uid]
 
@@ -112,6 +120,10 @@ class Render():
 
     def play_music(self, path):
         """
+        Load and play background music.
+
+        Attributes:
+        - `path`: path to the music file (ogg, wav, midi).
         """
         pygame.mixer.music.load(path)
         pygame.mixer.music.play(-1)
@@ -119,6 +131,7 @@ class Render():
 
     def stop_music(self):
         """
+        Stop the background music.
         """
         pygame.mixer.music.stop()
 
