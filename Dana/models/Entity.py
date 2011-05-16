@@ -107,9 +107,9 @@ class LivingEntity(Entity):
         Return: the value of the given stat.
         """
         if stat == 'str':
-            return self.health
+            return self.strength
         elif stat == 'int':
-            return self.maxhp
+            return self.intell
         else:
             Entity.__getitem__(stat)
 
