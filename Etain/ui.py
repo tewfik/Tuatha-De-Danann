@@ -13,22 +13,22 @@ class UI():
         """
         """
         self.render = render
+        self.alt = False
 
 
     def run(self):
         """
         """
-        alt = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 self.render.__del__()
                 sys.exit()
             elif event.type == KEYDOWN:
                 if event.key == K_LALT:
-                    alt = True
+                    self.alt = True
                 if event.key == K_RETURN:
-                    if alt == True:
+                    if self.alt == True:
                         pygame.display.toggle_fullscreen()
             elif event.type == KEYUP:
                 if event.key == K_LALT:
-                    alt = False
+                    self.alt = False
