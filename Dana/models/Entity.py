@@ -58,12 +58,17 @@ class Entity(object):
         - `normal`: Amount of normal damage inflicted before damage reduction.
         - `magic`: Amount of magic damage inflicted before damage reduction.
         - `true`: Amount of true damage inflicted.
+
+        Return : True if hp reachs 0, else False.
         """
         normal_mul = 100 / (100 + self.armor)
         magic_mul = 100 / (100 + self.mresist)
-        self.health -= true + normal * normal_mul + magic * magic_mul
-        if self.health < 0:
-            self.health = 0
+        self.hp -= true + normal * normal_mul + magic * magic_mul
+        dead = False
+        if self.hp < 0:
+            self.hp = 0
+            dead = True
+        return dead
 
 
 
@@ -150,8 +155,10 @@ class Attack():
 
         Arguments:
         - `target`: the entity hit by the attack.
+
+        Return: a boolean (True : the entity died, False : it's still alive).
         """
         normal_dmg = self.ent['str'] * self.rStr[0] + self.ent['int'] * self.rInt[0] + self.base[0]
         magic_dmg = self.ent['str'] * self.rStr[1] + self.ent['int'] * self.rInt[1] + self.base[1]
         true_dmg = self.ent['str'] * self.rStr[2] + self.ent['int'] * self.rInt[2] + self.base[2]
-        target.get_dmg(normal_dmg, magic_dmg, true_dmg)
+        return target.get_dmg(normal_dmg, magic_dmg, true_dmg)
