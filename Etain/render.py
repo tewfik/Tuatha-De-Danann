@@ -20,7 +20,7 @@ class Render():
     Display entities, map and catch mouse and keyboard input to transfer them to the event handler.
     """
 
-    def __init__(self, height, width, depth, title, fps):
+    def __init__(self, height, width, depth, title, fps, send_queue, receive_queue):
         """
         Initialize the window's display.
 
@@ -31,6 +31,8 @@ class Render():
         - `width`: the width of the window (given in square).
         - `l_entities`: list of entities currently on the map.
         - `UI`: the UI handler.
+        - `s_queue`: the queue used to send commands to Dana.
+        - `r_queue`: the queue used to receive commands from Dana.
         - `depth`: the color depth.
         - `title`: set the caption in windowed mode.
         """
@@ -41,6 +43,9 @@ class Render():
         self.width = width
         self.l_entities = entity.List()
         self.UI = ui.UI(self)
+        self.s_queue = send_queue
+        self.r_queue = receive_queue
+
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
 
