@@ -27,6 +27,16 @@ class Area():
         self.tiles = {}
 
 
+    def __getitem__(self, row):
+        """
+        Allow the user to get a row of the map with area[row].
+
+        Attributes:
+        - `row`: index of the row to return.
+        """
+        return self.map[row]
+
+
     def load_tiles(self):
         """
         Load all tiles' image used in this area in memory.

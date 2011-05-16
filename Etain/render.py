@@ -72,7 +72,8 @@ class Render():
             pos.top = j * SQUARE_SIZE
             for i in xrange(0, self.width):
                 pos.left = i * SQUARE_SIZE
-                self.window.blit(self.area.tiles[self.area.map[j][i]], pos)
+                self.window.blit(self.area.tiles[self.area[j][i]], pos)
+
 
     def register_entity(self, pos, width, height, uid, anim_path):
         """
