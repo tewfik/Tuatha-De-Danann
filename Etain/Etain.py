@@ -23,7 +23,9 @@ if __name__ == '__main__':
         host = 'localhost'
         port = 1337
     network.connection_start((host,port))
+    print('network engine is running')
 
+    # render's operations have to be in the main thread.
     display = render.Render(HEIGHT, WIDTH, 32, TITLE, FPS)
     display.load_map('../shared/etain.map')
     display.run()
