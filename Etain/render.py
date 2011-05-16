@@ -25,11 +25,14 @@ class Render():
         Initialize the window's display.
 
         Attributes:
+        - `font`: the font to use for texts.
+        - `fps`: set the frame rate (caution : increasing the frame rate increase the game's speed).
         - `height`: the height of the window (given in square, size in pixel of each square given by SQUARE_SIZE).
         - `width`: the width of the window (given in square).
+        - `l_entities`: list of entities currently on the map.
+        - `UI`: the UI handler.
         - `depth`: the color depth.
         - `title`: set the caption in windowed mode.
-        - `fps`: set the frame rate (caution : increasing the frame rate increase the game's speed).
         """
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
@@ -37,14 +40,14 @@ class Render():
         self.height = height
         self.width = width
         self.l_entities = entity.List()
-        self.UI = ui.UI(self, height, width)
+        self.UI = ui.UI(self)
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
 
 
     def run(self):
         """
-        Main programm's loop (currently run at 40Fps).
+        Main programm's loop (process, display and inputs).
         """
         clock = pygame.time.Clock()
 
@@ -72,19 +75,28 @@ class Render():
             pos.top = j * SQUARE_SIZE
             for i in xrange(0, self.width):
                 pos.left = i * SQUARE_SIZE
-                self.window.blit(self.area.tiles[self.area.map[j][i]], pos)
+                self.window.blit(self.area.tiles[self.area[j][i]], pos)
+
 
     def register_entity(self, pos, width, height, uid, anim_path):
         """
         Register a New graphic entity to the world.
+
+        Arguments:
+        - `pos`: a tuple (x, y) giving the coordinates where to spawn the entity.
+        - `width`: the width of the entity (used for display only).
+        - `height`: the height of the entity (used for display only).
+        - `uid`: the unique id of the entity (int).
+        - `anim_path`: the anim file of the entity.
         """
         self.l_entities.add_entity(pos, width, height, uid, anim_path)
 
 
     def remove_entity(self, uid):
         """
+        Remove a graphical entity from the world.
         """
-        self.l_entities.remove_entity(uid)
+        del self.l_entities[uid]
 
 
     def draw_entities(self):
@@ -92,8 +104,8 @@ class Render():
         Draw every entities on the map in their current state of animation.
         """
         for uid in self.l_entities.entities:
-            image = self.l_entities.entities[uid].update()
-            pos = self.l_entities.entities[uid].get_hitbox()
+            image = self.l_entities[uid].update()
+            pos = self.l_entities[uid].get_hitbox()
             self.window.blit(image, pos)
 
 
@@ -101,7 +113,7 @@ class Render():
         """
         Load the map and entities' informations from a file.
 
-        Attributes:
+        Arguments:
         - `path`: the path to the save file of the map to load.
         """
         f_map = open(path, 'r')
@@ -112,6 +124,10 @@ class Render():
 
     def play_music(self, path):
         """
+        Load and play background music.
+
+        Arguments:
+        - `path`: path to the music file (ogg, wav, midi).
         """
         pygame.mixer.music.load(path)
         pygame.mixer.music.play(-1)
@@ -119,6 +135,7 @@ class Render():
 
     def stop_music(self):
         """
+        Stop the background music.
         """
         pygame.mixer.music.stop()
 

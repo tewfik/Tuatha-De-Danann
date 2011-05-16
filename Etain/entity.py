@@ -12,15 +12,30 @@ class List():
     def __init__(self):
         """
         Create the lists attributes:
+
+        Attributes:
+        - `entities`: internal list of entities.
         """
         self.entities = {}
+
+
+    def __getitem__(self, uid):
+        """
+        allow the user to get entity from the list with list_obj[uid].
+
+        Arguments:
+        - `uid`:  the uid of the entity we want to get.
+
+        Return: An entity object from the list.
+        """
+        return self.entities[uid]
 
 
     def add_entity(self, pos, width, height, uid, anim_path):
         """
         Create a new entity and store it in the list with is uid.
 
-        Attributes:
+        Arguments:
         - `pos`: a (x, y) tuple with the starting coordinate.
         - `width`: the width of the entity.
         - `height`: the height of the entity.
@@ -38,9 +53,12 @@ class List():
         f.close()
 
 
-    def remove_entity(self, uid):
+    def __delitem__(self, uid):
         """
         Remove an entity to free its memory.
+
+        Arguments:
+        - `uid`: the unique id (int) of the entity to delete.
         """
         del self.entities[uid]
 
@@ -56,9 +74,13 @@ class Entity():
         Set the starting position of the entity.
 
         Attributes:
+        - `animations`: a list of Animation objects associated to the entity.
         - `pos`: a (x, y) tuple with the starting coordinate.
         - `width`: the width of the entity.
         - `height`: the height of the entity.
+        - `current_anim`: the current played animation.
+        - `default_anim`: the animation to play by default.
+        - `dest`: the destination the entity is moving to ([x, y] coordinates).
         """
         self.animations = {}
         self.pos = [pos[0], pos[1]]
@@ -71,7 +93,9 @@ class Entity():
 
     def get_hitbox(self):
         """
-        Return a pygame.Rect corresponding to the sprites size and the entity position.
+        Get the hitbox corresponding to the sprites size and the entity position.
+
+        Return: a pygame.Rect.
         """
         return pygame.Rect(self.pos[0], self.pos[1], self.width, self.height)
 
@@ -80,7 +104,7 @@ class Entity():
         """
         Add a new animation to the entity.
 
-        Attributes:
+        Arguments:
         - `name`: name of the animation (ie: attack, idle...).
         - `sprites_paths`: list of paths to the sprites.
         - `period`: number of frame to wait between two sprites.
@@ -93,7 +117,11 @@ class Entity():
 
     def move(self, pos, speed):
         """
-        Move the entity to a new location at <speed> pixel per frame.
+        Move the entity to a new location at a given speed.
+
+        Arguments:
+        - `pos`: a tuple (x, y) giving the destination's coordinates.
+        - `speed`: movespeed in pixel per frame.
         """
         self.dest = [pos[0], pos[1]]
         self.speed = speed
@@ -101,7 +129,9 @@ class Entity():
 
     def update(self):
         """
-        Give a timer's tick to the entity so it redraw itself and pass it to the world.
+        Give a timer's tick to the entity so it redraw itself and give an image to display to the world.
+
+        Return: A pygame.Surface object.
         """
         if self.dest != self.pos:
             vect = (self.dest[0] - self.pos[0], self.dest[1] - self.pos[1])
@@ -123,7 +153,7 @@ class Entity():
         """
         Change the animation being played.
 
-        Attributes:
+        Arguments:
         - `name`: the name of the animation to be played.
         """
         self.current_anim = name
@@ -131,6 +161,7 @@ class Entity():
 
 
 
+#TODO(Mika): add a sound effect for animation.
 class Animation():
     """
     Use to manipulate an entity's animation.
@@ -144,6 +175,10 @@ class Animation():
         - `name`: name of the animation (ie: attack, idle...).
         - `sprites`: list of sprites (pygame.image).
         - `period`: number of frame to wait between two sprites.
+        - `frame_elapsed`: number of frame elapsed since the animation started.
+        - `current_sprite`: the current displayed sprite.
+        - `nb_sprites`: the number of sprites in the animation.
+        - `end`: a boolean (True : ended, False : playing).
         """
         self.name = name
         self.sprites = sprites
@@ -166,6 +201,8 @@ class Animation():
     def next_frame(self):
         """
         Increase internal frame counter and current animation's frame.
+
+        Return: A pygame.Surface object.
         """
         self.frame_elapsed += 1
         if self.frame_elapsed >= self.period:

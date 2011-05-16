@@ -14,6 +14,7 @@ BLOCK = 1
 # exceptions
 class ForbiddenMove(Exception):
     """
+    Exception raised when a player try to perform a forbidden move.
     """
     pass
 
@@ -35,8 +36,8 @@ class World(object):
         f_map = open('../../shared/etain.map')
         self.map = pickle.load(f_map)
         f_map.close()
-        self.entities = []
-        self.entities_pos = []
+        self.entities = {}
+        self.entities_pos = {}
 
 
     def get_objet_by_position(self, position):
@@ -44,11 +45,15 @@ class World(object):
         Get an object which is on a given position.
 
         Arguments:
-        - `position`: tuple following the format (pos_x, pos_y)
+        - `position`: tuple following the format (x, y)
 
         Return: an entity object.
         """
-        return self.entities[self.entities_pos.index(position)]
+        for index in self.entities:
+            if self.entities_pos[index] = [position[0], position[1]]:
+                i = index
+                break
+        return self.entities[i]
 
 
     def get_position_by_object_id(self, id):
@@ -60,17 +65,10 @@ class World(object):
 
         Return: position of the given entity. tuple (x, y).
         """
-        object = None
-        for entity in self.entities:
-            if entity.get_id() == id:
-                object = entity
-                break
-        if object == None:
-            raise ValueError
-        return object
+        return self.entities_pos[id]
 
 
-    def register(self, entity):
+    def register(self, entity, id):
         """
         An entity who join the world have to register to it.
 
@@ -80,7 +78,8 @@ class World(object):
         # TODO(tewfik): define a spawn area
         pos_x = 0
         pos_y = 0
-        self.entities.append([pos_x, pos_y, entity])
+        self.entities[id] = entity
+        self.entities_pos[id] = [pos_x, pos_y]
 
 
     def unregister(self, entity_id):
@@ -90,7 +89,8 @@ class World(object):
         Arguments:
         - `entity_id`: unique entity identifier.
         """
-        pass
+        del self.entities[id]
+        del self.entities_pos[id]
 
     def square_available(self, x, y):
         """
@@ -108,7 +108,7 @@ class World(object):
         if(self.map[x][y] != FREE):
             result = false
         # if there is another entity on the square
-        if(self.get_object_by_position((x,y))):
+        if(self.get_object_by_position((x, y))):
             result = false
 
         return result

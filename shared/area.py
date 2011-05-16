@@ -12,17 +12,29 @@ HEIGHT = 24
 
 class Area():
     """
-    Object defining area of a map and the entities (NPC and non-living) on it.
+    Object defining area of a map.
     """
 
     def __init__(self):
         """
+        Area initialize it's internal representation of the map.
+
         Attributes:
         - `map`: array defining the map with the tiles' code.
         - `tiles`: list of pygame Surface corresponding to the tiles' code.
         """
         self.map = []
-        self.tiles = [False]*128
+        self.tiles = {}
+
+
+    def __getitem__(self, row):
+        """
+        Allow the user to get a row of the map with area[row].
+
+        Arguments:
+        - `row`: index of the row to return.
+        """
+        return self.map[row]
 
 
     def load_tiles(self):
@@ -31,7 +43,7 @@ class Area():
         """
         for line in self.map:
             for tile in line:
-                if not self.tiles[tile]:
+                if not tile in self.tiles:
                     self.tiles[tile] = pygame.image.load('tiles/'+str(tile)+'.png')
 
 
