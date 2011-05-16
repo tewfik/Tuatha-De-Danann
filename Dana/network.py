@@ -19,33 +19,7 @@ class TCPHandler(SocketServer.BaseRequestHandler):
     """
     """
 
-    def register(self):
-        """
-        A client ask for an unique identifier.
-        The server has to register the client id, his login and his (hashed) pass.
-        """
-        #get login/pass
-        #client_id = AccountManagement.get_next_client_id()
-        global _dana_queue
-        global last_id
-
-        # TODO(tewfik): asking to dana to generate the client id
-        last_id += 1
-        #
-        try:
-            self.request.send(str(last_id))
-        except socket.error:
-            print e
-        except IOError as e:
-            if e.errno == errno.EPIPE:
-                # broken pipe
-                print e
-            else:
-                # other error
-                print e
-
-
-    def send_loop(self, client_id):
+    def send_loop(self):
         """
         Dana send data to the client.
         """
@@ -55,6 +29,7 @@ class TCPHandler(SocketServer.BaseRequestHandler):
         client_queue = Queue.Queue()
         # ask for a client_id (client_id == 0 : request for a client_id) and send the queue's reference to Dana
         _dana_queue.put((0, client_queue))
+        print("Client's queue has been sent to Dana")
 
         # main loop
         close_connection = False
@@ -69,16 +44,16 @@ class TCPHandler(SocketServer.BaseRequestHandler):
             try:
                 self.request.send(dana_request)
             except socket.error as e:
-                print e
+                print(e)
                 close_connection = True
             except IOError as e:
                 if e.errno == errno.EPIPE:
                     # broken pipe
-                    print e
+                    print(e)
                     close_connection = True
                 else:
                     # other error
-                    print e
+                    print(e)
                     close_connection = True
 
             if close_connection:
@@ -88,7 +63,7 @@ class TCPHandler(SocketServer.BaseRequestHandler):
             time.sleep(1) # DEBUG
 
 
-    def receive_loop(self, client_id):
+    def receive_loop(self):
         """
         Dana receives data from the client, parses it and reacts to it.
         """
@@ -100,25 +75,25 @@ class TCPHandler(SocketServer.BaseRequestHandler):
                 # wait for request
                 data = self.request.recv(1024).strip()
             except socket.error as e:
-                print e
+                print(e)
                 data = ""
             except IOError as e:
                 if e.errno == errno.EPIPE:
                     # broken pipe
                     data = ""
-                    print e
+                    print(e)
                 else:
                     # other error
                     data = ""
-                    print e
+                    print(e)
 
             if(not data):
                 self.end_connection()
                 break
 
             # send the request to Dana
-            _dana_queue.put(data)
-            print "%s wrote: %s" % (self.client_address[0], data)
+            _dana_queue.put(tuple(data.split(":")))
+            print('%s wrote: %s' % (self.client_address[0], data))
 
 
     def handle(self):
@@ -131,26 +106,24 @@ class TCPHandler(SocketServer.BaseRequestHandler):
 
         # choose between send connection and receive connection
         try:
-            data = self.request.recv(1024).strip()
+            connection_type = self.request.recv(1024).strip()
         except socket.error as e:
-            print e
+            print(e)
             raise
         except IOError as e:
             if e.errno == errno.EPIPE:
                 # broken pipe
-                print e
+                print(e)
                 raise
             else:
                 # other error
-                print e
+                print(e)
                 raise
 
-        connection_type, client_id = data.split(" ")
-
         if connection_type  == "receive":
-            self.send_loop(client_id)
+            self.send_loop()
         elif connection_type == "send":
-            self.receive_loop(client_id)
+            self.receive_loop()
         else:
             self.request.send("vtff")
 
@@ -158,7 +131,7 @@ class TCPHandler(SocketServer.BaseRequestHandler):
     def end_connection(self):
         """
         """
-        print "end connection"
+        print("end connection")
 
 
 
