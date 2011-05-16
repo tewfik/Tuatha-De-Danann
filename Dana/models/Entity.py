@@ -12,26 +12,29 @@ class Entity(object):
 
         Attributes:
         - `id`: object unique identifier. Default = random generation.
-        - `hp`: the maximum and base health point of the entity, when it reachs 0 the entity die.
+        - `hp`: the current health point of the entity, when it reachs 0 the entity die.
+        - `maxhp`: the maximum and base health point of the entity.
         - `armor`: reduce incoming physical damage (100 armor = 100% increased effective health).
         - `mresist`: reduce incoming magic damage (100 mresist = 100% increased effective health).
         """
         self.id = id
-        self.health = hp
+        self.hp = hp
         self.maxhp = hp
-        self.mresist = mresist
         self.armor = armor
+        self.mresist = mresist
 
 
     def __getitem__(self, stat):
         """
         improved getter to easily access stats.
 
-        Attributes:
+        Arguments:
         - `stat`: the name of the stat to get.
+
+        Return: the value of the given stat.
         """
         if stat == 'hp':
-            return self.health
+            return self.hp
         elif stat == 'maxhp':
             return self.maxhp
         elif stat == 'mr':
@@ -51,7 +54,7 @@ class Entity(object):
         """
         Inflict damage to the entity after calcul of damage reduction.
 
-        Attributes:
+        Arguments:
         - `normal`: Amount of normal damage inflicted before damage reduction.
         - `magic`: Amount of magic damage inflicted before damage reduction.
         - `true`: Amount of true damage inflicted.
@@ -75,10 +78,13 @@ class LivingEntity(Entity):
 
         Attributes:
         - `id`: object unique identifier. Default = random generation.
-        - `hp`: the maximum and base health point of the entity, when it reachs 0 the entity die.
+        - `hp`: the current health point of the entity, when it reachs 0 the entity die.
+        - `maxhp`: the maximum and base health point of the entity.
+        - `armor`: reduce incoming physical damage (100 armor = 100% increased effective health).
+        - `mresist`: reduce incoming magic damage (100 mresist = 100% increased effective health).
         - `strength`: the strength of the entity (mainly used to improve physical damage dealt).
         - `intell`: the intelligence of the entity (mainly used to improve magic damage dealt).
-        - `armor`: reduce incoming physical damage (100 armor = 100% increased effective health).
+        - `l_attacks`: list of Attack object the entity can use.
         """
         Entity.__init__(id, hp, mresist, armor)
         self.strength = strength
@@ -90,8 +96,10 @@ class LivingEntity(Entity):
         """
         improved getter to easily access stats.
 
-        Attributes:
+        Arguments:
         - `stat`: the name of the stat to get.
+
+        Return: the value of the given stat.
         """
         if stat == 'str':
             return self.health
@@ -105,7 +113,7 @@ class LivingEntity(Entity):
         """
         Add a new attack to the Entity.
 
-        Attributes:
+        Arguments:
         - `name`: internal name given to the attack.
         - `base`: a tuple (phys, mag, true) representing base damage of the attack.
         - `ratioStr`: a tuple (phys, mag, true) of the ratio of strength used for the attack.
@@ -125,10 +133,10 @@ class Attack():
         Initialize the propertie of the attack.
 
         Attributes:
-        - `entity`: the entity which this attack belongs to.
+        - `ent`: the entity which this attack belongs to.
         - `base`: a tuple (normal, magic, true) corresponding to the base dmg of the attack.
-        - `ratioStr`: a tuple (normal, magic, true) corresponding to the ratio of strength for each dmg's type.
-        - `ratioInt`: a tuple (normal, magic, true) corresponding to the raiot of intelligence for each dmg's type.
+        - `rStr`: a tuple (normal, magic, true) corresponding to the ratio of strength for each dmg's type.
+        - `rInt`: a tuple (normal, magic, true) corresponding to the raiot of intelligence for each dmg's type.
         """
         self.ent = entity
         self.base = base
@@ -140,7 +148,7 @@ class Attack():
         """
         inflict damage to a target hit by this attack.
 
-        Attributes:
+        Arguments:
         - `target`: the entity hit by the attack.
         """
         normal_dmg = self.ent['str'] * self.rStr[0] + self.ent['int'] * self.rInt[0] + self.base[0]

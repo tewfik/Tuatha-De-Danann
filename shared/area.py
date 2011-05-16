@@ -31,7 +31,7 @@ class Area():
         """
         Allow the user to get a row of the map with area[row].
 
-        Attributes:
+        Arguments:
         - `row`: index of the row to return.
         """
         return self.map[row]

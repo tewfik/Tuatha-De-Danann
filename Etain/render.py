@@ -25,11 +25,14 @@ class Render():
         Initialize the window's display.
 
         Attributes:
+        - `font`: the font to use for texts.
+        - `fps`: set the frame rate (caution : increasing the frame rate increase the game's speed).
         - `height`: the height of the window (given in square, size in pixel of each square given by SQUARE_SIZE).
         - `width`: the width of the window (given in square).
+        - `l_entities`: list of entities currently on the map.
+        - `UI`: the UI handler.
         - `depth`: the color depth.
         - `title`: set the caption in windowed mode.
-        - `fps`: set the frame rate (caution : increasing the frame rate increase the game's speed).
         """
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
@@ -79,7 +82,7 @@ class Render():
         """
         Register a New graphic entity to the world.
 
-        Attributes:
+        Arguments:
         - `pos`: a tuple (x, y) giving the coordinates where to spawn the entity.
         - `width`: the width of the entity (used for display only).
         - `height`: the height of the entity (used for display only).
@@ -110,7 +113,7 @@ class Render():
         """
         Load the map and entities' informations from a file.
 
-        Attributes:
+        Arguments:
         - `path`: the path to the save file of the map to load.
         """
         f_map = open(path, 'r')
@@ -123,7 +126,7 @@ class Render():
         """
         Load and play background music.
 
-        Attributes:
+        Arguments:
         - `path`: path to the music file (ogg, wav, midi).
         """
         pygame.mixer.music.load(path)

@@ -45,7 +45,7 @@ class World(object):
         Get an object which is on a given position.
 
         Arguments:
-        - `position`: tuple following the format (pos_x, pos_y)
+        - `position`: tuple following the format (x, y)
 
         Return: an entity object.
         """

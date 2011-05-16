@@ -15,6 +15,10 @@ class UI():
     def __init__(self, render):
         """
         Initialize the UI and the Key which will bond to actions.
+
+        Attributes:
+        - `render`: the main render object used for display.
+        - `alt`: Boolean representing the state of the LEFT_ALT key.
         """
         self.render = render
         self.alt = False
