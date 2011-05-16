@@ -39,9 +39,35 @@ class UI():
             elif event.type == KEYDOWN:
                 if event.key == K_LALT:
                     self.alt = True
-                if event.key == K_RETURN:
+                elif event.key == K_RETURN:
                     if self.alt == True:
                         pygame.display.toggle_fullscreen()
+                elif self.round_state == 'CHOICE':
+                        pos = self.render.l_entities[self.render.me].pos
+                    if event.key == K_UP:
+                        pos[1] -= 1
+                        self.render.s_queue.put('MOVE:'+pos[0]+':'+pos[1])
+                    elif event.key == K_RIGHT:
+                        pos[0] += 1
+                        self.render.s_queue.put('MOVE:'+pos[0]+':'+pos[1])
+                    elif event.key == K_DOWN:
+                        pos[1] += 1
+                        self.render.s_queue.put('MOVE:'+pos[0]+':'+pos[1])
+                    elif event.key == K_LEFT:
+                        pos[0] -= 1
+                        self.render.s_queue.put('MOVE:'+pos[0]+':'+pos[1])
+                    elif event.key == K_z:
+                        pos[1] -= 1
+                        self.render.s_queue.put('ATTACK:attack:'+pos[0]+':'+pos[1])
+                    elif event.key == K_d:
+                        pos[0] += 1
+                        self.render.s_queue.put('ATTACK:attack:'+pos[0]+':'+pos[1])
+                    elif event.key == K_s:
+                        pos[1] += 1
+                        self.render.s_queue.put('ATTACK:attack:'+pos[0]+':'+pos[1])
+                    elif event.key == K_q:
+                        pos[0] -= 1
+                        self.render.s_queue.put('ATTACK:attack:'+pos[0]+':'+pos[1])
             elif event.type == KEYUP:
                 if event.key == K_LALT:
                     self.alt = False
@@ -71,3 +97,5 @@ class UI():
             data = f.readline().split('**')
             f.clos()
             register_entity((cmd[3], cmd[4]), data[0], data[1], cmd[2], data[2])
+        elif cmd[0] == 'YOU':
+            self.render.me = cmd[1]
