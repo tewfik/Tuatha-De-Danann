@@ -42,12 +42,13 @@ class Dana(threading.Thread):
         - `msg`: message to process.
         """
         if client_id == 0:
-            self.register_client(msg)
+            client_id = self.register_client(msg)
+            print('Client n° %d has been registered' % client_id)
+
         # check that the client id is registered
         elif self.clients_queues.has_key(client_id):
             # request processing
-            client_id, method = msg.split(':')
-            self.clients_queues[client_id].put('coucou %s' % client_id)  # DEBUG
+            self.clients_queues[client_id].put('Hi %s, your message "%s" has been processed' % (client_id, msg))  # DEBUG
         else:
             # error
             print('error: a request from an unregistered client has been received')
@@ -58,8 +59,9 @@ class Dana(threading.Thread):
         Register a client which ask for connection in Dana.
 
         Arguments:
-        - `client_id`: client unique identifier
-        - `msg`: the first message of a client has to be a Queue that Dana will use to send data to the client
+        - `msg`: the first message of a client has to be a Queue that Dana will use to send data to the client.
+
+        Return: client id which has been allocated to the client.
         """
         # check that the message is a Queue
         if msg.__class__.__name__ == Queue.Queue.__name__:
@@ -67,11 +69,13 @@ class Dana(threading.Thread):
             self.clients_queues[client_id] = msg  # register the client queue
 
             # confirm the registration of the client's queue => send its client_id
-            self.clients_queues[client_id].put(client_id)
+            self.clients_queues[client_id].put(str(client_id))
         else:
-            # error
+            # error TODO(tewfik): create a ProtocolException
             print('protocol error: the first message send by a client thread to Dana'
                   'have to be a Queue reference.')
+
+        return client_id
 
 
     def get_next_id(self):
@@ -85,10 +89,11 @@ class Dana(threading.Thread):
         """
         next_client_id = 1
         #lock self.next_client_id_search
-        while(self.clients_queues[next_client_id] is not None):
+        while self.clients_queues.has_key(next_client_id):
             next_client_id += 1
             #book next_client_id
         #unlock self.next_client_id_search
+        print "next_client_id : " , next_client_id
 
         return next_client_id
 
@@ -109,7 +114,10 @@ class Dana(threading.Thread):
         """
         while not self.shutdown:
             # wait for a queue message
+            print('Dana is waiting for client request')
             client_id, request_msg = self.queue.get() # TODO(tewfik) : change this for a non-blocking one and manage a timeout ?
+            client_id = int(client_id)
+            print('Client %d sent : "%s"' % (client_id, request_msg))
             self.process_message(client_id, request_msg)
             
 
@@ -134,6 +142,7 @@ def main(port):
 
     dana.shutdown = True
     dana.join()
+    print("Dana end")
 
 
 if __name__ == '__main__':
