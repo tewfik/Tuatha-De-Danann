@@ -49,11 +49,12 @@ class World(object):
 
         Return: an entity object.
         """
+        result = None
         for index in self.entities:
-            if self.entities_pos[index] = [position[0], position[1]]:
-                i = index
+            if self.entities_pos[index] = position:
+                result = self.entities[index]
                 break
-        return self.entities[i]
+        return result
 
 
     def get_position_by_object_id(self, id):
@@ -68,18 +69,17 @@ class World(object):
         return self.entities_pos[id]
 
 
-    def register(self, entity, id):
+    def register(self, entity, id, x, y):
         """
         An entity who join the world have to register to it.
 
         Arguments:
         - `entity`: a player, a monster, a vehicle ...
+        - `x`: x coordinate where to spawn the entity.
+        - `y`: y coordinate.
         """
-        # TODO(tewfik): define a spawn area
-        pos_x = 0
-        pos_y = 0
         self.entities[id] = entity
-        self.entities_pos[id] = [pos_x, pos_y]
+        self.entities_pos[id] = (x, y)
 
 
     def unregister(self, entity_id):
@@ -123,6 +123,6 @@ class World(object):
         - `dest_y`: destination's y.
         """
         if(self.square_available(dest_x, dest_y)):
-            #register
-            #confirm
-            pass
+            self.entities_pos[id] = (dest_x, dest_y)
+        else:
+            raise ForbiddenMove('square ('+str(dest_x)+', '+str(dest_y)+') unavailable')
