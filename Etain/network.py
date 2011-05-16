@@ -27,7 +27,7 @@ class ThreadSend(threading.Thread):
         except socket.error as e:
             print 'Send socket failed to connect to ' + str(address[0]) + ':' + str(address[1])
             print e
-            close_conneciton = True
+            close_connection = True
         except IOError as e:
             if e.errno == errno.EPIPE:
                 # broken pipe
