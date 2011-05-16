@@ -18,8 +18,26 @@ class Entity(object):
         """
         self.id = id
         self.health = hp
+        self.maxhp = hp
         self.mresist = mresist
         self.armor = armor
+
+
+    def __getitem__(self, stat):
+        """
+        improved getter to easily access stats.
+
+        Attributes:
+        - `stat`: the name of the stat to get.
+        """
+        if stat == 'hp':
+            return self.health
+        elif stat == 'maxhp':
+            return self.maxhp
+        elif stat == 'mr':
+            return self.mresist
+        elif stat == 'armor':
+            return self.armor
 
 
     def get_id(self):
@@ -68,6 +86,21 @@ class LivingEntity(Entity):
         self.l_attacks = {}
 
 
+    def __getitem__(self, stat):
+        """
+        improved getter to easily access stats.
+
+        Attributes:
+        - `stat`: the name of the stat to get.
+        """
+        if stat == 'str':
+            return self.health
+        elif stat == 'int':
+            return self.maxhp
+        else:
+            Entity.__getitem__(stat)
+
+
     def add_attack(self, name, base=(0, 0, 0), ratioStr=(0, 0, 0), ratioInt=(0, 0, 0)):
         """
         Add a new attack to the Entity.
@@ -110,7 +143,7 @@ class Attack():
         Attributes:
         - `target`: the entity hit by the attack.
         """
-        normal_dmg = self.ent.strength * self.rStr[0] + self.ent.intell * self.rInt[0] + self.base[0]
-        magic_dmg = self.ent.strength * self.rStr[1] + self.ent.intell * self.rInt[1] + self.base[1]
-        true_dmg = self.ent.strenght * self.rStr[2] + self.ent.intell * self.rInt[2] + self.base[2]
+        normal_dmg = self.ent['str'] * self.rStr[0] + self.ent['int'] * self.rInt[0] + self.base[0]
+        magic_dmg = self.ent['str'] * self.rStr[1] + self.ent['int'] * self.rInt[1] + self.base[1]
+        true_dmg = self.ent['str'] * self.rStr[2] + self.ent['int'] * self.rInt[2] + self.base[2]
         target.get_dmg(normal_dmg, magic_dmg, true_dmg)
