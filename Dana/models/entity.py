@@ -6,18 +6,20 @@ class Entity(object):
     A player, a monster, a vehicle ...
     """
 
-    def __init__(self, id=None, hp=100, armor=0, mresist=0):
+    def __init__(self, id, type, hp=100, armor=0, mresist=0):
         """
         Entity creation.
 
         Attributes:
         - `id`: object unique identifier. Default = random generation.
+        - `type`: entity type ('scarecrow' | 'guerrier')
         - `hp`: the current health point of the entity, when it reachs 0 the entity die.
         - `maxhp`: the maximum and base health point of the entity.
         - `armor`: reduce incoming physical damage (100 armor = 100% increased effective health).
         - `mresist`: reduce incoming magic damage (100 mresist = 100% increased effective health).
         """
         self.id = id
+        self.type = type
         self.hp = hp
         self.maxhp = hp
         self.armor = armor
