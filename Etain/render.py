@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: UTF8 -*-
+# -*- coding: utf-8 -*-
 
 import sys
 import pygame
@@ -64,9 +64,16 @@ class Render():
 
             self.draw_world()
             self.draw_entities()
+            # fps displaying
             text = self.font.render(str(clock.get_fps()), False, (0, 0, 0))
             text_Rect = text.get_rect()
             text_Rect.right = self.width*SQUARE_SIZE - 10
+            text_Rect.top = 10
+            self.window.blit(text, text_Rect)
+            # battle state displaying
+            text = self.font.render(self.UI.round_state, False, (0, 0, 0))
+            text_Rect = text.get_rect()
+            text_Rect.left = 10
             text_Rect.top = 10
             self.window.blit(text, text_Rect)
 
