@@ -43,7 +43,7 @@ class Dana(threading.Thread):
         """
         threading.Thread.__init__(self)
 
-        self.world = models.World.World()
+        self.world = models.world.World()
         self.shutdown = False
         self.queue = queue
         self.clients_queues = {}
@@ -67,21 +67,21 @@ class Dana(threading.Thread):
         elif self.clients_queues.has_key(client_id):
             # request processing
             msg_tab = msg.split(':')
-            if msg_tab[0] == 'GET_ENTITY':
+            if msg_tab[0] == 'GET_ENTITIES':
                 self.get_entities_request(client_id)
-            elif msg_tab[0] == 'MOVE':
-                try:
-                    self.move_request(client_id, x=int(msg_tab[1]), y=int(msg_tab[2]))
-                except ValueError as e:
-                    print(e)
-            elif msg_tab[0] == 'ATTACK':
-                try:
-                    self.attack_request(client_id, name=msg_tab[1], x=int(msg_tab[2]), y=int(msg_tab[3]))
-                except ValueError as e:
-                    print(e)
+            elif self.state = 'CHOICE':
+                if msg_tab[0] == 'MOVE':
+                    try:
+                        self.move_request(client_id, x=int(msg_tab[1]), y=int(msg_tab[2]))
+                    except ValueError as e:
+                        print(e)
+                elif msg_tab[0] == 'ATTACK':
+                    try:
+                        self.attack_request(client_id, name=msg_tab[1], x=int(msg_tab[2]), y=int(msg_tab[3]))
+                    except ValueError as e:
+                        print(e)
             else:
                 print('Unknown request.')
-            self.clients_queues[client_id].put('Hi %s, your message "%s" has been processed' % (client_id, msg))  # DEBUG
         else:
             # error
             print('error: a request from an unregistered client has been received')
@@ -104,7 +104,7 @@ class Dana(threading.Thread):
             #
             player = models.entity.LivingEntity(id=client_id)
             player.add_attack('attack', (10, 0, 0))
-            x = random.randInt(10, 22)
+            x = random.randint(10, 22)
             y = 22
             while not self.world.square_available(x, y):
                 x = random.randInt(10, 22)

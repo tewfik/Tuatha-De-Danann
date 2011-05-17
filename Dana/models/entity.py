@@ -93,7 +93,7 @@ class LivingEntity(Entity):
         - `intell`: the intelligence of the entity (mainly used to improve magic damage dealt).
         - `l_attacks`: list of Attack object the entity can use.
         """
-        Entity.__init__(id, hp, mresist, armor)
+        Entity.__init__(self, id, hp, mresist, armor)
         self.strength = strength
         self.intell = intell
         self.l_attacks = {}
@@ -135,7 +135,7 @@ class Attack():
     Represent an attack of an entity.
     """
 
-    def __init(self, entity, base, ratioStr, ratioInt):
+    def __init__(self, entity, base, ratioStr, ratioInt):
         """
         Initialize the propertie of the attack.
 

@@ -46,7 +46,7 @@ class World(object):
         """
         """
         epouvantail = entity(id=999)
-        self.register(epouvantail, id=999, 16, 3)
+        self.register(epouvantail, id=999, x=16, y=3)
 
 
     def get_object_by_position(self, position):
@@ -114,7 +114,7 @@ class World(object):
         result = True
 
         # if square is not free
-        if self.map[x][y] not in FREE:
+        if self.map[x][y] != FREE:
             result = False
         # if there is another entity on the square
         if self.get_object_by_position((x, y)):
