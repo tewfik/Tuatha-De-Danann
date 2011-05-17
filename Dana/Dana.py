@@ -2,10 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import time
 import threading
 import Queue
+import collections
 
 import network
+
+# interval in seconds when players are able to choose their actions
+CHOICE_TIME_INTERVAL = 20
+# interval in seconds of one action
+ACTION_TIME_INTERVAL = 2
+# number of actions allowed for one player in one turn
+NB_ACTIONS = 1
 
 class Dana(threading.Thread):
     """
@@ -18,6 +27,8 @@ class Dana(threading.Thread):
     - `shutdown`: if True => terminate Dana
     - `queue`: queue Dana has to use to receive messages which are addressed to it.
     - `clients_queues`: dictionary of clients' queues. Format : clients_queues[client_id] = Queue object.
+    - `clients_actions` : actions of one turn choosen by each clients.
+    - `state`: state of the game (CHOICE | RENDER_FIGHT).
     """
 
     def __init__(self, queue):
@@ -31,6 +42,8 @@ class Dana(threading.Thread):
         self.shutdown = False
         self.queue = queue
         self.clients_queues = {}
+        self.clients_actions = {}
+        self.state = 'BEGIN_FIGHT'
 
 
     def process_message(self, client_id, msg):
@@ -107,6 +120,73 @@ class Dana(threading.Thread):
         """
         pass
 
+
+    def get_clients_ids(self):
+        """
+        Return: list of connected clients' ids.
+        """
+        return self.clients_queues.keys()
+
+
+    def send_to_all(self, msg):
+        """
+        Send a message to all clients.
+
+        Arguments:
+        - `msg`: message to send.
+        """
+        for client_queue in self.clients_queues:
+            client_queue.put(msg)
+
+
+    def battle(self):
+        """
+        Process a battle with all clients connected.
+
+        This function describe the flow of a battle
+        """
+        battle_is_finished = False
+        count_round = 0
+        # rounds loop
+        while not battle_is_finished:
+            # actions choice phase
+            self.state = 'CHOICE'
+            self.clear_clients_actions()
+            self.send_to_all('ROUND_START:' + str(count_round))
+            time.sleep(CHOICE_TIME_INTERVAL)  # wait that clients finish to choose their actions
+
+            # send actions to clients, they will display them.
+            self.state = 'RENDER_FIGHT'
+            for count_actions in xrange(NB_ACTION):
+                self.send_to_all('BEGIN_ACTION:' + count_actions)
+                # send all actions for a given action turn to the clients
+                for client_actions in self.clients_actions:
+                    action = client_actions.popleft()
+                    self.send_to_all(action)
+                    time.sleep(ACTION_TIME_INTERVAL)
+                self.send_to_all('END_ROUND:' + str(count_round))
+                count_round += 1
+
+            if self.battle_is_finished():
+                battle_is_finished = True
+
+        self.send_to_all('BATTLE_END')
+
+
+    def clear_clients_actions(self):
+        """
+        Reinitialize to a void list all clients' actions lists.
+        """
+        self.clients_actions = {}
+        for client_id in self.get_clients_ids():
+            self.clients_actions[client_id] = deque()
+
+
+    def battle_is_finished(self):
+        """
+        Return: True if the battle is finished.
+        """
+        return False
 
     def run(self):
         """
