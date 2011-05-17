@@ -45,8 +45,8 @@ class World(object):
     def load_fixtures(self):
         """
         """
-        epouvantail = entity(id=999)
-        self.register(epouvantail, id=999, x=16, y=3)
+        epouvantail = entity.Entity(id=999, type='scarecrow')
+        self.register(epouvantail, id=999, x=16, y=21)
 
 
     def get_object_by_position(self, position):

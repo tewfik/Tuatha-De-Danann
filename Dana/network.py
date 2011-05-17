@@ -92,7 +92,7 @@ class TCPHandler(SocketServer.BaseRequestHandler):
                 break
 
             # send the request to Dana
-            _dana_queue.put(tuple(data.split(":")))
+            _dana_queue.put(tuple(data.split(":", 1)))
             print('%s wrote: %s' % (self.client_address[0], data))
 
 
