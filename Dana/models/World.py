@@ -8,8 +8,7 @@ from area import Area
 
 
 # square states
-FREE = 0
-BLOCK = 1
+FREE = xrange(18)  # states 0..17 are non-blocking squares
 
 # exceptions
 class ForbiddenMove(Exception):
@@ -29,11 +28,11 @@ class World(object):
         World creation.
 
         Attributes:
-        - `map`: main array.
-        - `entities`: A list which represent entities' positions which can behave in the world. A list following the format [(pos_x1, pos_y1), ...]
-        - `entitites_pos`: Represent entities [object1, ...].
+        - `map`: Area object.
+        - `entities`: list of entities object.
+        - `entities_pos`: list of entities' positions [(x1, y1), (x2, y2) ...].
         """
-        f_map = open('../../shared/etain.map')
+        f_map = open('../../shared/etain.map', 'r')
         self.map = pickle.load(f_map)
         f_map.close()
         self.entities = {}
@@ -51,7 +50,7 @@ class World(object):
         """
         result = None
         for index in self.entities:
-            if self.entities_pos[index] = position:
+            if self.entities_pos[index] == position:
                 result = self.entities[index]
                 break
         return result
@@ -102,16 +101,17 @@ class World(object):
 
         Return: true => free square, else false.
         """
-        result = true
+        result = True
 
         # if square is not free
-        if(self.map[x][y] != FREE):
-            result = false
+        if self.map[x][y] not in FREE:
+            result = False
         # if there is another entity on the square
-        if(self.get_object_by_position((x, y))):
-            result = false
+        if self.get_object_by_position((x, y)):
+            result = False
 
         return result
+
 
     def move(self, id, dest_x, dest_y):
         """
@@ -122,7 +122,7 @@ class World(object):
         - `dest_x`: destination's x.
         - `dest_y`: destination's y.
         """
-        if(self.square_available(dest_x, dest_y)):
+        if self.square_available(dest_x, dest_y):
             self.entities_pos[id] = (dest_x, dest_y)
         else:
-            raise ForbiddenMove('square ('+str(dest_x)+', '+str(dest_y)+') unavailable')
+            raise ForbiddenMove('square (' + str(dest_x) + ', ' + str(dest_y) + ') unavailable')
