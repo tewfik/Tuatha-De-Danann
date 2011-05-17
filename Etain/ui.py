@@ -30,7 +30,7 @@ class UI():
         Get the events currently in the queue and add new event to the send queue.
         """
         while not self.render.r_queue.empty():
-            process(self.render.r_queue.get().split(':'))
+            self.process(self.render.r_queue.get().split(':'))
 
         for event in pygame.event.get():
             if event.type == QUIT:
