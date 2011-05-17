@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import pickle
 import sys
-sys.path.append("../../shared/")
-from area import Area
+#import pickle
+#sys.path.append("../../shared/")
+#from area import Area
 
 
 # square states
-FREE = xrange(18)  # states 0..17 are non-blocking squares
+FREE = 0
+BLOCK = 1
 
 # exceptions
 class ForbiddenMove(Exception):
@@ -32,9 +33,10 @@ class World(object):
         - `entities`: list of entities object.
         - `entities_pos`: list of entities' positions [(x1, y1), (x2, y2) ...].
         """
-        f_map = open('../../shared/etain.map', 'r')
-        self.map = pickle.load(f_map)
-        f_map.close()
+        # f_map = open('../../shared/etain.map', 'r')
+        # self.map = pickle.load(f_map)
+        # f_map.close()
+        self.map = [[0 for col in xrange(32)] for row in xrange(24)]  # DEBUG: a map without blocking square
         self.entities = {}
         self.entities_pos = {}
 
