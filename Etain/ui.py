@@ -43,7 +43,7 @@ class UI():
                     if self.alt == True:
                         pygame.display.toggle_fullscreen()
                 elif self.round_state == 'CHOICE':
-                        pos = self.render.l_entities[self.render.me].pos
+                    pos = self.render.l_entities[self.render.me].pos
                     if event.key == K_UP:
                         pos[1] -= 1
                         self.render.s_queue.put('MOVE:'+pos[0]+':'+pos[1])

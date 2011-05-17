@@ -199,7 +199,7 @@ class Dana(threading.Thread):
             client_id = int(client_id)
             print('Client %d sent : "%s"' % (client_id, request_msg))
             self.process_message(client_id, request_msg)
-            
+
 
 
 def main(port):

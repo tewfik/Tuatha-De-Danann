@@ -3,7 +3,7 @@
 
 import sys
 import threading
-
+import Queue
 import network
 import render
 from area import Area
@@ -26,8 +26,8 @@ if __name__ == '__main__':
         port = 1337
 
     # queues initialization: communication between network threads and game logic thread (which is in render)
-    send_queue = threading.Queue()
-    receive_queue = threading.Queue()
+    send_queue = Queue.Queue()
+    receive_queue = Queue.Queue()
 
     # network connection
     network.connection_start((host,port), send_queue, receive_queue)
