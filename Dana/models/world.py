@@ -6,6 +6,7 @@ import sys
 #sys.path.append("../../shared/")
 #from area import Area
 
+import entity
 
 # square states
 FREE = 0
@@ -41,7 +42,14 @@ class World(object):
         self.entities_pos = {}
 
 
-    def get_objet_by_position(self, position):
+    def load_fixtures(self):
+        """
+        """
+        epouvantail = entity(id=999)
+        self.register(epouvantail, id=999, 16, 3)
+
+
+    def get_object_by_position(self, position):
         """
         Get an object which is on a given position.
 
