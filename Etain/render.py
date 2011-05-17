@@ -50,7 +50,7 @@ class Render():
 
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
-        self.s_queue.put('GET_ENTITY')
+        self.s_queue.put('GET_ENTITIES')
 
 
     def run(self):
