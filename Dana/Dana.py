@@ -6,8 +6,11 @@ import time
 import threading
 import Queue
 import collections
+import random
 
 import network
+import models.world
+import models.entity
 
 # interval in seconds when players are able to choose their actions
 CHOICE_TIME_INTERVAL = 20
@@ -24,7 +27,8 @@ class Dana(threading.Thread):
     generate the stuff which has to be sent to clients ...
 
     Attributes:
-    - `shutdown`: if True => terminate Dana
+    - `world`: a representation of the world.
+    - `shutdown`: if True => terminate Dana.
     - `queue`: queue Dana has to use to receive messages which are addressed to it.
     - `clients_queues`: dictionary of clients' queues. Format : clients_queues[client_id] = Queue object.
     - `clients_actions` : actions of one turn choosen by each clients.
@@ -39,6 +43,7 @@ class Dana(threading.Thread):
         """
         threading.Thread.__init__(self)
 
+        self.world = models.World.World()
         self.shutdown = False
         self.queue = queue
         self.clients_queues = {}
@@ -61,6 +66,21 @@ class Dana(threading.Thread):
         # check that the client id is registered
         elif self.clients_queues.has_key(client_id):
             # request processing
+            msg_tab = msg.split(':')
+            if msg_tab[0] == 'GET_ENTITY':
+                self.get_entities_request(client_id)
+            elif msg_tab[0] == 'MOVE':
+                try:
+                    self.move_request(client_id, x=int(msg_tab[1]), y=int(msg_tab[2]))
+                except ValueError as e:
+                    print(e)
+            elif msg_tab[0] == 'ATTACK':
+                try:
+                    self.attack_request(client_id, name=msg_tab[1], x=int(msg_tab[2]), y=int(msg_tab[3]))
+                except ValueError as e:
+                    print(e)
+            else:
+                print('Unknown request.')
             self.clients_queues[client_id].put('Hi %s, your message "%s" has been processed' % (client_id, msg))  # DEBUG
         else:
             # error
@@ -81,8 +101,18 @@ class Dana(threading.Thread):
             client_id = self.get_next_id()        # generate an available client id.
             self.clients_queues[client_id] = msg  # register the client queue
 
+            #
+            player = models.entity.LivingEntity(id=client_id)
+            player.add_attack('attack', (10, 0, 0))
+            x = random.randInt(10, 22)
+            y = 22
+            while not self.world.square_available(x, y):
+                x = random.randInt(10, 22)
+
+            self.world.register(player, client_id, x, y)
             # confirm the registration of the client's queue => send its client_id
             self.clients_queues[client_id].put(str(client_id))
+            self.clients_queues[client_id].put('YOU:' + str(client_id))
         else:
             # error TODO(tewfik): create a ProtocolException
             print('protocol error: the first message send by a client thread to Dana'
@@ -145,6 +175,8 @@ class Dana(threading.Thread):
 
         This function describe the flow of a battle
         """
+        self.world.load_fixtures()
+
         battle_is_finished = False
         count_round = 0
         # rounds loop
@@ -199,6 +231,54 @@ class Dana(threading.Thread):
             client_id = int(client_id)
             print('Client %d sent : "%s"' % (client_id, request_msg))
             self.process_message(client_id, request_msg)
+
+
+    def get_entities_request(self, client_id):
+        """
+        Send entities list details to a client.
+
+        Arguments:
+        - `client_id`: client identifier
+        """
+        for entity_id in self.world.entities:
+            entity = self.world.entities[entity_id]
+            pos = self.world.entities_pos[entity_id]
+            self.clients_queues[client_id].put('ENTITY:' + entity.type + ':' + entity_id + ':' + pos[0] + ':' + pos[1])
+
+
+    def move_request(self, client_id, x, y):
+        """
+        An entity ask for move.
+
+        Arguments:
+        - `client_id`: client unique identifier.
+        - `x`: x position
+        - `y`: y position
+        """
+        #TODO(tewfik): check that the client don't move more than which he is allowed to move.
+        try:
+            self.world.move(client_id, x, y)
+        except ForbidenMove as e:
+            print(e)
+
+        self.clients_actions[client_id].append('MOVE:%d:%d:%d' % (client_id, x, y))
+
+
+    def attack_request(self, client_id, name, x, y):
+        """
+        An entity ask for attacking.
+
+        Arguments:
+        - `client_id`: client unique identifier.
+        - `name`: attack name
+        - `x`: target x pos.
+        - `y`: target y pos.
+        """
+        target = self.world.get_objet_by_position((x, y))
+        if target is not None:
+            self.world.entities[client_id].l_attacks[name].hit(target)
+            self.clients_actions[client_id].append('ATTACK:%d:%s:%d:%d' % (client_id, name, x, y))
+        # TODO(tewfik): manage attack fail
 
 
 
