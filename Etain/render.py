@@ -33,6 +33,7 @@ class Render():
         - `UI`: the UI handler.
         - `s_queue`: the queue used to send commands to Dana.
         - `r_queue`: the queue used to receive commands from Dana.
+        - `me`: uid of the entity controlled by the player.
         - `depth`: the color depth.
         - `title`: set the caption in windowed mode.
         """
@@ -45,9 +46,11 @@ class Render():
         self.UI = ui.UI(self)
         self.s_queue = send_queue
         self.r_queue = receive_queue
+        self.me = None
 
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
+        self.s_queue.put('GET_ENTITY')
 
 
     def run(self):
