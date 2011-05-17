@@ -4,6 +4,8 @@
 import pygame
 from pygame.locals import *
 
+SQUARE_SIZE = 32
+
 class List():
     """
     An object used by the render engine to store every entities on the world.
@@ -80,7 +82,8 @@ class Entity():
         - `height`: the height of the entity.
         - `current_anim`: the current played animation.
         - `default_anim`: the animation to play by default.
-        - `dest`: the destination the entity is moving to ([x, y] coordinates).
+        - `cur_pos`: the current position (in pixels).
+        - `dest`: the destination the entity is moving to ([x, y] in pixels).
         """
         self.animations = {}
         self.pos = [pos[0], pos[1]]
@@ -88,7 +91,8 @@ class Entity():
         self.height = height
         self.current_anim = "idle"
         self.default_anim = "idle"
-        self.dest = [pos[0], pos[1]]
+        self.cur_pos = [(pos[0] + 1)*SQUARE_SIZE - self.width, (pos[1] + 1)*SQUARE_SIZE - self.height]
+        self.dest = cur_pos
 
 
     def get_hitbox(self):
@@ -97,7 +101,7 @@ class Entity():
 
         Return: a pygame.Rect.
         """
-        return pygame.Rect(self.pos[0], self.pos[1], self.width, self.height)
+        return pygame.Rect(self.cur_pos[0], self.cur_pos[1], self.width, self.height)
 
 
     def add_animation(self, name, sprites_paths, period):
@@ -123,7 +127,7 @@ class Entity():
         - `pos`: a tuple (x, y) giving the destination's coordinates.
         - `speed`: movespeed in pixel per frame.
         """
-        self.dest = [pos[0], pos[1]]
+        self.dest = [(pos[0] + 1)*SQUARE_SIZE - self.width, (pos[1] + 1)*SQUARE_SIZE - self.height]
         self.speed = speed
 
 
@@ -134,14 +138,14 @@ class Entity():
         Return: A pygame.Surface object.
         """
         if self.dest != self.pos:
-            vect = (self.dest[0] - self.pos[0], self.dest[1] - self.pos[1])
+            vect = (self.dest[0] - self.cur_pos[0], self.dest[1] - self.cur_pos[1])
             norm = sqrt(vect[0]**2 + vect[1]**2)
             vect = (speed * vect[0] / norm, speed * vect[1] / norm)
-            oldpos = pos
-            self.pos = [self.pos[0] + vect[0], self.pos[1] + vect[1]]
-            if (oldpos[0] < self.dest[0] < self.pos[0]) or (oldpos[0] > self.dest[0] > self.pos[0]):
+            oldpos = self.cur_pos
+            self.pos = [self.cur_pos[0] + vect[0], self.cur_pos[1] + vect[1]]
+            if (oldpos[0] < self.dest[0] < self.cur_pos[0]) or (oldpos[0] > self.dest[0] > self.cur_pos[0]):
                 self.pos[0] = self.dest[0]
-            if (oldpos[1] < self.dest[1] < self.pos[1]) or (oldpos[1] > self.dest[1] > self.pos[1]):
+            if (oldpos[1] < self.dest[1] < self.cur_pos[1]) or (oldpos[1] > self.dest[1] > self.cur_pos[1]):
                 self.pos[1] = self.dest[1]
 
         if self.animations[self.current_anim].end:
