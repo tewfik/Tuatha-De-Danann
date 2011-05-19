@@ -27,6 +27,7 @@ class Render():
         Attributes:
         - `font`: the font to use for texts.
         - `fps`: set the frame rate (caution : increasing the frame rate increase the game's speed).
+        - `fps_render`: a boolean telling render to display fps or not.
         - `height`: the height of the window (given in square, size in pixel of each square given by SQUARE_SIZE).
         - `width`: the width of the window (given in square).
         - `l_entities`: list of entities currently on the map.
@@ -34,12 +35,14 @@ class Render():
         - `s_queue`: the queue used to send commands to Dana.
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
+        - `clock`: A pygame timer.
         - `depth`: the color depth.
         - `title`: set the caption in windowed mode.
         """
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
         self.fps = fps
+        self.fps_render = False
         self.height = height
         self.width = width
         self.l_entities = entity.List()
@@ -47,6 +50,7 @@ class Render():
         self.s_queue = send_queue
         self.r_queue = receive_queue
         self.me = None
+        self.clock = pygame.time.Clock()
 
         self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
         pygame.display.set_caption(title)
@@ -57,28 +61,33 @@ class Render():
         """
         Main programm's loop (process, display and inputs).
         """
-        clock = pygame.time.Clock()
 
         while(True):
             self.UI.run()
-
             self.draw_world()
             self.draw_entities()
+            self.draw_overlay()
+
+            pygame.display.update()
+            self.clock.tick(self.fps)
+
+
+    def draw_overlay(self):
+        """
+        """
+        if self.fps_render:
             # fps displaying
-            text = self.font.render(str(clock.get_fps()), False, (0, 0, 0))
+            text = self.font.render(str(self.clock.get_fps()), False, (0, 0, 0))
             text_Rect = text.get_rect()
             text_Rect.right = self.width*SQUARE_SIZE - 10
             text_Rect.top = 10
             self.window.blit(text, text_Rect)
-            # battle state displaying
-            text = self.font.render(self.UI.round_state, False, (0, 0, 0))
-            text_Rect = text.get_rect()
-            text_Rect.left = 10
-            text_Rect.top = 10
-            self.window.blit(text, text_Rect)
-
-            pygame.display.update()
-            clock.tick(self.fps)
+        # battle state displaying
+        text = self.font.render(self.UI.round_state, False, (0, 0, 0))
+        text_Rect = text.get_rect()
+        text_Rect.left = 10
+        text_Rect.top = 10
+        self.window.blit(text, text_Rect)
 
 
     def draw_world(self):

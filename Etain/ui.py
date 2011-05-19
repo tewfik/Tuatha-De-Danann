@@ -39,9 +39,11 @@ class UI():
             elif event.type == KEYDOWN:
                 if event.key == K_LALT:
                     self.alt = True
-                elif event.key == K_RETURN:
-                    if self.alt == True:
+                elif self.alt == True:
+                    if event.key == K_RETURN:
                         pygame.display.toggle_fullscreen()
+                    elif event.key == K_r:
+                        self.render.fps_render = True
                 elif self.round_state == 'CHOICE':
                     pos = list(self.render.l_entities[self.render.me].pos)
                     if event.key == K_UP:
