@@ -129,6 +129,7 @@ class Entity():
         - `pos`: a tuple (x, y) giving the destination's coordinates.
         - `speed`: movespeed in pixel per frame.
         """
+        self.pos = list(pos)
         self.dest = [(pos[0] + 1)*SQUARE_SIZE - self.width, (pos[1] + 1)*SQUARE_SIZE - self.height]
         self.speed = speed
 
