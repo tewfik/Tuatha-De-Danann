@@ -95,7 +95,7 @@ class UI():
         elif cmd[0] == 'MOVE':
             print 'caracter position'
             try:
-                self.render.l_entities[int(cmd[1])].move(pos=(int(cmd[2]), int(cmd[3])), speed=1)
+                self.render.l_entities[int(cmd[1])].move(dest=(int(cmd[2]), int(cmd[3])), speed=1)
             except ValueError as e:
                 print(e)
         elif cmd[0] == 'ATTACK':
