@@ -34,7 +34,7 @@ class List():
         return self.entities[uid]
 
 
-    def add_entity(self, pos, width, height, uid, anim_path):
+    def add_entity(self, pos, width, height, hp, uid, anim_path):
         """
         Create a new entity and store it in the list with is uid.
 
@@ -42,10 +42,11 @@ class List():
         - `pos`: a (x, y) tuple with the starting coordinate.
         - `width`: the width of the entity.
         - `height`: the height of the entity.
+        - `hp`: Gives the current hp and max hp of the entity.
         - `uid`: an unique identifier (int).
         - `animate_path`: the path to the .anim file of the entity.
         """
-        self.entities[uid] = Entity(pos, width, height)
+        self.entities[uid] = Entity(pos, width, height, hp)
         try:
             f = open("data/"+anim_path, 'r')
         except:
@@ -72,7 +73,7 @@ class Entity():
     Object representing any living or non-living entities on the world.
     """
 
-    def __init__(self, pos, width, height):
+    def __init__(self, pos, width, height, hp):
         """
         Set the starting position of the entity.
 
@@ -81,11 +82,15 @@ class Entity():
         - `pos`: a (x, y) tuple with the starting coordinate.
         - `width`: the width of the entity.
         - `height`: the height of the entity.
+        - `hp`: Gives the current hp of the entity.
+        - `max_hp`: Gives the max hp of the entity.
         - `current_anim`: the current played animation.
         - `default_anim`: the animation to play by default.
         - `cur_pos`: the current position (in pixels).
         - `dest`: the destination the entity is moving to ([x, y] in pixels).
         """
+        self.hp = hp
+        self.max_hp = hp
         self.animations = {}
         self.pos = [pos[0], pos[1]]
         self.width = width

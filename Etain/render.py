@@ -109,7 +109,7 @@ class Render():
                 pygame.draw.line(self.window, (50, 50, 50), (0, i*SQUARE_SIZE), (self.width*SQUARE_SIZE, i*SQUARE_SIZE))
 
 
-    def register_entity(self, pos, width, height, uid, anim_path):
+    def register_entity(self, pos, width, height, hp, uid, anim_path):
         """
         Register a New graphic entity to the world.
 
@@ -117,10 +117,11 @@ class Render():
         - `pos`: a tuple (x, y) giving the coordinates where to spawn the entity.
         - `width`: the width of the entity (used for display only).
         - `height`: the height of the entity (used for display only).
+        - `hp`: current and max hp of the entity.
         - `uid`: the unique id of the entity (int).
         - `anim_path`: the anim file of the entity.
         """
-        self.l_entities.add_entity(pos, width, height, uid, anim_path)
+        self.l_entities.add_entity(pos, width, height, hp, uid, anim_path)
 
 
     def remove_entity(self, uid):
@@ -134,10 +135,16 @@ class Render():
         """
         Draw every entities on the map in their current state of animation.
         """
-        for uid in self.l_entities.entities:
-            image = self.l_entities[uid].update()
-            pos = self.l_entities[uid].get_hitbox()
+        for entity in self.l_entities.entities.values():
+            image = entity.update()
+            pos = entity.get_hitbox()
             self.window.blit(image, pos)
+
+            self.window.fill((200, 0, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
+                                          SQUARE_SIZE - 4, 6))
+            hp_ratio = entity.hp/float(entity.max_hp)
+            self.window.fill((0, 200, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
+                                          round(hp_ratio*(SQUARE_SIZE - 4)), 6))
 
 
     def load_map(self, path):
