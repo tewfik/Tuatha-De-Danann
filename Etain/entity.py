@@ -121,16 +121,25 @@ class Entity():
             sprites.append(sprite)
         self.animations[name] = Animation(name, sprites, period)
 
-    def move(self, pos, speed):
+    def move(self, dest, speed):
         """
         Move the entity to a new location at a given speed.
 
         Arguments:
-        - `pos`: a tuple (x, y) giving the destination's coordinates.
+        - `dest`: a tuple (x, y) giving the destination's coordinates.
         - `speed`: movespeed in pixel per frame.
         """
-        self.pos = list(pos)
-        self.dest = [(pos[0] + 1)*SQUARE_SIZE - self.width, (pos[1] + 1)*SQUARE_SIZE - self.height]
+        self.pos = list(dest)
+        self.dest = [(dest[0] + 1)*SQUARE_SIZE - self.width, (dest[1] + 1)*SQUARE_SIZE - self.height]
+        if dest[1] < self.pos[1]:
+            play_anim('move_up')
+        elif dest[0] > self.pos[0]:
+            play_anim('move_right')
+        elif dest[1] > self.pos[1]:
+            play_anim('move_down')
+        elif dest[0] < self.pos[0]:
+            play_anim('move_left')
+
         self.speed = speed
 
 
@@ -146,7 +155,6 @@ class Entity():
             norm = sqrt(vect[0]**2 + vect[1]**2)
             vect = (self.speed * vect[0] / norm, self.speed * vect[1] / norm)
             oldpos = self.cur_pos
-#            self.pos = [self.cur_pos[0] + vect[0], self.cur_pos[1] + vect[1]]
             self.cur_pos = [self.cur_pos[0] + vect[0], self.cur_pos[1] + vect[1]]
             if (oldpos[0] < self.dest[0] < self.cur_pos[0]) or (oldpos[0] > self.dest[0] > self.cur_pos[0]):
                 self.cur_pos[0] = self.dest[0]
@@ -162,13 +170,14 @@ class Entity():
 
     def play_anim(self, name):
         """
-        Change the animation being played.
+        Change the animation being played if given animation exists.
 
         Arguments:
         - `name`: the name of the animation to be played.
         """
-        self.current_anim = name
-        self.animations[self.current_anim].reset()
+        if name in self.animations:
+            self.current_anim = name
+            self.animations[name].reset()
 
 
 
