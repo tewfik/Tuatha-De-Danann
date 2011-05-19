@@ -28,6 +28,7 @@ class Render():
         - `font`: the font to use for texts.
         - `fps`: set the frame rate (caution : increasing the frame rate increase the game's speed).
         - `fps_render`: a boolean telling render to display fps or not.
+        - `grid_render`: a boolean telling render to display the grid or not.
         - `height`: the height of the window (given in square, size in pixel of each square given by SQUARE_SIZE).
         - `width`: the width of the window (given in square).
         - `l_entities`: list of entities currently on the map.
@@ -43,6 +44,7 @@ class Render():
         self.font = pygame.font.SysFont(None, 24)
         self.fps = fps
         self.fps_render = False
+        self.grid_render = False
         self.height = height
         self.width = width
         self.l_entities = entity.List()
@@ -100,6 +102,11 @@ class Render():
             for i in xrange(0, self.width):
                 pos.left = i * SQUARE_SIZE
                 self.window.blit(self.area.tiles[self.area[j][i]], pos)
+        if self.grid_render:
+            for i in xrange(1, self.width):
+                pygame.draw.line(self.window, (50, 50, 50), (i*SQUARE_SIZE, 0), (i*SQUARE_SIZE, self.height*SQUARE_SIZE))
+            for i in xrange(1, self.height):
+                pygame.draw.line(self.window, (50, 50, 50), (0, i*SQUARE_SIZE), (self.width*SQUARE_SIZE, i*SQUARE_SIZE))
 
 
     def register_entity(self, pos, width, height, uid, anim_path):
