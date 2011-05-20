@@ -157,7 +157,6 @@ class Entity():
         Return: A pygame.Surface object.
         """
         if self.dest != self.cur_pos:
-            print('movement start')
             vect = (self.dest[0] - self.cur_pos[0], self.dest[1] - self.cur_pos[1])
             norm = sqrt(vect[0]**2 + vect[1]**2)
             vect = (self.speed * vect[0] / norm, self.speed * vect[1] / norm)
@@ -165,10 +164,8 @@ class Entity():
             self.cur_pos = [self.cur_pos[0] + vect[0], self.cur_pos[1] + vect[1]]
             if (oldpos[0] < self.dest[0] < self.cur_pos[0]) or (oldpos[0] > self.dest[0] > self.cur_pos[0]):
                 self.cur_pos[0] = self.dest[0]
-                print('x updated')
             if (oldpos[1] < self.dest[1] < self.cur_pos[1]) or (oldpos[1] > self.dest[1] > self.cur_pos[1]):
                 self.cur_pos[1] = self.dest[1]
-                print('y updated')
 
         if self.animations[self.current_anim].end:
             self.play_anim(self.default_anim)
