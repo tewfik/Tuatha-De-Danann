@@ -260,7 +260,7 @@ class Dana(threading.Thread):
         - `client_id`: client who sent the request.
         - `ping_id`: identifier of the ping request (to differenciate several ping request).
         """
-        self.clients_queues[client_id].put('PONG %d' % ping_id)
+        self.clients_queues[client_id].put('PONG:%d' % ping_id)
 
 
     def get_entities_request(self, client_id):
