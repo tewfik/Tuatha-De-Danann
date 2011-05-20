@@ -51,6 +51,25 @@ class Dana(threading.Thread):
         self.state = 'BEGIN_FIGHT'
 
 
+    def run(self):
+        """
+        Main loop of Dana.
+        """
+        battle_thread = threading.Thread(target=self.battle)
+        battle_thread.daemon = True
+        battle_thread.start()
+
+        while not self.shutdown:
+            # wait for a queue message
+            print('Dana is waiting for client request')
+            client_id, request_msg = self.queue.get() # TODO(tewfik) : change this for a non-blocking one and manage a timeout ?
+            client_id = int(client_id)
+            print('Client %d sent : "%s"' % (client_id, request_msg))
+            self.process_message(client_id, request_msg)
+
+        battle_thread.join()
+
+
     def process_message(self, client_id, msg):
         """
         Process a given message.
@@ -70,6 +89,7 @@ class Dana(threading.Thread):
             if msg_tab[0] == 'GET_ENTITIES':
                 self.get_entities_request(client_id)
             elif self.state == 'CHOICE':
+                # consider clients actions if and only if Dana is in choice state
                 if msg_tab[0] == 'MOVE':
                     try:
                         self.move_request(client_id, x=int(msg_tab[1]), y=int(msg_tab[2]))
@@ -80,11 +100,54 @@ class Dana(threading.Thread):
                         self.attack_request(client_id, name=msg_tab[1], x=int(msg_tab[2]), y=int(msg_tab[3]))
                     except ValueError as e:
                         print(e)
+            elif msg_tab[0] == 'PING':
+                self.ping_request(client_id, msg_tab[1])
             else:
                 print('Unknown request.')
         else:
             # error
             print('error: a request from an unregistered client has been received')
+
+
+    def battle(self):
+        """
+        Process a battle with all clients connected.
+
+        This function describe the flow of a battle
+        """
+        self.world.load_fixtures()
+
+        battle_is_finished = False
+        count_round = 0
+        # rounds loop
+        while not battle_is_finished:
+            # actions choice phase
+            self.state = 'CHOICE'
+            self.clear_clients_actions()
+            self.send_to_all('ROUND_START:' + str(count_round))
+            time.sleep(CHOICE_TIME_INTERVAL)  # wait that clients finish to choose their actions
+
+            # send actions to clients, they will display them.
+            self.state = 'RENDER_FIGHT'
+            self.send_to_all('END_CHOICE')
+            for count_actions in xrange(NB_ACTIONS):
+                self.send_to_all('BEGIN_ACTION:' + str(count_actions))
+                # send all actions for a given action turn to the clients
+                for client_actions in self.clients_actions.values():
+                    try:
+                        action = client_actions.popleft()
+                        self.send_to_all(action)
+                        time.sleep(ACTION_TIME_INTERVAL)
+                    except IndexError as e:
+                        print(e)
+                        print('|-> empty actions list for client')
+                self.send_to_all('END_ROUND:' + str(count_round))
+                count_round += 1
+
+            if self.battle_is_finished():
+                battle_is_finished = True
+
+        self.send_to_all('BATTLE_END')
 
 
     def register_client(self, msg):
@@ -174,47 +237,6 @@ class Dana(threading.Thread):
             client_queue.put(msg)
 
 
-    def battle(self):
-        """
-        Process a battle with all clients connected.
-
-        This function describe the flow of a battle
-        """
-        self.world.load_fixtures()
-
-        battle_is_finished = False
-        count_round = 0
-        # rounds loop
-        while not battle_is_finished:
-            # actions choice phase
-            self.state = 'CHOICE'
-            self.clear_clients_actions()
-            self.send_to_all('ROUND_START:' + str(count_round))
-            time.sleep(CHOICE_TIME_INTERVAL)  # wait that clients finish to choose their actions
-
-            # send actions to clients, they will display them.
-            self.state = 'RENDER_FIGHT'
-            self.send_to_all('END_CHOICE')
-            for count_actions in xrange(NB_ACTIONS):
-                self.send_to_all('BEGIN_ACTION:' + str(count_actions))
-                # send all actions for a given action turn to the clients
-                for client_actions in self.clients_actions.values():
-                    try:
-                        action = client_actions.popleft()
-                        self.send_to_all(action)
-                        time.sleep(ACTION_TIME_INTERVAL)
-                    except IndexError as e:
-                        print(e)
-                        print('|-> empty actions list for client')
-                self.send_to_all('END_ROUND:' + str(count_round))
-                count_round += 1
-
-            if self.battle_is_finished():
-                battle_is_finished = True
-
-        self.send_to_all('BATTLE_END')
-
-
     def clear_clients_actions(self):
         """
         Reinitialize to a void list all clients' actions lists.
@@ -230,23 +252,15 @@ class Dana(threading.Thread):
         """
         return False
 
-    def run(self):
+    def ping_request(self, client_id, ping_id):
         """
-        Main loop of Dana.
+        Answer 'pong' to a 'ping' request from the client.
+
+        Arguments:
+        - `client_id`: client who sent the request.
+        - `ping_id`: identifier of the ping request (to differenciate several ping request).
         """
-        battle_thread = threading.Thread(target=self.battle)
-        battle_thread.daemon = True
-        battle_thread.start()
-
-        while not self.shutdown:
-            # wait for a queue message
-            print('Dana is waiting for client request')
-            client_id, request_msg = self.queue.get() # TODO(tewfik) : change this for a non-blocking one and manage a timeout ?
-            client_id = int(client_id)
-            print('Client %d sent : "%s"' % (client_id, request_msg))
-            self.process_message(client_id, request_msg)
-
-        battle_thread.join()
+        self.clients_queues[client_id].put('PONG %d' % ping_id)
 
 
     def get_entities_request(self, client_id):
