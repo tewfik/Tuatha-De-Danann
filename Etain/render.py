@@ -95,12 +95,11 @@ class Render():
         """
         Display the ground's tiles'.
         """
-        pos = pygame.Rect(0, 0, SQUARE_SIZE, SQUARE_SIZE)
         for j in xrange(0, self.height):
-            pos.top = j * SQUARE_SIZE
+            top = j * SQUARE_SIZE
             for i in xrange(0, self.width):
-                pos.left = i * SQUARE_SIZE
-                self.window.blit(self.area.tiles[self.area[j][i]], pos)
+                left = i * SQUARE_SIZE
+                self.window.blit(self.area.tiles[self.area[j][i]], (left, top))
         if self.grid_render:
             for i in xrange(1, self.width):
                 pygame.draw.line(self.window, (50, 50, 50), (i*SQUARE_SIZE, 0), (i*SQUARE_SIZE, self.height*SQUARE_SIZE))
@@ -138,18 +137,20 @@ class Render():
             layer = self.l_entities.get_layer(i)
             for entity in layer.values():
                 image = entity.update()
-                pos = entity.get_hitbox()
-                ellipse_Rect = (entity.cur_pos[0], entity.cur_pos[1] + entity.height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
-                pygame.draw.ellipse(self.window, entity.faction_color, ellipse_Rect , 2)
-                self.window.blit(image, pos)
+                ellipse_Rect = (entity.pixel_pos[0], entity.pixel_pos[1] + entity.height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
 
-                self.window.fill((0, 0, 0, 200), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
-                                               SQUARE_SIZE - 4, 6))
+                # entity and circle
+                pygame.draw.ellipse(self.window, entity.faction_color, ellipse_Rect , 2)
+                self.window.blit(image, entity.pixel_pos)
+
+                # health bar
+                self.window.fill((0, 0, 0, 200), (entity.pixel_pos[0] + 2, entity.pixel_pos[1] - 10,
+                                                  SQUARE_SIZE - 4, 6))
                 hp_ratio = entity.hp/float(entity.max_hp)
-                self.window.fill((0, 200, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
-                                          round(hp_ratio*(SQUARE_SIZE - 4)), 6))
-                pygame.draw.rect(self.window, entity.faction_color, (entity.cur_pos[0] + 1, entity.cur_pos[1] - 11,
-                                                               SQUARE_SIZE - 2, 8), 1)
+                self.window.fill((0, 200, 0), (entity.pixel_pos[0] + 2, entity.pixel_pos[1] - 10,
+                                               round(hp_ratio*(SQUARE_SIZE - 4)), 6))
+                pygame.draw.rect(self.window, entity.faction_color, (entity.pixel_pos[0] + 1, entity.pixel_pos[1] - 11,
+                                                                     SQUARE_SIZE - 2, 8), 1)
 
 
     def load_map(self, path):

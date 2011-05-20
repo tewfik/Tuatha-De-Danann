@@ -101,11 +101,11 @@ class Entity():
         - `faction_color`: Color of the entity's faction.
         - `current_anim`: the current played animation.
         - `default_anim`: the animation to play by default.
-        - `cur_pos`: the current position (in pixels).
+        - `pixel_pos`: the current position (in pixels).
         - `dest`: the destination the entity is moving to ([x, y] in pixels).
         """
         self.animations = {}
-        self.pos = [pos[0], pos[1]]
+        self.pos = pos
         self.width = width
         self.height = height
         self.hp = hp
@@ -113,18 +113,9 @@ class Entity():
         self.faction_color = (0, 0, 150)
         self.current_anim = "idle"
         self.default_anim = "idle"
-        self.cur_pos = [(pos[0] + 1)*SQUARE_SIZE - self.width, (pos[1] + 1)*SQUARE_SIZE - self.height]
-        self.dest = self.cur_pos
+        self.pixel_pos = ((pos[0] + 1)*SQUARE_SIZE - self.width, (pos[1] + 1)*SQUARE_SIZE - self.height)
+        self.dest = self.pixel_pos
         self.speed = 1  # TODO(mika): initialize in a better way
-
-
-    def get_hitbox(self):
-        """
-        Get the hitbox corresponding to the sprites size and the entity position.
-
-        Return: a pygame.Rect.
-        """
-        return pygame.Rect(self.cur_pos[0], self.cur_pos[1], self.width, self.height)
 
 
     def add_animation(self, name, sprites_paths, period):
@@ -150,8 +141,8 @@ class Entity():
         - `dest`: a tuple (x, y) giving the destination's coordinates.
         - `speed`: movespeed in pixel per frame.
         """
-        self.pos = list(dest)
-        self.dest = [(dest[0] + 1)*SQUARE_SIZE - self.width, (dest[1] + 1)*SQUARE_SIZE - self.height]
+        self.pos = dest
+        self.dest = ((dest[0] + 1)*SQUARE_SIZE - self.width, (dest[1] + 1)*SQUARE_SIZE - self.height)
         if dest[1] < self.pos[1]:
             play_anim('move_up')
         elif dest[0] > self.pos[0]:
@@ -170,16 +161,16 @@ class Entity():
 
         Return: A pygame.Surface object.
         """
-        if self.dest != self.cur_pos:
-            vect = (self.dest[0] - self.cur_pos[0], self.dest[1] - self.cur_pos[1])
+        if self.dest != self.pixel_pos:
+            vect = (self.dest[0] - self.pixel_pos[0], self.dest[1] - self.pixel_pos[1])
             norm = sqrt(vect[0]**2 + vect[1]**2)
             vect = (self.speed * vect[0] / norm, self.speed * vect[1] / norm)
-            oldpos = self.cur_pos
-            self.cur_pos = [self.cur_pos[0] + vect[0], self.cur_pos[1] + vect[1]]
-            if (oldpos[0] < self.dest[0] < self.cur_pos[0]) or (oldpos[0] > self.dest[0] > self.cur_pos[0]):
-                self.cur_pos[0] = self.dest[0]
-            if (oldpos[1] < self.dest[1] < self.cur_pos[1]) or (oldpos[1] > self.dest[1] > self.cur_pos[1]):
-                self.cur_pos[1] = self.dest[1]
+            oldpos = self.pixel_pos
+            self.pixel_pos = (self.pixel_pos[0] + vect[0], self.pixel_pos[1] + vect[1])
+            if (oldpos[0] < self.dest[0] < self.pixel_pos[0]) or (oldpos[0] > self.dest[0] > self.pixel_pos[0]):
+                self.pixel_pos = (self.dest[0], self.pixel_pos[1])
+            if (oldpos[1] < self.dest[1] < self.pixel_pos[1]) or (oldpos[1] > self.dest[1] > self.pixel_pos[1]):
+                self.pixel_pos = (self.pixel_pos[0], self.dest[1])
 
         if self.animations[self.current_anim].end:
             self.play_anim(self.default_anim)
