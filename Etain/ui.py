@@ -5,6 +5,8 @@ import sys
 import pygame
 from pygame.locals import *
 
+SQUARE_SIZE = 32
+
 class UI():
     """
     Class used for the User Interface.
@@ -81,6 +83,18 @@ class UI():
             elif event.type == KEYUP:
                 if event.key == K_LALT:
                     self.alt = False
+            else:
+                mouse_event(event)
+
+
+    def mouse_event(self):
+        """
+        """
+        if event.type == MOUSEBUTTONDOWN:
+            mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
+            if event.button == 1 and self.round_state == 'CHOICE':
+                self.render.s_queue.put('MOVE:'+str(mouse_pos[0])+':'+str(mouse_pos[1]))
+
 
 
     def process(self, cmd):
