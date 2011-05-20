@@ -107,7 +107,7 @@ class Dana(threading.Thread):
             x = random.randint(10, 22)
             y = 22
             while not self.world.square_available(x, y):
-                x = random.randInt(10, 22)
+                x = random.randint(10, 22)
 
             self.world.register(player, client_id, x, y)
             # confirm the registration of the client's queue => send its client_id
