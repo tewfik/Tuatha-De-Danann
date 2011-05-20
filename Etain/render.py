@@ -137,20 +137,22 @@ class Render():
             layer = self.l_entities.get_layer(i)
             for entity in layer.values():
                 image = entity.update()
-                ellipse_Rect = (entity.pixel_pos[0], entity.pixel_pos[1] + entity.height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
-
-                # entity and circle
-                pygame.draw.ellipse(self.window, entity.faction_color, ellipse_Rect , 2)
+                self.draw_entity_HUD(entity.faction_color, entity.hp, entity.max_hp, entity.pixel_pos, entity.height, entity.width)
                 self.window.blit(image, entity.pixel_pos)
 
-                # health bar
-                self.window.fill((0, 0, 0, 200), (entity.pixel_pos[0] + 2, entity.pixel_pos[1] - 10,
-                                                  SQUARE_SIZE - 4, 6))
-                hp_ratio = entity.hp/float(entity.max_hp)
-                self.window.fill((0, 200, 0), (entity.pixel_pos[0] + 2, entity.pixel_pos[1] - 10,
-                                               round(hp_ratio*(SQUARE_SIZE - 4)), 6))
-                pygame.draw.rect(self.window, entity.faction_color, (entity.pixel_pos[0] + 1, entity.pixel_pos[1] - 11,
-                                                                     SQUARE_SIZE - 2, 8), 1)
+
+    def draw_entity_HUD(self, faction, hp, max_hp, pos, height, width):
+        """
+        """
+        # select circle
+        ellipse_Rect = (pos[0], pos[1] + height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
+        pygame.draw.ellipse(self.window, faction, ellipse_Rect , 2)
+
+        # health bar
+        self.window.fill((0, 0, 0, 200), (pos[0] + 2, pos[1] - 10, SQUARE_SIZE - 4, 6))
+        hp_ratio = hp/float(max_hp)
+        self.window.fill((0, 200, 0), (pos[0] + 2, pos[1] - 10, round(hp_ratio*(SQUARE_SIZE - 4)), 6))
+        pygame.draw.rect(self.window, faction, (pos[0] + 1, pos[1] - 11, SQUARE_SIZE - 2, 8), 1)
 
 
     def load_map(self, path):
