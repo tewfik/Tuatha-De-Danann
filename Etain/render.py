@@ -141,11 +141,13 @@ class Render():
             pygame.draw.ellipse(self.window, entity.faction_color, ellipse_Rect , 2)
             self.window.blit(image, pos)
 
-            self.window.fill((200, 0, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
-                                          SQUARE_SIZE - 4, 6))
+            self.window.fill((100, 100, 100), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
+                                               SQUARE_SIZE - 4, 6), BLEND_SUB)
             hp_ratio = entity.hp/float(entity.max_hp)
             self.window.fill((0, 200, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
                                           round(hp_ratio*(SQUARE_SIZE - 4)), 6))
+            pygame.draw.rect(self.window, entity.faction_color, (entity.cur_pos[0] + 1, entity.cur_pos[1] - 11,
+                                                               SQUARE_SIZE - 2, 8), 1)
 
 
     def load_map(self, path):
