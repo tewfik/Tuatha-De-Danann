@@ -84,17 +84,19 @@ class Entity():
         - `height`: the height of the entity.
         - `hp`: Gives the current hp of the entity.
         - `max_hp`: Gives the max hp of the entity.
+        - `faction_color`: Color of the entity's faction.
         - `current_anim`: the current played animation.
         - `default_anim`: the animation to play by default.
         - `cur_pos`: the current position (in pixels).
         - `dest`: the destination the entity is moving to ([x, y] in pixels).
         """
-        self.hp = hp
-        self.max_hp = hp
         self.animations = {}
         self.pos = [pos[0], pos[1]]
         self.width = width
         self.height = height
+        self.hp = hp
+        self.max_hp = hp
+        self.faction_color = (0, 0, 150)
         self.current_anim = "idle"
         self.default_anim = "idle"
         self.cur_pos = [(pos[0] + 1)*SQUARE_SIZE - self.width, (pos[1] + 1)*SQUARE_SIZE - self.height]

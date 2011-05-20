@@ -138,6 +138,8 @@ class Render():
         for entity in self.l_entities.entities.values():
             image = entity.update()
             pos = entity.get_hitbox()
+            ellipse_Rect = (entity.cur_pos[0], entity.cur_pos[1] + entity.height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
+            pygame.draw.ellipse(self.window, entity.faction_color, ellipse_Rect , 2)
             self.window.blit(image, pos)
 
             self.window.fill((200, 0, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
