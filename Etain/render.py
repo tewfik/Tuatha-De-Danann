@@ -9,8 +9,7 @@ sys.path.append("../shared/")
 from area import Area
 import entity
 import ui
-
-SQUARE_SIZE = 32
+from locales import *
 
 
 class Render():
@@ -20,32 +19,25 @@ class Render():
     Display entities, map and catch mouse and keyboard input to transfer them to the event handler.
     """
 
-    def __init__(self, height, width, title, fps, send_queue, receive_queue):
+    def __init__(self, send_queue, receive_queue):
         """
         Initialize the window's display.
 
         Attributes:
         - `font`: the font to use for texts.
-        - `fps`: set the frame rate (caution : increasing the frame rate increase the game's speed).
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
-        - `height`: the height of the window (given in square, size in pixel of each square given by SQUARE_SIZE).
-        - `width`: the width of the window (given in square).
         - `l_entities`: list of entities currently on the map.
         - `UI`: the UI handler.
         - `s_queue`: the queue used to send commands to Dana.
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
         - `clock`: A pygame timer.
-        - `title`: set the caption in windowed mode.
         """
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
-        self.fps = fps
         self.fps_render = False
         self.grid_render = False
-        self.height = height
-        self.width = width
         self.l_entities = entity.List()
         self.UI = ui.UI(self)
         self.s_queue = send_queue
@@ -53,8 +45,8 @@ class Render():
         self.me = None
         self.clock = pygame.time.Clock()
 
-        self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0)
-        pygame.display.set_caption(title)
+        self.window = pygame.display.set_mode((WIDTH * SQUARE_SIZE, HEIGHT * SQUARE_SIZE), 0)
+        pygame.display.set_caption(TITLE)
         self.s_queue.put('GET_ENTITIES')
 
 
@@ -70,7 +62,7 @@ class Render():
             self.draw_overlay()
 
             pygame.display.flip()
-            self.clock.tick(self.fps)
+            self.clock.tick(FPS)
 
 
     def draw_overlay(self):
@@ -80,7 +72,7 @@ class Render():
             # fps displaying
             text = self.font.render(str(self.clock.get_fps()), False, (0, 0, 0))
             text_Rect = text.get_rect()
-            text_Rect.right = self.width*SQUARE_SIZE - 10
+            text_Rect.right = WIDTH * SQUARE_SIZE - 10
             text_Rect.top = 10
             self.window.blit(text, text_Rect)
         # battle state displaying
@@ -95,16 +87,16 @@ class Render():
         """
         Display the ground's tiles'.
         """
-        for j in xrange(0, self.height):
+        for j in xrange(0, HEIGHT):
             top = j * SQUARE_SIZE
-            for i in xrange(0, self.width):
+            for i in xrange(0, WIDTH):
                 left = i * SQUARE_SIZE
                 self.window.blit(self.area.tiles[self.area[j][i]], (left, top))
         if self.grid_render:
-            for i in xrange(1, self.width):
-                pygame.draw.line(self.window, (50, 50, 50), (i*SQUARE_SIZE, 0), (i*SQUARE_SIZE, self.height*SQUARE_SIZE))
-            for i in xrange(1, self.height):
-                pygame.draw.line(self.window, (50, 50, 50), (0, i*SQUARE_SIZE), (self.width*SQUARE_SIZE, i*SQUARE_SIZE))
+            for i in xrange(1, WIDTH):
+                pygame.draw.line(self.window, (50, 50, 50), (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT * SQUARE_SIZE))
+            for i in xrange(1, HEIGHT):
+                pygame.draw.line(self.window, (50, 50, 50), (0, i * SQUARE_SIZE), (WIDTH * SQUARE_SIZE, i * SQUARE_SIZE))
 
 
     def register_entity(self, pos, width, height, hp, uid, anim_path):
@@ -133,7 +125,7 @@ class Render():
         """
         Draw every entities on the map in their current state of animation.
         """
-        for i in xrange(self.height):
+        for i in xrange(HEIGHT):
             layer = self.l_entities.get_layer(i)
             for entity in layer.values():
                 image = entity.update()

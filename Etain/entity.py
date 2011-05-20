@@ -4,8 +4,7 @@
 import pygame
 from pygame.locals import *
 from math import sqrt
-
-SQUARE_SIZE = 32
+from locales import *
 
 class List():
     """

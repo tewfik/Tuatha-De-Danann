@@ -4,8 +4,7 @@
 import sys
 import pygame
 from pygame.locals import *
-
-SQUARE_SIZE = 32
+from locales import *
 
 class UI():
     """
