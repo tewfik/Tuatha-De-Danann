@@ -84,10 +84,10 @@ class UI():
                 if event.key == K_LALT:
                     self.alt = False
             else:
-                mouse_event(event)
+                self.mouse_event(event)
 
 
-    def mouse_event(self):
+    def mouse_event(self, event):
         """
         """
         if event.type == MOUSEBUTTONDOWN:
