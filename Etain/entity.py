@@ -34,6 +34,16 @@ class List():
         return self.entities[uid]
 
 
+    def get_layer(self, i):
+        """
+        """
+        layer= {}
+        for uid in self.entities:
+            if self.entities[uid].pos[1] == i:
+                layer[uid] = self.entities[uid]
+        return layer
+
+
     def add_entity(self, pos, width, height, hp, uid, anim_path):
         """
         Create a new entity and store it in the list with is uid.
