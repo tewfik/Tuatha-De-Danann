@@ -20,7 +20,7 @@ class Render():
     Display entities, map and catch mouse and keyboard input to transfer them to the event handler.
     """
 
-    def __init__(self, height, width, depth, title, fps, send_queue, receive_queue):
+    def __init__(self, height, width, title, fps, send_queue, receive_queue):
         """
         Initialize the window's display.
 
@@ -37,7 +37,6 @@ class Render():
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
         - `clock`: A pygame timer.
-        - `depth`: the color depth.
         - `title`: set the caption in windowed mode.
         """
         pygame.init()
@@ -54,7 +53,7 @@ class Render():
         self.me = None
         self.clock = pygame.time.Clock()
 
-        self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0, depth)
+        self.window = pygame.display.set_mode((width*SQUARE_SIZE, height*SQUARE_SIZE), 0)
         pygame.display.set_caption(title)
         self.s_queue.put('GET_ENTITIES')
 
@@ -70,7 +69,7 @@ class Render():
             self.draw_entities()
             self.draw_overlay()
 
-            pygame.display.update()
+            pygame.display.flip()
             self.clock.tick(self.fps)
 
 
