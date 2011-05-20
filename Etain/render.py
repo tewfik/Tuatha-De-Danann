@@ -134,20 +134,27 @@ class Render():
         """
         Draw every entities on the map in their current state of animation.
         """
+        layers = []
+        for i in xrange(self.height):
+            layers.append(pygame.Surface((self.width*SQUARE_SIZE, self.height*SQUARE_SIZE), HWSURFACE | SRCALPHA))
         for entity in self.l_entities.entities.values():
+            l_ent = layers[entity.pos[1]]
             image = entity.update()
             pos = entity.get_hitbox()
             ellipse_Rect = (entity.cur_pos[0], entity.cur_pos[1] + entity.height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
-            pygame.draw.ellipse(self.window, entity.faction_color, ellipse_Rect , 2)
-            self.window.blit(image, pos)
+            pygame.draw.ellipse(l_ent, entity.faction_color, ellipse_Rect , 2)
+            l_ent.blit(image, pos)
 
-            self.window.fill((100, 100, 100), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
-                                               SQUARE_SIZE - 4, 6), BLEND_SUB)
+            l_ent.fill((0, 0, 0, 200), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
+                                               SQUARE_SIZE - 4, 6))
             hp_ratio = entity.hp/float(entity.max_hp)
-            self.window.fill((0, 200, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
+            l_ent.fill((0, 200, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
                                           round(hp_ratio*(SQUARE_SIZE - 4)), 6))
-            pygame.draw.rect(self.window, entity.faction_color, (entity.cur_pos[0] + 1, entity.cur_pos[1] - 11,
+            pygame.draw.rect(l_ent, entity.faction_color, (entity.cur_pos[0] + 1, entity.cur_pos[1] - 11,
                                                                SQUARE_SIZE - 2, 8), 1)
+
+        for layer in layers:
+            self.window.blit(layer, (0, 0))
 
 
     def load_map(self, path):
