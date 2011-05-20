@@ -95,12 +95,11 @@ class Render():
         """
         Display the ground's tiles'.
         """
-        pos = pygame.Rect(0, 0, SQUARE_SIZE, SQUARE_SIZE)
         for j in xrange(0, self.height):
-            pos.top = j * SQUARE_SIZE
+            top = j * SQUARE_SIZE
             for i in xrange(0, self.width):
-                pos.left = i * SQUARE_SIZE
-                self.window.blit(self.area.tiles[self.area[j][i]], pos)
+                left = i * SQUARE_SIZE
+                self.window.blit(self.area.tiles[self.area[j][i]], (left, top))
         if self.grid_render:
             for i in xrange(1, self.width):
                 pygame.draw.line(self.window, (50, 50, 50), (i*SQUARE_SIZE, 0), (i*SQUARE_SIZE, self.height*SQUARE_SIZE))
@@ -134,43 +133,26 @@ class Render():
         """
         Draw every entities on the map in their current state of animation.
         """
-#        layers = []
-#        for i in xrange(self.height):
-#            layers.append(pygame.Surface((self.width*SQUARE_SIZE, self.height*SQUARE_SIZE), HWSURFACE | SRCALPHA))
-#        for entity in self.l_entities.entities.values():
-#            l_ent = layers[entity.pos[1]]
-#            image = entity.update()
-#            pos = entity.get_hitbox()
-#            ellipse_Rect = (entity.cur_pos[0], entity.cur_pos[1] + entity.height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
-#            pygame.draw.ellipse(l_ent, entity.faction_color, ellipse_Rect , 2)
-#            l_ent.blit(image, pos)
-#
-#            l_ent.fill((0, 0, 0, 200), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
-#                                               SQUARE_SIZE - 4, 6))
-#            hp_ratio = entity.hp/float(entity.max_hp)
-#            l_ent.fill((0, 200, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
-#                                          round(hp_ratio*(SQUARE_SIZE - 4)), 6))
-#            pygame.draw.rect(l_ent, entity.faction_color, (entity.cur_pos[0] + 1, entity.cur_pos[1] - 11,
-#                                                               SQUARE_SIZE - 2, 8), 1)
-#
-#        for layer in layers:
-#            self.window.blit(layer, (0, 0))
         for i in xrange(self.height):
             layer = self.l_entities.get_layer(i)
             for entity in layer.values():
                 image = entity.update()
-                pos = entity.get_hitbox()
-                ellipse_Rect = (entity.cur_pos[0], entity.cur_pos[1] + entity.height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
-                pygame.draw.ellipse(self.window, entity.faction_color, ellipse_Rect , 2)
-                self.window.blit(image, pos)
+                self.draw_entity_HUD(entity.faction_color, entity.hp, entity.max_hp, entity.pixel_pos, entity.height, entity.width)
+                self.window.blit(image, entity.pixel_pos)
 
-                self.window.fill((0, 0, 0, 200), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
-                                               SQUARE_SIZE - 4, 6))
-                hp_ratio = entity.hp/float(entity.max_hp)
-                self.window.fill((0, 200, 0), (entity.cur_pos[0] + 2, entity.cur_pos[1] - 10,
-                                          round(hp_ratio*(SQUARE_SIZE - 4)), 6))
-                pygame.draw.rect(self.window, entity.faction_color, (entity.cur_pos[0] + 1, entity.cur_pos[1] - 11,
-                                                               SQUARE_SIZE - 2, 8), 1)
+
+    def draw_entity_HUD(self, faction, hp, max_hp, pos, height, width):
+        """
+        """
+        # select circle
+        ellipse_Rect = (pos[0], pos[1] + height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
+        pygame.draw.ellipse(self.window, faction, ellipse_Rect , 2)
+
+        # health bar
+        self.window.fill((0, 0, 0, 200), (pos[0] + 2, pos[1] - 10, SQUARE_SIZE - 4, 6))
+        hp_ratio = hp/float(max_hp)
+        self.window.fill((0, 200, 0), (pos[0] + 2, pos[1] - 10, round(hp_ratio*(SQUARE_SIZE - 4)), 6))
+        pygame.draw.rect(self.window, faction, (pos[0] + 1, pos[1] - 11, SQUARE_SIZE - 2, 8), 1)
 
 
     def load_map(self, path):
