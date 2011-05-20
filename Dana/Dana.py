@@ -109,7 +109,11 @@ class Dana(threading.Thread):
             while not self.world.square_available(x, y):
                 x = random.randint(10, 22)
 
-            self.world.register(player, client_id, x, y)
+            try:
+                self.world.register(player, client_id, x, y)
+            except ForbiddenMove as e:
+                print(e)
+
             # confirm the registration of the client's queue => send its client_id
             self.clients_queues[client_id].put(str(client_id))
             self.clients_queues[client_id].put('YOU:' + str(client_id))
@@ -270,12 +274,10 @@ class Dana(threading.Thread):
         #TODO(tewfik): check that the client don't move more than which he is allowed to move.
         try:
             self.world.move(client_id, x, y)
+            self.clients_actions[client_id].append('MOVE:%d:%d:%d' % (client_id, x, y))
+            print 'client_position = (%d, %d)' % self.world.entities_pos[client_id] # DEBUG client position
         except models.world.ForbiddenMove as e:
             print(e)
-
-        self.clients_actions[client_id].append('MOVE:%d:%d:%d' % (client_id, x, y))
-
-        print 'client_position = (%d, %d)' % self.world.entities_pos[client_id] # DEBUG client position
 
 
     def attack_request(self, client_id, name, x, y):

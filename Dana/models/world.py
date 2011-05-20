@@ -86,9 +86,15 @@ class World(object):
         - `entity`: a player, a monster, a vehicle ...
         - `x`: x coordinate where to spawn the entity.
         - `y`: y coordinate.
+
+        Exceptions:
+        - `ForbiddenMove`: the square (x, y) is unavailable.
         """
-        self.entities[id] = entity
-        self.entities_pos[id] = (x, y)
+        if self.square_available(x, y):
+            self.entities[id] = entity
+            self.entities_pos[id] = (x, y)
+        else:
+            raise ForbiddenMove('square (%d, %d) unavailable' % (x, y))
 
 
     def unregister(self, entity_id):
