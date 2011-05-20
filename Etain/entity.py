@@ -36,6 +36,10 @@ class List():
 
     def get_layer(self, i):
         """
+        Give a sub-dictionnary of entity of the given layer.
+
+        Arguments:
+        - `i`: number of the layer (0 is bottom layer, HEIGHT is top layer)
         """
         layer= {}
         for uid in self.entities:
