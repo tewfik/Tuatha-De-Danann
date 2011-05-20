@@ -50,7 +50,7 @@ class UI():
                         else:
                             self.render.grid_render = True
                     elif event.key == K_r:
-                        if self.render.grid_render:
+                        if self.render.fps_render:
                             self.render.fps_render = False
                         else:
                             self.render.fps_render = True
