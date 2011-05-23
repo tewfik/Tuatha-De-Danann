@@ -47,32 +47,6 @@ class UI():
                         self.render.grid_render = not self.render.grid_render
                     elif event.key == K_r:
                         self.render.fps_render = not self.render.fps_render
-                elif self.round_state == 'CHOICE':
-                    pos = list(self.render.l_entities[self.render.me].pos)
-                    if event.key == K_UP:
-                        pos[1] -= 1
-                        self.render.s_queue.put('MOVE:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_RIGHT:
-                        pos[0] += 1
-                        self.render.s_queue.put('MOVE:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_DOWN:
-                        pos[1] += 1
-                        self.render.s_queue.put('MOVE:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_LEFT:
-                        pos[0] -= 1
-                        self.render.s_queue.put('MOVE:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_z:
-                        pos[1] -= 1
-                        self.render.s_queue.put('ATTACK:attack:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_d:
-                        pos[0] += 1
-                        self.render.s_queue.put('ATTACK:attack:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_s:
-                        pos[1] += 1
-                        self.render.s_queue.put('ATTACK:attack:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_q:
-                        pos[0] -= 1
-                        self.render.s_queue.put('ATTACK:attack:'+str(pos[0])+':'+str(pos[1]))
             elif event.type == KEYUP:
                 if event.key == K_LALT:
                     self.alt = False
@@ -89,7 +63,10 @@ class UI():
             elif not self.render.menu:
                 mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
                 if event.button == 1 and self.round_state == 'CHOICE':
-                    self.render.s_queue.put('MOVE:'+str(mouse_pos[0])+':'+str(mouse_pos[1]))
+                    if self.entity_on(mouse_pos):
+                        self.render.s_queue.put('ATTACK:attack:%d:%d' % mouse_pos)
+                    else:
+                        self.render.s_queue.put('MOVE:%d:%d' % mouse_pos)
             else:
                 menu_x = (WIDTH - MENU_WIDTH) / 2
                 menu_y = (HEIGHT - MENU_HEIGHT) / 2
@@ -106,6 +83,17 @@ class UI():
                return True
         else:
             return False
+
+
+    def entity_on(self, pos):
+        """
+        """
+        result = False
+        for entity in self.render.l_entities.get_layer(pos[1]):
+            if entity.pos[0] == pos[0]:
+                result = True
+                break
+        return result
 
 
     def process(self, cmd):
