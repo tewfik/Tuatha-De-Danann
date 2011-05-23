@@ -90,12 +90,19 @@ class Render():
             pass
 
         # Speech bubbles
-        for bubble in self.bubbles.values():
+        del_uid = None
+        for uid in self.bubbles:
+            bubble = self.bubbles[uid]
             ent = self.l_entities[bubble[0]]
             pos = (ent.pixel_pos[0] + ent.width, ent.pixel_pos[1])
             pygame.draw.polygon(self.window, WHITE, ((pos[0] - 5, pos[1] + 10), (pos[0] + 40, pos[1] - 20), (pos[0] + 15, pos[1] - 20)))
             pygame.draw.ellipse(self.window, WHITE, (pos[0] - 10, pos[1] - 50, 100, 50))
             self.text(bubble[1], self.speech_font, top=pos[1] - 35, left=pos[0] + 5, alias=False)
+            bubble[2] -= 1
+            if bubble[2] <= 0:
+                del_uid = uid
+        if del_uid is not None:
+            del self.bubbles[del_uid]
 
         # Menu display
         if self.menu:
