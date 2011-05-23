@@ -173,13 +173,13 @@ class Dana(threading.Thread):
                 x = random.randint(10, 22)
 
             try:
-                self.world.register(player, client_id, x, y)
+                self.world.register(entity=player, entity_id=client_id, faction_id=1, x=x, y=y)
             except ForbiddenMove as e:
                 print(e)
 
             # confirm the registration of the client's queue => send its client_id
             self.clients_queues[client_id].put(str(client_id))
-            self.clients_queues[client_id].put('YOU:' + str(client_id))
+            self.clients_queues[client_id].put('YOU:%d:%d' % (client_id, 1))  # TODO(tewfik): replace "1" by a calculated faction_id
             print('client N° %d has been registered' % client_id)
         else:
             # error TODO(tewfik): create a ProtocolException
@@ -263,6 +263,22 @@ class Dana(threading.Thread):
         self.clients_queues[client_id].put('PONG:%d' % ping_id)
 
 
+    def entity_response(self, client_id, type, faction_id, entity_id, x, y, hp_max, hp):
+        """
+        Send an entity's details to a given client.
+
+        Arguments:
+        - `type`: entity's type ('warrior', 'scarecrow' ...).
+        - `faction_id`: faction identifier.
+        - `entity_id`: entity unique identifier.
+        - `x`: x position.
+        - `y`: y position.
+        - `hp_max`: maximum hp.
+        - `hp`: current hp.
+        """
+        self.clients_queues[client_id].put('ENTITY:%s:%d:%d:%d:%d:%d:%d' % (type, faction_id, entity_id, x, y, hp_max, hp))
+
+
     def get_entities_request(self, client_id):
         """
         Send entities list details to a client.
@@ -273,7 +289,15 @@ class Dana(threading.Thread):
         for entity_id in self.world.entities:
             entity = self.world.entities[entity_id]
             pos = self.world.entities_pos[entity_id]
-            self.clients_queues[client_id].put('ENTITY:%s:%d:%d:%d' % (entity.type, entity_id, pos[0], pos[1]))
+            self.send_entity_response(client_id,
+                                      type=entity.type,
+                                      faction_id=1,#
+                                      entity_id=entity_id,
+                                      x=pos[0],
+                                      y=pos[1],
+                                      hp_max=entity.maxhp,
+                                      hp=entity.hp)
+
 
 
     def move_request(self, client_id, x, y):
