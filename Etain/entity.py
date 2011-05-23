@@ -66,7 +66,7 @@ class List():
             print "Can't load data/"+anim_path
         for line in f.readlines():
             line = line.split("**")
-            self.entities[uid].add_animation(line[0], line[2:-1], int(line[1]))
+            self.entities[uid].add_animation(line[0], line[3:-1], int(line[1]), line[2])
         f.close()
 
 
@@ -110,14 +110,14 @@ class Entity():
         self.hp = hp
         self.max_hp = hp
         self.faction_color = (0, 0, 150)
-        self.current_anim = "idle"
-        self.default_anim = "idle"
+        self.current_anim = "idle_down" # TODO(mika): initialize in a better way
+        self.default_anim = "idle_down" # TODO(mika): initialize in a better way
         self.pixel_pos = ((pos[0] + 1)*SQUARE_SIZE - self.width, (pos[1] + 1)*SQUARE_SIZE - self.height)
         self.dest = self.pixel_pos
         self.speed = 1  # TODO(mika): initialize in a better way
 
 
-    def add_animation(self, name, sprites_paths, period):
+    def add_animation(self, name, sprites_paths, period, direction):
         """
         Add a new animation to the entity.
 
@@ -125,12 +125,13 @@ class Entity():
         - `name`: name of the animation (ie: attack, idle...).
         - `sprites_paths`: list of paths to the sprites.
         - `period`: number of frame to wait between two sprites.
+        - `direction`: the direction the entity is facing during the animation.
         """
         sprites = []
         for path in sprites_paths:
             sprite = pygame.image.load('sprites/'+path)
             sprites.append(sprite)
-        self.animations[name] = Animation(name, sprites, period)
+        self.animations[name] = Animation(name, sprites, period, direction)
 
     def move(self, dest, speed):
         """
@@ -170,6 +171,8 @@ class Entity():
                 self.pixel_pos = (self.dest[0], self.pixel_pos[1])
             if (oldpos[1] < self.dest[1] < self.pixel_pos[1]) or (oldpos[1] > self.dest[1] > self.pixel_pos[1]):
                 self.pixel_pos = (self.pixel_pos[0], self.dest[1])
+            if (self.dest == self.pixel_pos):
+                self.stop_anim()
 
         if self.animations[self.current_anim].end:
             self.play_anim(self.default_anim, True)
@@ -189,6 +192,14 @@ class Entity():
             self.animations[name].reset(loop)
 
 
+    def stop_anim(self):
+        """
+        Stop the current animation and play idle anim.
+        """
+        anim_idle = "idle_"+self.animations[self.current_anim].direction
+        self.play_anim(anim_idle, True)
+
+
 
 #TODO(Mika): add a sound effect for animation.
 class Animation():
@@ -196,7 +207,7 @@ class Animation():
     Use to manipulate an entity's animation.
     """
 
-    def __init__(self, name, sprites, period):
+    def __init__(self, name, sprites, period, direction):
         """
         Initialize the animation.
 
@@ -208,6 +219,8 @@ class Animation():
         - `current_sprite`: the current displayed sprite.
         - `nb_sprites`: the number of sprites in the animation.
         - `end`: a boolean (True : ended, False : playing).
+        - `loop`: True to play the anim in a loop, False to play once.
+        - `direction`: the direction the entity is facing during the animation.
         """
         self.name = name
         self.sprites = sprites
@@ -217,6 +230,7 @@ class Animation():
         self.nb_sprites = len(sprites)
         self.end = False
         self.loop = False
+        self.direction = direction
 
 
     def reset(self, loop):
