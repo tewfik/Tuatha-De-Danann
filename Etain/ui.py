@@ -44,15 +44,9 @@ class UI():
                     if event.key == K_RETURN:
                         pygame.display.toggle_fullscreen()
                     elif event.key == K_g:
-                        if self.render.grid_render:
-                            self.render.grid_render = False
-                        else:
-                            self.render.grid_render = True
+                        self.render.grid_render = not self.render.grid_render
                     elif event.key == K_r:
-                        if self.render.fps_render:
-                            self.render.fps_render = False
-                        else:
-                            self.render.fps_render = True
+                        self.render.fps_render = not self.render.fps_render
                 elif self.round_state == 'CHOICE':
                     pos = list(self.render.l_entities[self.render.me].pos)
                     if event.key == K_UP:
