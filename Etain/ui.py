@@ -119,7 +119,7 @@ class UI():
                 print(e)
         elif cmd[0] == 'ATTACK':
             try:
-                self.render.l_entities[int(cmd[1])].play_anim(name=cmd[2])
+                self.render.l_entities[int(cmd[1])].play_anim(name=cmd[2], loop=False)
             except ValueError as e:
                 print(e)
         elif cmd[0] == 'ENTITY':
