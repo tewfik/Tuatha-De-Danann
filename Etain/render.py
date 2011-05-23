@@ -26,6 +26,7 @@ class Render():
         Attributes:
         - `font`: the font to use for texts.
         - `menu_font`: the font to use for menus.
+        - `speech_font`: the font to use for speech bubbles.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
         - `menu`: a boolean telling render to display the menu or not.
@@ -35,19 +36,24 @@ class Render():
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
         - `clock`: A pygame timer.
+        - `bubbles`: A dictionnary of all bubbles currently displaying.
         """
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
         self.menu_font = pygame.font.SysFont(None, 16)
+        self.speech_font = pygame.font.SysFont("Monospace", 12)
+        self.speech_font.set_bold(True)
         self.fps_render = False
         self.grid_render = False
         self.menu = False
+        self.banner_fight = False
         self.l_entities = entity.List()
         self.UI = ui.UI(self)
         self.s_queue = send_queue
         self.r_queue = receive_queue
         self.me = None
         self.clock = pygame.time.Clock()
+        self.bubbles = {}
 
         self.window = pygame.display.set_mode((WIDTH, HEIGHT), 0)
         pygame.display.set_caption(TITLE)
@@ -80,6 +86,17 @@ class Render():
         # battle state displaying
         self.text(self.UI.round_state, left = 10, top = 10)
 
+        if self.banner_fight:
+            pass
+
+        # Speech bubbles
+        for bubble in self.bubbles.values():
+            ent = self.l_entities[bubble[0]]
+            pos = (ent.pixel_pos[0] + ent.width, ent.pixel_pos[1])
+            pygame.draw.polygon(self.window, WHITE, ((pos[0] - 5, pos[1] + 10), (pos[0] + 40, pos[1] - 20), (pos[0] + 15, pos[1] - 20)))
+            pygame.draw.ellipse(self.window, WHITE, (pos[0] - 10, pos[1] - 50, 100, 50))
+            self.text(bubble[1], self.speech_font, top=pos[1] - 35, left=pos[0] + 5, alias=False)
+
         # Menu display
         if self.menu:
             menu_x = (WIDTH - MENU_WIDTH) / 2
@@ -97,12 +114,12 @@ class Render():
             self.text("Afficher les IPS.", self.menu_font, top=menu_y + 90, left=menu_x + 50)
 
 
-    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, color=(0, 0, 0)):
+    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, color=(0, 0, 0), alias=True):
         """
         """
         if font is None:
             font = self.font
-        text = font.render(msg, True, color)
+        text = font.render(msg, alias, color)
         text_Rect = text.get_rect()
         if top is not None:
             text_Rect.top = top
