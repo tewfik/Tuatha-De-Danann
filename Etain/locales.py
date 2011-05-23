@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 # Render config
-HEIGHT = 24
-WIDTH = 32
+ROWS = 24
+COLUMNS = 32
+SQUARE_SIZE = 32
+HEIGHT = ROWS * SQUARE_SIZE
+WIDTH = COLUMNS * SQUARE_SIZE
 TITLE = 'Tuatha dé Danann'
 FPS = 40
-SQUARE_SIZE = 32
 
 # Factions
 NEUTRE = 0

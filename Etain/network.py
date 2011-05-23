@@ -159,7 +159,7 @@ class ThreadReceive(threading.Thread):
         """
         global _receive_queue
 
-        # main receive loop 
+        # main receive loop
         close_connection = False
         while not close_connection:
             data = None

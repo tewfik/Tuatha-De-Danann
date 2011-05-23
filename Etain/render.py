@@ -49,7 +49,7 @@ class Render():
         self.me = None
         self.clock = pygame.time.Clock()
 
-        self.window = pygame.display.set_mode((WIDTH * SQUARE_SIZE, HEIGHT * SQUARE_SIZE), 0)
+        self.window = pygame.display.set_mode((WIDTH, HEIGHT), 0)
         pygame.display.set_caption(TITLE)
         self.s_queue.put('GET_ENTITIES')
 
@@ -64,7 +64,7 @@ class Render():
             self.draw_world()
             self.draw_entities()
             self.draw_overlay()
-            self.window.blit(gear, (WIDTH * SQUARE_SIZE - 18, 2))
+            self.window.blit(gear, (WIDTH - 18, 2))
 
             pygame.display.flip()
             self.clock.tick(FPS)
@@ -75,15 +75,15 @@ class Render():
         """
         # fps displaying
         if self.fps_render:
-            self.text("%1.1f" % self.clock.get_fps(), top = 2, right = WIDTH * SQUARE_SIZE - 18)
+            self.text("%1.1f" % self.clock.get_fps(), top = 2, right = WIDTH - 18)
 
         # battle state displaying
         self.text(self.UI.round_state, left = 10, top = 10)
 
         # Menu display
         if self.menu:
-            menu_x = (WIDTH*SQUARE_SIZE - MENU_WIDTH) / 2
-            menu_y = (HEIGHT*SQUARE_SIZE - MENU_HEIGHT) / 2
+            menu_x = (WIDTH - MENU_WIDTH) / 2
+            menu_y = (HEIGHT - MENU_HEIGHT) / 2
             self.window.fill(GREY, (menu_x, menu_y, MENU_WIDTH, MENU_HEIGHT))
 
             self.window.fill(WHITE, (menu_x + 30, menu_y + 50, 10, 10))
@@ -119,16 +119,16 @@ class Render():
         """
         Display the ground's tiles'.
         """
-        for j in xrange(0, HEIGHT):
+        for j in xrange(0, ROWS):
             top = j * SQUARE_SIZE
-            for i in xrange(0, WIDTH):
+            for i in xrange(0, COLUMNS):
                 left = i * SQUARE_SIZE
                 self.window.blit(self.area.tiles[self.area[j][i]], (left, top))
         if self.grid_render:
-            for i in xrange(1, WIDTH):
-                pygame.draw.line(self.window, (50, 50, 50), (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT * SQUARE_SIZE))
-            for i in xrange(1, HEIGHT):
-                pygame.draw.line(self.window, (50, 50, 50), (0, i * SQUARE_SIZE), (WIDTH * SQUARE_SIZE, i * SQUARE_SIZE))
+            for i in xrange(1, COLUMNS):
+                pygame.draw.line(self.window, (50, 50, 50), (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT))
+            for i in xrange(1, ROWS):
+                pygame.draw.line(self.window, (50, 50, 50), (0, i * SQUARE_SIZE), (WIDTH, i * SQUARE_SIZE))
 
 
     def register_entity(self, pos, width, height, max_hp, hp, faction, uid, anim_path):

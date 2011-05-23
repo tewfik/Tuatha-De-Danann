@@ -84,15 +84,15 @@ class UI():
         """
         """
         if event.type == MOUSEBUTTONDOWN:
-            if event.pos[0] > WIDTH * SQUARE_SIZE - 18  and event.pos[1] < 18:
+            if self.mouse_hitbox((WIDTH - 18, 0, 18, 18), event.pos):
                 self.render.menu = not self.render.menu
             elif not self.render.menu:
                 mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
                 if event.button == 1 and self.round_state == 'CHOICE':
                     self.render.s_queue.put('MOVE:'+str(mouse_pos[0])+':'+str(mouse_pos[1]))
             else:
-                menu_x = (WIDTH * SQUARE_SIZE - MENU_WIDTH) / 2
-                menu_y = (HEIGHT * SQUARE_SIZE - MENU_HEIGHT) / 2
+                menu_x = (WIDTH - MENU_WIDTH) / 2
+                menu_y = (HEIGHT - MENU_HEIGHT) / 2
                 if self.mouse_hitbox((menu_x + 30, menu_y + 50, 10, 10), event.pos):
                         self.render.grid_render = not self.render.grid_render
                 elif self.mouse_hitbox((menu_x + 30, menu_y + 90, 10, 10), event.pos):

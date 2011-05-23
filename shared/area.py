@@ -7,8 +7,8 @@ import pygame
 from pygame.locals import *
 
 SQUARE_SIZE = 32
-WIDTH = 32
-HEIGHT = 24
+COLUMNS = 32
+ROWS = 24
 
 class Area():
     """
@@ -55,11 +55,11 @@ if __name__ == '__main__':
         sys.exit()
 
     f = open(sys.argv[1], 'r')
-    area.map = [[0]* WIDTH for x in xrange(0,HEIGHT)]
-    for i in xrange(0, HEIGHT):
+    area.map = [[0]* COLUMNS for x in xrange(ROWS)]
+    for i in xrange(0, ROWS):
         line = f.readline()[:-1]
         row = line.split(' ')
-        for j in xrange(0, WIDTH):
+        for j in xrange(0, COLUMNS):
             area.map[i][j] = int(row[j])
     f.close()
 
