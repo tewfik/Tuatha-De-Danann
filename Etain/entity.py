@@ -140,16 +140,16 @@ class Entity():
         - `dest`: a tuple (x, y) giving the destination's coordinates.
         - `speed`: movespeed in pixel per frame.
         """
+        if dest[1] < self.pos[1]:
+            self.play_anim('move_up', True)
+        elif dest[0] > self.pos[0]:
+            self.play_anim('move_right', True)
+        elif dest[1] > self.pos[1]:
+            self.play_anim('move_down', True)
+        elif dest[0] < self.pos[0]:
+            self.play_anim('move_left', True)
         self.pos = dest
         self.dest = ((dest[0] + 1)*SQUARE_SIZE - self.width, (dest[1] + 1)*SQUARE_SIZE - self.height)
-        if dest[1] < self.pos[1]:
-            play_anim('move_up')
-        elif dest[0] > self.pos[0]:
-            play_anim('move_right')
-        elif dest[1] > self.pos[1]:
-            play_anim('move_down')
-        elif dest[0] < self.pos[0]:
-            play_anim('move_left')
 
         self.speed = speed
 
@@ -172,20 +172,21 @@ class Entity():
                 self.pixel_pos = (self.pixel_pos[0], self.dest[1])
 
         if self.animations[self.current_anim].end:
-            self.play_anim(self.default_anim)
+            self.play_anim(self.default_anim, True)
         return self.animations[self.current_anim].next_frame()
 
 
-    def play_anim(self, name):
+    def play_anim(self, name, loop):
         """
         Change the animation being played if given animation exists.
 
         Arguments:
         - `name`: the name of the animation to be played.
+        - `loop`: True to play the anim in a loop, False to play once.
         """
         if name in self.animations:
             self.current_anim = name
-            self.animations[name].reset()
+            self.animations[name].reset(loop)
 
 
 
@@ -215,15 +216,20 @@ class Animation():
         self.current_sprite = 0
         self.nb_sprites = len(sprites)
         self.end = False
+        self.loop = False
 
 
-    def reset(self):
+    def reset(self, loop):
         """
         restart the animation.
+
+        Arguments:
+        - `loop`: True to play the anim in a loop, False to play once.
         """
         self.current_sprite = 0
         self.frame_elapsed = 0
         self.end = False
+        self.loop = loop
 
 
     def next_frame(self):
@@ -237,6 +243,8 @@ class Animation():
             self.frame_elapsed = 0
             if self.current_sprite < self.nb_sprites - 1:
                 self.current_sprite += 1
+            elif self.loop:
+                self.reset(True)
             else:
                 self.end = True
         return self.sprites[self.current_sprite]
