@@ -18,6 +18,11 @@ RED = (200, 0, 0)
 BLUE = (0, 0, 150)
 GREEN = (0, 200, 0)
 GREY = (128, 128, 128)
+WHITE = (255, 255, 255)
 
 # Factions' color
 FACTION_COLOR = {NEUTRE : GREY, ALLY : BLUE, ENNEMY : RED}
+
+# Menu config
+MENU_WIDTH = 500
+MENU_HEIGHT = 300

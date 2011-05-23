@@ -25,6 +25,7 @@ class Render():
 
         Attributes:
         - `font`: the font to use for texts.
+        - `menu_font`: the font to use for menus.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
         - `menu`: a boolean telling render to display the menu or not.
@@ -37,6 +38,7 @@ class Render():
         """
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
+        self.menu_font = pygame.font.SysFont(None, 14)
         self.fps_render = False
         self.grid_render = False
         self.menu = False
@@ -73,22 +75,36 @@ class Render():
         """
         # fps displaying
         if self.fps_render:
-            text = self.font.render("%1.1f" % self.clock.get_fps(), False, (0, 0, 0))
-            text_Rect = text.get_rect()
-            text_Rect.right = WIDTH * SQUARE_SIZE - 18
-            text_Rect.top = 2
-            self.window.blit(text, text_Rect)
+            self.text("%1.1f" % self.clock.get_fps(), top = 2, right = WIDTH * SQUARE_SIZE - 18)
 
         # battle state displaying
-        text = self.font.render(self.UI.round_state, False, (0, 0, 0))
-        text_Rect = text.get_rect()
-        text_Rect.left = 10
-        text_Rect.top = 10
-        self.window.blit(text, text_Rect)
+        self.text(self.UI.round_state, left = 10, top = 10)
 
         # Menu display
         if self.menu:
-            self.window.fill(GREY, ((WIDTH*SQUARE_SIZE - 500) / 2, (HEIGHT*SQUARE_SIZE - 300) / 2, 500, 300))
+            menu_x = (WIDTH*SQUARE_SIZE - MENU_WIDTH) / 2
+            menu_y = (HEIGHT*SQUARE_SIZE - MENU_HEIGHT) / 2
+            self.window.fill(GREY, (menu_x, menu_y, MENU_WIDTH, MENU_HEIGHT))
+            self.window.fill(WHITE, (menu_x + 30, menu_y + 50, 10, 10))
+            self.window.fill(WHITE, (menu_x + 30, menu_y + 90, 10, 10))
+
+
+    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, color=(0, 0, 0)):
+        """
+        """
+        if font is None:
+            font = self.font
+        text = font.render(msg, False, color)
+        text_Rect = text.get_rect()
+        if top is not None:
+            text_Rect.top = top
+        else:
+            text_Rect.bottom = bottom
+        if right is not None:
+            text_Rect.right = right
+        else:
+            text_Rect.left = left
+        self.window.blit(text, text_Rect)
 
 
     def draw_world(self):
