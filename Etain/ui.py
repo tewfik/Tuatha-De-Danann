@@ -77,6 +77,8 @@ class UI():
                         self.render.grid_render = not self.render.grid_render
                 elif self.mouse_over((menu_x + 30, menu_y + 90, 10, 10), event.pos):
                         self.render.fps_render = not self.render.fps_render
+                elif self.mouse_over((menu_x + MENU_WIDTH - 16, menu_y + 3, 13, 13), event.pos):
+                        self.render.menu = not self.render.menu
         elif event.type == MOUSEMOTION:
             mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
             if self.entity_on(mouse_pos):

@@ -113,6 +113,10 @@ class Render():
             menu_y = (HEIGHT - MENU_HEIGHT) / 2
             self.window.fill(GREY, (menu_x, menu_y, MENU_WIDTH, MENU_HEIGHT))
 
+            X = menu_x + MENU_WIDTH - 10
+            Y = menu_y + 9
+            pygame.draw.polygon(self.window, RED, ((X - 2, Y), (X - 6, Y - 4), (X - 4, Y - 6), (X, Y - 2), (X + 4, Y - 6), (X + 6, Y - 4),
+                                                   (X + 2, Y), (X + 6, Y + 4), (X + 4, Y + 6), (X, Y + 2), (X - 4, Y + 6), (X - 6, Y + 4)))
             self.window.fill(WHITE, (menu_x + 30, menu_y + 50, 10, 10))
             self.window.fill(WHITE, (menu_x + 30, menu_y + 90, 10, 10))
             if self.grid_render:
