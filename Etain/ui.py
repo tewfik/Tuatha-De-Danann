@@ -20,10 +20,12 @@ class UI():
         Attributes:
         - `render`: the main render object used for display.
         - `alt`: Boolean representing the state of the LEFT_ALT key.
+        - `spec`: A boolean setting whever the client can play or is a spectator.
         """
         self.render = render
         self.round_state = None
         self.alt = False
+        self.spec = False
 
 
     def run(self):
@@ -33,25 +35,26 @@ class UI():
         while not self.render.r_queue.empty():
             self.process(self.render.r_queue.get().split(':'))
 
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                self.render.__del__()
-                sys.exit()
-            elif event.type == KEYDOWN:
-                if event.key == K_LALT:
-                    self.alt = True
-                elif self.alt == True:
-                    if event.key == K_RETURN:
-                        pygame.display.toggle_fullscreen()
-                    elif event.key == K_g:
-                        self.render.grid_render = not self.render.grid_render
-                    elif event.key == K_r:
-                        self.render.fps_render = not self.render.fps_render
-            elif event.type == KEYUP:
-                if event.key == K_LALT:
-                    self.alt = False
-            else:
-                self.mouse_event(event)
+        if not self.spec:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    self.render.__del__()
+                    sys.exit()
+                elif event.type == KEYDOWN:
+                    if event.key == K_LALT:
+                        self.alt = True
+                    elif self.alt == True:
+                        if event.key == K_RETURN:
+                            pygame.display.toggle_fullscreen()
+                        elif event.key == K_g:
+                            self.render.grid_render = not self.render.grid_render
+                        elif event.key == K_r:
+                            self.render.fps_render = not self.render.fps_render
+                elif event.type == KEYUP:
+                    if event.key == K_LALT:
+                        self.alt = False
+                else:
+                    self.mouse_event(event)
 
 
     def mouse_event(self, event):
@@ -114,9 +117,14 @@ class UI():
         elif cmd[0] == 'END_ROUND':
             self.round_state = ''
         elif cmd[0] == 'END_CHOICE':
-            self.round_state = 'RENDER BATTLE'
-        elif cmd[0] == 'BEGIN_ACTION':
-            self.round_stat = 'ACTION '+str(cmd[1])
+            self.round_state = 'WAIT_ACTIONS'
+            # TODO(Mika) : display banner fight
+        elif cmd[0] == 'RENDER':
+            pass # TODO(Mika) : lancer l'affichage du combat'
+        elif cmd[0] == 'BATTLE_STATE':
+            self.round_state = cmd[1].upper()
+            if self.round_state != 'PLAYERS_CONNECTIONS':
+                self.spec = True
         elif cmd[0] == 'MOVE':
             try:
                 self.render.l_entities[int(cmd[2])].move(dest=(int(cmd[3]), int(cmd[4])), speed=1)
@@ -127,7 +135,7 @@ class UI():
                 self.render.l_entities[int(cmd[2])].play_anim(name=cmd[3], loop=False)
             except ValueError as e:
                 print(e)
-        elif cmd[0] == 'ENTITY':
+        elif cmd[0] == 'ENTITY' or cmd[0] == 'NEW_ENTITY':
             f = open('data/'+cmd[1]+'.cfg')
             data = f.readline().split('**')
             f.close()
@@ -138,3 +146,4 @@ class UI():
                 print(e)
         elif cmd[0] == 'YOU':
             self.render.me = int(cmd[1])
+            self.render.s_queue.put("GET_BATTLE_STATE")
