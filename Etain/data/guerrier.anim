@@ -1,2 +1,9 @@
-idle**100**guerrier_idle.png**
-attack**10**guerrier_attack_1.png**guerrier_attack_2.png**guerrier_attack_3.png**
+idle_up**100**up**warrior_idle_up.png**
+idle_right**100**right**warrior_idle_right.png**
+idle_down**100**down**warrior_idle_down.png**
+idle_left**100**left**warrior_idle_left.png**
+move_up**20**up**warrior_move_up_1.png**warrior_move_up_2.png**warrior_move_up_3.png**warrior_move_up_4.png**
+move_right**20**right**warrior_move_right_1.png**warrior_move_right_2.png**warrior_move_right_3.png**warrior_move_right_4.png**
+move_down**20**down**warrior_move_down_1.png**warrior_move_down_2.png**warrior_move_down_3.png**warrior_move_down_4.png**
+move_left**20**left**warrior_move_left_1.png**warrior_move_left_2.png**warrior_move_left_3.png**warrior_move_left_4.png**
+attack**10**right**guerrier_attack_1.png**guerrier_attack_2.png**guerrier_attack_3.png**
