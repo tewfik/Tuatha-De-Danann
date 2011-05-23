@@ -90,8 +90,10 @@ class Dana(threading.Thread):
         elif self.clients_queues.has_key(client_id):
             # request processing
             msg_tab = msg.split(':')
+
             if msg_tab[0] == 'GET_ENTITIES':
                 self.get_entities_request(client_id)
+
             elif self.state == 'ACTIONS_CHOICE':
                 # consider clients actions if and only if Dana is in choice state
                 if msg_tab[0] == 'MOVE':
@@ -99,13 +101,19 @@ class Dana(threading.Thread):
                         self.move_request(client_id, x=int(msg_tab[1]), y=int(msg_tab[2]))
                     except ValueError as e:
                         print(e)
+
                 elif msg_tab[0] == 'ATTACK':
                     try:
                         self.attack_request(client_id, name=msg_tab[1], x=int(msg_tab[2]), y=int(msg_tab[3]))
                     except ValueError as e:
                         print(e)
+
+            elif msg_tab[0] == 'GET_BATTLE_STATE':
+                self.get_battle_state_request(client_id)
+
             elif msg_tab[0] == 'PING':
                 self.ping_request(client_id, msg_tab[1])
+
             else:
                 print('Unknown request.')
         else:
@@ -122,18 +130,19 @@ class Dana(threading.Thread):
         self.world.load_fixtures()
 
         battle_is_finished = False
-        count_round = 0
+        round = 0
         # rounds loop
-        while not battle_is_finished:
+        while not self.battle_is_finished():
             # actions choice phase
             self.state = 'ACTIONS_CHOICE'
             self.clear_clients_actions()
-            self.send_to_all('ROUND_START:' + str(count_round))
+            self.send_to_all('ROUND_START:' + str(round))
             time.sleep(CHOICE_TIME_INTERVAL)  # wait that clients finish to choose their actions
 
             # send actions to clients, they will display them.
             self.state = 'RENDER_FIGHT'
             self.send_to_all('END_CHOICE')
+##########################################################################################################################################################
             for count_actions in xrange(NB_ACTIONS):
                 self.send_to_all('BEGIN_ACTION:' + str(count_actions))
                 # send all actions for a given action turn to the clients
@@ -145,11 +154,9 @@ class Dana(threading.Thread):
                     except IndexError as e:
                         print(e)
                         print('|-> empty actions list for client')
-                self.send_to_all('END_ROUND:' + str(count_round))
-                count_round += 1
-
-            if self.battle_is_finished():
-                battle_is_finished = True
+                self.send_to_all('END_ROUND:' + str(round))
+##########################################################################################################################################################
+            round += 1
 
         self.send_to_all('BATTLE_END')
 
@@ -169,7 +176,7 @@ class Dana(threading.Thread):
             self.clients_queues[client_id] = msg  # register the client queue
 
             #
-            player = models.entity.LivingEntity(id=client_id, type='warrior')
+            player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1)
             player.add_attack('attack', (10, 0, 0))
             x = random.randint(10, 22)
             y = 22
@@ -178,13 +185,24 @@ class Dana(threading.Thread):
 
             try:
                 self.world.register(entity=player, entity_id=client_id, faction_id=1, x=x, y=y)
+
+                # confirm the registration of the client's queue => send its client_id
+                self.clients_queues[client_id].put(str(client_id))
+                self.clients_queues[client_id].put('YOU:%d:%d' % (client_id, player.faction_id))
+                print('client N° %d has been registered' % client_id)
+
+                # inform all the clients that there is a new entity
+                player_position = self.world.get_position_by_object_id(player.id)
+                self.send_to_all('NEW_ENTITY:{type}:{faction}:{id}:{x}:{y}:{hpm}:{hp}'.format(type=player.type,
+                                                                                              faction=player.faction_id,
+                                                                                              id=player.id,
+                                                                                              x=player_position[0],
+                                                                                              y=player_position[1],
+                                                                                              hpm=player.maxhp,
+                                                                                              hp=player.hp))
             except ForbiddenMove as e:
                 print(e)
 
-            # confirm the registration of the client's queue => send its client_id
-            self.clients_queues[client_id].put(str(client_id))
-            self.clients_queues[client_id].put('YOU:%d:%d' % (client_id, 1))  # TODO(tewfik): replace "1" by a calculated faction_id
-            print('client N° %d has been registered' % client_id)
         else:
             # error TODO(tewfik): create a ProtocolException
             print('protocol error: the first message send by a client thread to Dana'
@@ -230,6 +248,22 @@ class Dana(threading.Thread):
         return self.clients_queues.keys()
 
 
+    def get_entity_faction(self, entity_id):
+        """
+        Get the entity's faction id.
+
+        Note that Entity objects have a 'faction' attribute which is
+        faster O(1) if you only need to know the faction of a given
+        object.
+
+        Arguments:
+        - `entity_id`: entity's identifier.
+        """
+        for faction_id, faction in self.factions.items():
+            if entity_id in faction:
+                return faction_id
+
+
     def send_to_all(self, msg):
         """
         Send a message to all clients.
@@ -267,6 +301,16 @@ class Dana(threading.Thread):
         self.clients_queues[client_id].put('PONG:%d' % ping_id)
 
 
+    def get_battle_state_request(self, client_id):
+        """
+        Send the battle state to a givent client.
+
+        Arguments:
+        - `client_id`: client identifier.
+        """
+        self.clients_queues[client_id].put('BATTLE_STATE:%s:%d' % (self.state, self.round))
+
+
     def send_entity_response(self, client_id, type, faction_id, entity_id, x, y, hp_max, hp):
         """
         Send an entity's details to a given client.
@@ -280,7 +324,8 @@ class Dana(threading.Thread):
         - `hp_max`: maximum hp.
         - `hp`: current hp.
         """
-        self.clients_queues[client_id].put('ENTITY:%s:%d:%d:%d:%d:%d:%d' % (type, faction_id, entity_id, x, y, hp_max, hp))
+        response = 'ENTITY:%s:%d:%d:%d:%d:%d:%d' % (type, faction_id, entity_id, x, y, hp_max, hp)
+        self.clients_queues[client_id].put(response)
 
 
     def get_entities_request(self, client_id):
@@ -293,14 +338,16 @@ class Dana(threading.Thread):
         for entity_id in self.world.entities:
             entity = self.world.entities[entity_id]
             pos = self.world.entities_pos[entity_id]
-            self.send_entity_response(client_id,
-                                      type=entity.type,
-                                      faction_id=1,#
-                                      entity_id=entity_id,
-                                      x=pos[0],
-                                      y=pos[1],
-                                      hp_max=entity.maxhp,
-                                      hp=entity.hp)
+            self.send_entity_response(
+                client_id=client_id,
+                type=entity.type,
+                faction_id=entity.faction_id,
+                entity_id=entity_id,
+                x=pos[0],
+                y=pos[1],
+                hp_max=entity.maxhp,
+                hp=entity.hp
+                )
 
 
 
