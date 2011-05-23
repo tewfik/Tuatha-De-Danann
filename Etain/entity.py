@@ -47,7 +47,7 @@ class List():
         return layer
 
 
-    def add_entity(self, pos, width, height, hp, uid, anim_path):
+    def add_entity(self, pos, width, height, max_hp, hp, faction, uid, anim_path):
         """
         Create a new entity and store it in the list with is uid.
 
@@ -55,11 +55,13 @@ class List():
         - `pos`: a (x, y) tuple with the starting coordinate.
         - `width`: the width of the entity.
         - `height`: the height of the entity.
-        - `hp`: Gives the current hp and max hp of the entity.
+        - `max_hp`: Gives the max hp of the entity.
+        - `hp`: Gives the current hp of the entity.
+        - `faction`: identify of the faction the entity belongs to.
         - `uid`: an unique identifier (int).
         - `animate_path`: the path to the .anim file of the entity.
         """
-        self.entities[uid] = Entity(pos, width, height, hp)
+        self.entities[uid] = Entity(pos, width, height, max_hp, hp, faction)
         try:
             f = open("data/"+anim_path, 'r')
         except:
@@ -86,7 +88,7 @@ class Entity():
     Object representing any living or non-living entities on the world.
     """
 
-    def __init__(self, pos, width, height, hp):
+    def __init__(self, pos, width, height, max_hp, hp, faction):
         """
         Set the starting position of the entity.
 
@@ -95,9 +97,9 @@ class Entity():
         - `pos`: a (x, y) tuple with the starting coordinate.
         - `width`: the width of the entity.
         - `height`: the height of the entity.
-        - `hp`: Gives the current hp of the entity.
         - `max_hp`: Gives the max hp of the entity.
-        - `faction_color`: Color of the entity's faction.
+        - `hp`: Gives the current hp of the entity.
+        - `faction`: identify of the faction the entity belongs to.
         - `current_anim`: the current played animation.
         - `default_anim`: the animation to play by default.
         - `pixel_pos`: the current position (in pixels).
@@ -107,9 +109,9 @@ class Entity():
         self.pos = pos
         self.width = width
         self.height = height
+        self.max_hp = max_hp
         self.hp = hp
-        self.max_hp = hp
-        self.faction_color = (0, 0, 150)
+        self.faction = faction
         self.current_anim = "idle_down" # TODO(mika): initialize in a better way
         self.default_anim = "idle_down" # TODO(mika): initialize in a better way
         self.pixel_pos = ((pos[0] + 0.5)*SQUARE_SIZE - self.width / 2, (pos[1] + 1)*SQUARE_SIZE - self.height)
