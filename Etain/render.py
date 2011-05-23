@@ -137,7 +137,7 @@ class Render():
         - `uid`: the unique id of the entity (int).
         - `anim_path`: the anim file of the entity.
         """
-        self.l_entities.add_entity(pos, width, height, hp, uid, anim_path)
+        self.l_entities.add_entity(pos, width, height, max_hp, hp, faction, uid, anim_path)
 
 
     def remove_entity(self, uid):
