@@ -12,7 +12,7 @@ class Entity(object):
 
         Attributes:
         - `id`: object unique identifier. Default = random generation.
-        - `type`: entity type ('scarecrow' | 'guerrier')
+        - `type`: entity type ('scarecrow' | 'warrior')
         - `hp`: the current health point of the entity, when it reachs 0 the entity die.
         - `maxhp`: the maximum and base health point of the entity.
         - `armor`: reduce incoming physical damage (100 armor = 100% increased effective health).
@@ -85,7 +85,7 @@ class LivingEntity(Entity):
 
         Attributes:
         - `id`: object unique identifier. Default = random generation.
-        - `type`: entity type ('scarecrow' | 'guerrier')
+        - `type`: entity type ('scarecrow' | 'warrior')
         - `hp`: the current health point of the entity, when it reachs 0 the entity die.
         - `maxhp`: the maximum and base health point of the entity.
         - `armor`: reduce incoming physical damage (100 armor = 100% increased effective health).
