@@ -90,10 +90,12 @@ class UI():
         """
         """
         if event.type == MOUSEBUTTONDOWN:
-            mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
-            if event.button == 1 and self.round_state == 'CHOICE':
-                self.render.s_queue.put('MOVE:'+str(mouse_pos[0])+':'+str(mouse_pos[1]))
-
+            if event.pos[0] > WIDTH * SQUARE_SIZE - 18  and event.pos[1] < 18:
+                self.render.menu = not self.render.menu
+            else:
+                mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
+                if event.button == 1 and self.round_state == 'CHOICE':
+                    self.render.s_queue.put('MOVE:'+str(mouse_pos[0])+':'+str(mouse_pos[1]))
 
 
     def process(self, cmd):

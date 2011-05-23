@@ -27,6 +27,7 @@ class Render():
         - `font`: the font to use for texts.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
+        - `menu`: a boolean telling render to display the menu or not.
         - `l_entities`: list of entities currently on the map.
         - `UI`: the UI handler.
         - `s_queue`: the queue used to send commands to Dana.
@@ -38,6 +39,7 @@ class Render():
         self.font = pygame.font.SysFont(None, 24)
         self.fps_render = False
         self.grid_render = False
+        self.menu = False
         self.l_entities = entity.List()
         self.UI = ui.UI(self)
         self.s_queue = send_queue
@@ -54,12 +56,13 @@ class Render():
         """
         Main programm's loop (process, display and inputs).
         """
-
+        gear = pygame.image.load("sprites/gear.png")
         while(True):
             self.UI.run()
             self.draw_world()
             self.draw_entities()
             self.draw_overlay()
+            self.window.blit(gear, (WIDTH * SQUARE_SIZE - 18, 2))
 
             pygame.display.flip()
             self.clock.tick(FPS)
@@ -68,19 +71,24 @@ class Render():
     def draw_overlay(self):
         """
         """
+        # fps displaying
         if self.fps_render:
-            # fps displaying
             text = self.font.render("%1.1f" % self.clock.get_fps(), False, (0, 0, 0))
             text_Rect = text.get_rect()
             text_Rect.right = WIDTH * SQUARE_SIZE - 18
             text_Rect.top = 2
             self.window.blit(text, text_Rect)
+
         # battle state displaying
         text = self.font.render(self.UI.round_state, False, (0, 0, 0))
         text_Rect = text.get_rect()
         text_Rect.left = 10
         text_Rect.top = 10
         self.window.blit(text, text_Rect)
+
+        # Menu display
+        if self.menu:
+            self.window.fill(GREY, ((WIDTH*SQUARE_SIZE - 500) / 2, (HEIGHT*SQUARE_SIZE - 300) / 2, 500, 300))
 
 
     def draw_world(self):
