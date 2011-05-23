@@ -38,7 +38,7 @@ class Render():
         """
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
-        self.menu_font = pygame.font.SysFont(None, 14)
+        self.menu_font = pygame.font.SysFont(None, 16)
         self.fps_render = False
         self.grid_render = False
         self.menu = False
@@ -85,8 +85,16 @@ class Render():
             menu_x = (WIDTH*SQUARE_SIZE - MENU_WIDTH) / 2
             menu_y = (HEIGHT*SQUARE_SIZE - MENU_HEIGHT) / 2
             self.window.fill(GREY, (menu_x, menu_y, MENU_WIDTH, MENU_HEIGHT))
+
             self.window.fill(WHITE, (menu_x + 30, menu_y + 50, 10, 10))
             self.window.fill(WHITE, (menu_x + 30, menu_y + 90, 10, 10))
+            if self.grid_render:
+                self.window.fill(BLACK, (menu_x + 32, menu_y + 52, 6, 6))
+            if self.fps_render:
+                self.window.fill(BLACK, (menu_x + 32, menu_y + 92, 6, 6))
+
+            self.text("Afficher la grille.", self.menu_font, top=menu_y + 50, left=menu_x + 50)
+            self.text("Afficher les IPS.", self.menu_font, top=menu_y + 90, left=menu_x + 50)
 
 
     def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, color=(0, 0, 0)):
@@ -94,7 +102,7 @@ class Render():
         """
         if font is None:
             font = self.font
-        text = font.render(msg, False, color)
+        text = font.render(msg, True, color)
         text_Rect = text.get_rect()
         if top is not None:
             text_Rect.top = top

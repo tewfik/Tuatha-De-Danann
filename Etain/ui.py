@@ -86,10 +86,26 @@ class UI():
         if event.type == MOUSEBUTTONDOWN:
             if event.pos[0] > WIDTH * SQUARE_SIZE - 18  and event.pos[1] < 18:
                 self.render.menu = not self.render.menu
-            else:
+            elif not self.render.menu:
                 mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
                 if event.button == 1 and self.round_state == 'CHOICE':
                     self.render.s_queue.put('MOVE:'+str(mouse_pos[0])+':'+str(mouse_pos[1]))
+            else:
+                menu_x = (WIDTH * SQUARE_SIZE - MENU_WIDTH) / 2
+                menu_y = (HEIGHT * SQUARE_SIZE - MENU_HEIGHT) / 2
+                if self.mouse_hitbox((menu_x + 30, menu_y + 50, 10, 10), event.pos):
+                        self.render.grid_render = not self.render.grid_render
+                elif self.mouse_hitbox((menu_x + 30, menu_y + 90, 10, 10), event.pos):
+                        self.render.fps_render = not self.render.fps_render
+
+
+    def mouse_hitbox(self, rect, pos):
+        """
+        """
+        if pos[0] >= rect[0] and pos[0] <= rect[0] + rect[2] and pos[1] >= rect[1] and pos[1] <= rect[1] + rect[3]:
+               return True
+        else:
+            return False
 
 
     def process(self, cmd):
