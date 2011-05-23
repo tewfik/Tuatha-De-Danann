@@ -123,7 +123,7 @@ class UI():
             f.close()
             try:
                 self.render.register_entity(pos=(int(cmd[4]), int(cmd[5])), width=int(data[0]), height=int(data[1]),max_hp=int(cmd[6]),
-                                            hp=int(cmd[7]), faction=int(cmd[2]), uid=int(cmd[2]), anim_path=data[2])
+                                            hp=int(cmd[7]), faction=int(cmd[2]), uid=int(cmd[3]), anim_path=data[2])
             except ValueError as e:
                 print(e)
         elif cmd[0] == 'YOU':
