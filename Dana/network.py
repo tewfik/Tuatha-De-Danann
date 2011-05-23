@@ -59,9 +59,6 @@ class TCPHandler(SocketServer.BaseRequestHandler):
             if close_connection:
                 self.end_connection()
 
-            import time # DEBUG
-            time.sleep(1) # DEBUG
-
 
     def receive_loop(self):
         """
