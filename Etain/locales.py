@@ -17,7 +17,7 @@ ENNEMY = 2
 RED = (200, 0, 0)
 BLUE = (0, 0, 150)
 GREEN = (0, 200, 0)
-GREY = (64, 64, 64)
+GREY = (128, 128, 128)
 
 # Factions' color
 FACTION_COLOR = {NEUTRE : GREY, ALLY : BLUE, ENNEMY : RED}
