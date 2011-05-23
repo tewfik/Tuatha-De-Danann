@@ -70,10 +70,10 @@ class Render():
         """
         if self.fps_render:
             # fps displaying
-            text = self.font.render(str(self.clock.get_fps()), False, (0, 0, 0))
+            text = self.font.render("%1.1f" % self.clock.get_fps(), False, (0, 0, 0))
             text_Rect = text.get_rect()
-            text_Rect.right = WIDTH * SQUARE_SIZE - 10
-            text_Rect.top = 10
+            text_Rect.right = WIDTH * SQUARE_SIZE - 18
+            text_Rect.top = 2
             self.window.blit(text, text_Rect)
         # battle state displaying
         text = self.font.render(self.UI.round_state, False, (0, 0, 0))
