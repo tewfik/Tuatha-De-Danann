@@ -123,7 +123,7 @@ class Render():
                 pygame.draw.line(self.window, (50, 50, 50), (0, i * SQUARE_SIZE), (WIDTH * SQUARE_SIZE, i * SQUARE_SIZE))
 
 
-    def register_entity(self, pos, width, height, hp, uid, anim_path):
+    def register_entity(self, pos, width, height, max_hp, hp, faction, uid, anim_path):
         """
         Register a New graphic entity to the world.
 
@@ -131,7 +131,9 @@ class Render():
         - `pos`: a tuple (x, y) giving the coordinates where to spawn the entity.
         - `width`: the width of the entity (used for display only).
         - `height`: the height of the entity (used for display only).
-        - `hp`: current and max hp of the entity.
+        - `max_hp`: max hp of the entity.
+        - `hp`: current hp of the entity.
+        - `faction`: the identifier of the faction the entity belongs to.
         - `uid`: the unique id of the entity (int).
         - `anim_path`: the anim file of the entity.
         """
