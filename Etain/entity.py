@@ -141,14 +141,17 @@ class Entity():
         - `dest`: a tuple (x, y) giving the destination's coordinates.
         - `speed`: movespeed in pixel per frame.
         """
-        if dest[1] < self.pos[1]:
-            self.play_anim('move_up', True)
-        elif dest[0] > self.pos[0]:
-            self.play_anim('move_right', True)
-        elif dest[1] > self.pos[1]:
-            self.play_anim('move_down', True)
-        elif dest[0] < self.pos[0]:
-            self.play_anim('move_left', True)
+        if (abs(dest[1] - self.pos[1]) >= abs(dest[0] - self.pos[0])):
+            if dest[1] < self.pos[1]:
+                self.play_anim('move_up', True)
+            elif dest[1] > self.pos[1]:
+                self.play_anim('move_down', True)
+        else:
+            if dest[0] > self.pos[0]:
+                self.play_anim('move_right', True)
+            elif dest[0] < self.pos[0]:
+                self.play_anim('move_left', True)
+
         self.pos = dest
         self.dest = ((dest[0] + 1)*SQUARE_SIZE - self.width, (dest[1] + 1)*SQUARE_SIZE - self.height)
 
