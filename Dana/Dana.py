@@ -12,6 +12,8 @@ import network
 import models.world
 import models.entity
 
+# interval in seconds when players are allowed to connect.
+PLAYER_CONNECTION_TIME_INTERVAL = 20
 # interval in seconds when players are able to choose their actions
 CHOICE_TIME_INTERVAL = 5
 # interval in seconds of one action
@@ -32,7 +34,8 @@ class Dana(threading.Thread):
     - `queue`: queue Dana has to use to receive messages which are addressed to it.
     - `clients_queues`: dictionary of clients' queues. Format : clients_queues[client_id] = Queue object.
     - `clients_actions` : actions of one turn choosen by each clients.
-    - `state`: state of the game (CHOICE | RENDER_FIGHT).
+    - `state`: state of the game (PLAYERS_CONNECTION | ACTIONS_CHOICE | RENDER_FIGHT | WAIT_RENDER_OK).
+    - `round`: round identifier. Start to zero and increment at each round.
     """
 
     def __init__(self, queue):
@@ -48,7 +51,8 @@ class Dana(threading.Thread):
         self.queue = queue
         self.clients_queues = {}
         self.clients_actions = {}
-        self.state = 'BEGIN_FIGHT'
+        self.state = 'PLAYERS_CONNECTIONS'
+        self.round = 0
 
 
     def run(self):
@@ -88,7 +92,7 @@ class Dana(threading.Thread):
             msg_tab = msg.split(':')
             if msg_tab[0] == 'GET_ENTITIES':
                 self.get_entities_request(client_id)
-            elif self.state == 'CHOICE':
+            elif self.state == 'ACTIONS_CHOICE':
                 # consider clients actions if and only if Dana is in choice state
                 if msg_tab[0] == 'MOVE':
                     try:
@@ -122,7 +126,7 @@ class Dana(threading.Thread):
         # rounds loop
         while not battle_is_finished:
             # actions choice phase
-            self.state = 'CHOICE'
+            self.state = 'ACTIONS_CHOICE'
             self.clear_clients_actions()
             self.send_to_all('ROUND_START:' + str(count_round))
             time.sleep(CHOICE_TIME_INTERVAL)  # wait that clients finish to choose their actions
