@@ -267,7 +267,7 @@ class Dana(threading.Thread):
         self.clients_queues[client_id].put('PONG:%d' % ping_id)
 
 
-    def entity_response(self, client_id, type, faction_id, entity_id, x, y, hp_max, hp):
+    def send_entity_response(self, client_id, type, faction_id, entity_id, x, y, hp_max, hp):
         """
         Send an entity's details to a given client.
 
