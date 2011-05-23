@@ -58,10 +58,10 @@ class UI():
         """
         """
         if event.type == MOUSEBUTTONDOWN:
+            mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
             if self.mouse_over((WIDTH - 18, 0, 18, 18), event.pos):
                 self.render.menu = not self.render.menu
             elif not self.render.menu:
-                mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
                 if event.button == 1 and self.round_state == 'CHOICE':
                     if self.entity_on(mouse_pos):
                         self.render.s_queue.put('ATTACK:attack:%d:%d' % mouse_pos)
@@ -74,6 +74,12 @@ class UI():
                         self.render.grid_render = not self.render.grid_render
                 elif self.mouse_over((menu_x + 30, menu_y + 90, 10, 10), event.pos):
                         self.render.fps_render = not self.render.fps_render
+        elif event.type == MOUSEMOTION:
+            mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
+            if self.entity_on(mouse_pos):
+                self.render.use_cursor(SWORD)
+            elif self.render.cursor != ARROW[0]:
+                self.render.use_cursor(ARROW)
 
 
     def mouse_over(self, rect, pos):
@@ -89,7 +95,7 @@ class UI():
         """
         """
         result = False
-        for entity in self.render.l_entities.get_layer(pos[1]):
+        for entity in self.render.l_entities.get_layer(pos[1]).values():
             if entity.pos[0] == pos[0]:
                 result = True
                 break

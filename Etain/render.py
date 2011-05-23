@@ -37,6 +37,7 @@ class Render():
         - `me`: uid of the entity controlled by the player.
         - `clock`: A pygame timer.
         - `bubbles`: A dictionnary of all bubbles currently displaying.
+        - `cursor`: current cursor used.
         """
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
@@ -57,6 +58,8 @@ class Render():
 
         self.window = pygame.display.set_mode((WIDTH, HEIGHT), 0)
         pygame.display.set_caption(TITLE)
+        self.cursor = "arrow"
+        self.use_cursor(ARROW)
         self.s_queue.put('GET_ENTITIES')
 
 
@@ -218,6 +221,29 @@ class Render():
         self.area = pickle.load(f_map)
         self.area.load_tiles()
         f_map.close()
+
+
+    def use_cursor(self, name):
+        """
+        """
+        self.cursor, cursor = name
+        hotspot = None
+        for y in range(len(cursor)):
+            for x in range(len(cursor[y])):
+                if cursor[y][x] in ['x', ',', 'O']:
+                    hotspot = x,y
+                    break
+            if hotspot != None:
+                break
+        if hotspot == None:
+            raise Exception("No hotspot specified for cursor !")
+        s = []
+        for line in cursor:
+            s.append(line.replace('x', 'X').replace(',', '.').replace('O', 'o'))
+        curs, mask = pygame.cursors.compile(s)
+        size = len(cursor[0]), len(cursor)
+        pygame.mouse.set_cursor(size, hotspot, curs, mask)
+
 
 
     def play_music(self, path):
