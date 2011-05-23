@@ -58,7 +58,7 @@ class UI():
         """
         """
         if event.type == MOUSEBUTTONDOWN:
-            if self.mouse_hitbox((WIDTH - 18, 0, 18, 18), event.pos):
+            if self.mouse_over((WIDTH - 18, 0, 18, 18), event.pos):
                 self.render.menu = not self.render.menu
             elif not self.render.menu:
                 mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
@@ -70,13 +70,13 @@ class UI():
             else:
                 menu_x = (WIDTH - MENU_WIDTH) / 2
                 menu_y = (HEIGHT - MENU_HEIGHT) / 2
-                if self.mouse_hitbox((menu_x + 30, menu_y + 50, 10, 10), event.pos):
+                if self.mouse_over((menu_x + 30, menu_y + 50, 10, 10), event.pos):
                         self.render.grid_render = not self.render.grid_render
-                elif self.mouse_hitbox((menu_x + 30, menu_y + 90, 10, 10), event.pos):
+                elif self.mouse_over((menu_x + 30, menu_y + 90, 10, 10), event.pos):
                         self.render.fps_render = not self.render.fps_render
 
 
-    def mouse_hitbox(self, rect, pos):
+    def mouse_over(self, rect, pos):
         """
         """
         if pos[0] >= rect[0] and pos[0] <= rect[0] + rect[2] and pos[1] >= rect[1] and pos[1] <= rect[1] + rect[3]:
