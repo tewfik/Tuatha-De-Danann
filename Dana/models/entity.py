@@ -6,13 +6,14 @@ class Entity(object):
     A player, a monster, a vehicle ...
     """
 
-    def __init__(self, id, type, hp=100, armor=0, mresist=0):
+    def __init__(self, id, type, faction_id=0, hp=100, armor=0, mresist=0):
         """
         Entity creation.
 
         Attributes:
         - `id`: object unique identifier. Default = random generation.
         - `type`: entity type ('scarecrow' | 'warrior')
+        - `faction_id`: faction identifier.
         - `hp`: the current health point of the entity, when it reachs 0 the entity die.
         - `maxhp`: the maximum and base health point of the entity.
         - `armor`: reduce incoming physical damage (100 armor = 100% increased effective health).
@@ -20,6 +21,7 @@ class Entity(object):
         """
         self.id = id
         self.type = type
+        self.faction_id = faction_id
         self.hp = hp
         self.maxhp = hp
         self.armor = armor
@@ -79,13 +81,14 @@ class LivingEntity(Entity):
     An entity which can move, attack...
     """
 
-    def __init__(self, id, type, hp=100, strength=0, intell=0, armor=0, mresist=0):
+    def __init__(self, id, type, faction_id=0, hp=100, strength=0, intell=0, armor=0, mresist=0):
         """
         Entity creation.
 
         Attributes:
         - `id`: object unique identifier. Default = random generation.
-        - `type`: entity type ('scarecrow' | 'warrior')
+        - `type`: entity type ('scarecrow' | 'warrior' | 'tree')
+        - `faction_id`: faction_id identifier.
         - `hp`: the current health point of the entity, when it reachs 0 the entity die.
         - `maxhp`: the maximum and base health point of the entity.
         - `armor`: reduce incoming physical damage (100 armor = 100% increased effective health).
@@ -94,7 +97,7 @@ class LivingEntity(Entity):
         - `intell`: the intelligence of the entity (mainly used to improve magic damage dealt).
         - `l_attacks`: list of Attack object the entity can use.
         """
-        Entity.__init__(self, id, type, hp, mresist, armor)
+        Entity.__init__(self, id, type, faction_id, hp, mresist, armor)
         self.strength = strength
         self.intell = intell
         self.l_attacks = {}

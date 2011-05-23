@@ -47,12 +47,12 @@ class World(object):
     def load_fixtures(self):
         """
         """
-        epouvantail = entity.Entity(id=1001, type='scarecrow')
+        epouvantail = entity.Entity(id=1001, type='scarecrow', faction_id=2)
         self.register(epouvantail, entity_id=1001, faction_id=2, x=16, y=21)
 
-        arbre1 = entity.Entity(id=2001, type='tree')
+        arbre1 = entity.Entity(id=2001, type='tree', faction_id=0)
         self.register(arbre1, entity_id=2001, faction_id=0, x=23, y=15)
-        arbre2 = entity.Entity(id=2002, type='tree')
+        arbre2 = entity.Entity(id=2002, type='tree', faction_id=0)
         self.register(arbre2, entity_id=2002, faction_id=0, x=10, y=25)
 
 
@@ -113,11 +113,12 @@ class World(object):
 
         Arguments:
         - `faction_id`: faction identifier.
-        - `entity_id`: entity identifier.
+        - `entity`: entity identifier.
         """
         if not self.factions.has_key(faction_id):
             self.factions[faction_id] = []
         self.factions[faction_id].append(entity_id)
+        self.entities[entity_id].faction = faction_id
 
 
     def unregister(self, entity_id, faction_id=None):

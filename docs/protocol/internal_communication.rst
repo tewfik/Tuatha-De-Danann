@@ -1,5 +1,7 @@
-Message format
-==============
+Internal communication
+======================
+
+Communication between clients' local representations thread and main Dana thread.
 
 Client to Dana
 --------------

@@ -11,7 +11,8 @@ step 3 : the client send data (+ client id) in the "send channel" and receive da
 .. toctree::
    :maxdepth: 2
 
-   message_format
+   internal_communication
+   methods
 
 .. seealso::
 
