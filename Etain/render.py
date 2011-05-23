@@ -137,14 +137,14 @@ class Render():
         """
         """
         # select circle
-        ellipse_Rect = (pos[0], pos[1] + height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
+        ellipse_Rect = (pos[0] + (width - SQUARE_SIZE)/ 2, pos[1] + height - 3 * SQUARE_SIZE / 4, SQUARE_SIZE, 3 * SQUARE_SIZE / 4)
         pygame.draw.ellipse(self.window, faction, ellipse_Rect , 2)
 
         # health bar
-        self.window.fill((0, 0, 0, 200), (pos[0] + 2, pos[1] - 10, SQUARE_SIZE - 4, 6))
+        self.window.fill((0, 0, 0, 200), (pos[0] + (width- SQUARE_SIZE) / 2 + 2, pos[1] - 10, SQUARE_SIZE - 4, 6))
         hp_ratio = hp/float(max_hp)
-        self.window.fill((0, 200, 0), (pos[0] + 2, pos[1] - 10, round(hp_ratio*(SQUARE_SIZE - 4)), 6))
-        pygame.draw.rect(self.window, faction, (pos[0] + 1, pos[1] - 11, SQUARE_SIZE - 2, 8), 1)
+        self.window.fill((0, 200, 0), (pos[0] + (width - SQUARE_SIZE) / 2 + 2, pos[1] - 10, round(hp_ratio*(SQUARE_SIZE - 4)), 6))
+        pygame.draw.rect(self.window, faction, (pos[0] + (width - SQUARE_SIZE) / 2 + 1, pos[1] - 11, SQUARE_SIZE - 2, 8), 1)
 
 
     def load_map(self, path):

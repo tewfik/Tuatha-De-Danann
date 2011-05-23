@@ -112,7 +112,7 @@ class Entity():
         self.faction_color = (0, 0, 150)
         self.current_anim = "idle_down" # TODO(mika): initialize in a better way
         self.default_anim = "idle_down" # TODO(mika): initialize in a better way
-        self.pixel_pos = ((pos[0] + 1)*SQUARE_SIZE - self.width, (pos[1] + 1)*SQUARE_SIZE - self.height)
+        self.pixel_pos = ((pos[0] + 0.5)*SQUARE_SIZE - self.width / 2, (pos[1] + 1)*SQUARE_SIZE - self.height)
         self.dest = self.pixel_pos
         self.speed = 1  # TODO(mika): initialize in a better way
 
