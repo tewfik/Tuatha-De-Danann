@@ -12,6 +12,9 @@ WIDTH = COLUMNS * SQUARE_SIZE
 TITLE = 'Tuatha dé Danann'
 FPS = 40
 
+# Chat
+BUBBLE_TTL = FPS * 4
+
 # Factions
 NEUTRE = 0
 ALLY = 1
