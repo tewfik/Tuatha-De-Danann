@@ -172,9 +172,9 @@ class UI():
     def do_actions(self, pa):
         """
         """
-        for cmd in self.fight[pa]
+        for cmd in self.fight[pa]:
             if cmd[0] == 'MOVE':
-               try:
+                try:
                     self.render.l_entities[int(cmd[2])].move(dest=(int(cmd[3]), int(cmd[4])), speed=1)
                 except ValueError as e:
                     print(e)
