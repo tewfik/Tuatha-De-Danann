@@ -28,9 +28,11 @@ class Render():
         - `menu_font`: the font to use for menus.
         - `banner_font`: the font to use for banners.
         - `speech_font`: the font to use for speech bubbles.
+        - `chat_font`: the font to use for chat.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
         - `menu`: a boolean telling render to display the menu or not.
+        - `chat`: a list [True|False, text, int], text is the text being written.
         - `banner_fight`: True if render display the banner "Fight start".
         - `banner_next`: True if render should display "Next Round" banner.
         - `l_entities`: list of entities currently on the map.
@@ -49,9 +51,11 @@ class Render():
         self.banner_font = pygame.font.SysFont(None, 128)
         self.speech_font = pygame.font.SysFont("Monospace", 12)
         self.speech_font.set_bold(True)
+        self.chat_font = pygame.font.SysFont(None, 16)
         self.fps_render = False
         self.grid_render = False
         self.menu = False
+        self.chat = [False, '', 0]
         self.banner_fight = False
         self.banner_next = False
         self.l_entities = entity.List()
@@ -138,6 +142,23 @@ class Render():
 
             self.text("Afficher la grille.", self.menu_font, top=menu_y + 50, left=menu_x + 50)
             self.text("Afficher les IPS.", self.menu_font, top=menu_y + 90, left=menu_x + 50)
+
+        # Chat display
+        if self.chat[0]:
+            self.draw_chat()
+
+
+    def draw_chat(self):
+        """
+        """
+        self.window.fill(WHITE, (2, HEIGHT - 17, WIDTH - 4, 15))
+        self.chat[2] += 1
+        if self.chat[2] >= FPS / 2:
+            self.text(self.chat[1] + '|', font=self.chat_font, top=HEIGHT - 15, left=4)
+            if self.chat[2] >= FPS:
+                self.chat[2] = 0
+        else:
+            self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 15, left=4)
 
 
     def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, centerx=None, centery=None, color=(0, 0, 0), alias=True):

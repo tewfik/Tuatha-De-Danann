@@ -68,6 +68,16 @@ class UI():
                             self.render.grid_render = not self.render.grid_render
                         elif event.key == K_r:
                             self.render.fps_render = not self.render.fps_render
+                    elif event.key == K_RETURN:
+                        if self.render.chat[0]:
+                            self.render.chat = [False, '', 0]
+                            #TODO(Mika) : send chat message here
+                        else:
+                            self.render.chat[0] = True
+                    elif self.render.chat[0] and event.key in DICT:
+                        self.render.chat[1] += DICT[event.key]
+
+
                 elif event.type == KEYUP:
                     if event.key == K_LALT:
                         self.alt = False
