@@ -53,39 +53,36 @@ class UI():
                     self.render.s_queue.put('RENDER_OK')
                     self.render.banner_next = True
 
-        if not self.spec:
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    self.render.__del__()
-                    sys.exit()
-                elif event.type == KEYDOWN:
-                    if event.key == K_LALT:
-                        self.alt = True
-                    elif self.alt == True:
-                        if event.key == K_RETURN:
-                            pygame.display.toggle_fullscreen()
-                        elif event.key == K_g:
-                            self.render.grid_render = not self.render.grid_render
-                        elif event.key == K_r:
-                            self.render.fps_render = not self.render.fps_render
-                    elif event.key == K_RETURN:
-                        if self.render.chat[0]:
-                            self.render.s_queue.put('CHAT_MSG:%s' % self.render.chat[1])
-                            self.render.chat = [False, '', 0]
-                        else:
-                            self.render.chat[0] = True
-                    elif self.render.chat[0]:
-                        if event.key in DICT:
-                            self.render.chat[1] += DICT[event.key]
-                        elif event.key == K_BACKSPACE:
-                            self.render.chat[1] = self.render.chat[1][:-1]
-
-
-                elif event.type == KEYUP:
-                    if event.key == K_LALT:
-                        self.alt = False
-                else:
-                    self.mouse_event(event)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                self.render.__del__()
+                sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_LALT:
+                    self.alt = True
+                elif self.alt == True:
+                    if event.key == K_RETURN:
+                        pygame.display.toggle_fullscreen()
+                    elif event.key == K_g:
+                        self.render.grid_render = not self.render.grid_render
+                    elif event.key == K_r:
+                        self.render.fps_render = not self.render.fps_render
+                elif event.key == K_RETURN:
+                    if self.render.chat[0]:
+                        self.render.s_queue.put('CHAT_MSG:%s' % self.render.chat[1])
+                        self.render.chat = [False, '', 0]
+                    else:
+                        self.render.chat[0] = True
+                elif self.render.chat[0]:
+                    if event.key in DICT:
+                        self.render.chat[1] += DICT[event.key]
+                    elif event.key == K_BACKSPACE:
+                        self.render.chat[1] = self.render.chat[1][:-1]
+            elif event.type == KEYUP:
+                if event.key == K_LALT:
+                    self.alt = False
+            else:
+                self.mouse_event(event)
 
 
     def mouse_event(self, event):
@@ -96,7 +93,7 @@ class UI():
             if self.mouse_over((WIDTH - 18, 0, 18, 18), event.pos):
                 self.render.menu = not self.render.menu
             elif not self.render.menu:
-                if event.button == 1 and self.round_state == 'CHOICE':
+                if event.button == 1 and self.round_state == 'CHOICE' and not self.render.spec:
                     if self.entity_on(mouse_pos):
                         self.render.s_queue.put('ATTACK:attack:%d:%d' % mouse_pos)
                     else:
@@ -158,7 +155,6 @@ class UI():
         elif cmd[0] == 'RENDER':
             self.round_state = 'RENDER'
             self.render.banner_fight = False
-            # TODO(Mika) : lancer l'affichage du combat'
         elif cmd[0] == 'BATTLE_STATE':
             self.round_state = cmd[1].upper()
             if self.round_state != 'PLAYERS_CONNECTIONS':
