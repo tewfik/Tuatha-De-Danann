@@ -20,6 +20,9 @@ CHOICE_TIME_INTERVAL = 5
 ACTION_TIME_INTERVAL = 2
 # number of actions allowed for one player in one turn
 NB_ACTIONS = 1
+# interval in seconds after which Dana stops to wait clients
+TIMEOUT = 10
+
 
 class Dana(threading.Thread):
     """
@@ -36,6 +39,9 @@ class Dana(threading.Thread):
     - `clients_actions` : actions of one turn choosen by each clients.
     - `state`: state of the game (PLAYERS_CONNECTION | ACTIONS_CHOICE | RENDER_FIGHT | WAIT_RENDER_OK).
     - `round`: round identifier. Start to zero and increment at each round.
+    - `render_ok_list`: list of clients which have finished to render.
+    - `render_ok_event`: notice battle thread that all clients have finished to render.
+
     """
 
     def __init__(self, queue):
@@ -53,6 +59,8 @@ class Dana(threading.Thread):
         self.clients_actions = {}
         self.state = 'PLAYERS_CONNECTIONS'
         self.round = 0
+        self.render_ok = []
+        self.render_ok_event = threading.Event()
 
 
     def run(self):
@@ -111,6 +119,9 @@ class Dana(threading.Thread):
             elif msg_tab[0] == 'GET_BATTLE_STATE':
                 self.get_battle_state_request(client_id)
 
+            elif msg_tab[0] == 'RENDER_OK':
+                self.render_ok_request(client_id)
+
             elif msg_tab[0] == 'PING':
                 self.ping_request(client_id, msg_tab[1])
 
@@ -129,36 +140,58 @@ class Dana(threading.Thread):
         """
         self.world.load_fixtures()
 
-        battle_is_finished = False
-        round = 0
+        # wait for players connection
+        time.sleep(PLAYER_CONNECTION_TIME_INTERVAL)
+
         # rounds loop
         while not self.battle_is_finished():
             # actions choice phase
-            self.state = 'ACTIONS_CHOICE'
             self.clear_clients_actions()
-            self.send_to_all('ROUND_START:' + str(round))
+            self.state = 'ACTIONS_CHOICE'
+            self.send_to_all('ROUND_START:' + str(self.round))
             time.sleep(CHOICE_TIME_INTERVAL)  # wait that clients finish to choose their actions
 
             # send actions to clients, they will display them.
             self.state = 'RENDER_FIGHT'
-            self.send_to_all('END_CHOICE')
-##########################################################################################################################################################
-            for count_actions in xrange(NB_ACTIONS):
-                self.send_to_all('BEGIN_ACTION:' + str(count_actions))
-                # send all actions for a given action turn to the clients
-                for client_actions in self.clients_actions.values():
-                    try:
-                        action = client_actions.popleft()
-                        self.send_to_all(action)
-                        time.sleep(ACTION_TIME_INTERVAL)
-                    except IndexError as e:
-                        print(e)
-                        print('|-> empty actions list for client')
-                self.send_to_all('END_ROUND:' + str(round))
-##########################################################################################################################################################
-            round += 1
+            self.send_to_all('END_CHOICE:' + str(self.round))
+
+            # render battle and send actions to display to clients
+            self.render_battle()
+
+            # ask to client to display the battle (display actions previously sent) 
+            self.state = 'WAIT_RENDER_OK'
+            self.send_to_all('RENDER:' + str(self.round))
+
+            # wait clients finished to display the battle
+            self.render_ok_event.wait(timeout=TIMEOUT)
+            self.render_ok_event.clear()
+            self.render_ok_list = []
+
+            self.round += 1
 
         self.send_to_all('BATTLE_END')
+
+
+    def render_battle(self):
+        """
+        Render the battle based on actions choice that clients have previously done.
+        """
+        for count_actions in xrange(NB_ACTIONS):
+            self.send_to_all('BEGIN_ACTION:' + str(count_actions))
+            # send all actions for a given action turn to the clients
+            for client_actions in self.clients_actions.values():
+                try:
+                    action = client_actions.popleft()
+
+                    ###############################################################################################################
+                    # TODO(tewfik): write a better
+                    self.send_to_all(action)
+                    time.sleep(ACTION_TIME_INTERVAL)
+                    ###############################################################################################################
+
+                except IndexError as e:
+                    print(e)
+                    print('|-> empty actions list for client')
 
 
     def register_client(self, msg):
@@ -349,6 +382,19 @@ class Dana(threading.Thread):
                 hp=entity.hp
                 )
 
+
+    def render_ok_request(self, client_id):
+        """
+        A client notices that he finished to render the battle.
+
+        Arguments:
+        - `client_id`: identifier of the client which has finished to render the battle.
+        """
+        if self.state == 'WAIT_RENDER_OK':
+            self.render_ok_list.append(client_id)
+            # if all clients have finished to render, awake battle thread
+            if len(self.render_ok_list) == len(self.clients_queues):
+                self.render_ok_event.set()
 
 
     def move_request(self, client_id, x, y):
