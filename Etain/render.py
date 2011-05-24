@@ -161,6 +161,13 @@ class Render():
             self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 15, left=4)
 
 
+    def effect(self, type, id=None, target_id=None, params=None):
+        """
+        """
+        if type.lower() == 'dmg':
+            self.l_entities[target_id].hp -= params[0]
+
+
     def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, centerx=None, centery=None, color=(0, 0, 0), alias=True):
         """
         """

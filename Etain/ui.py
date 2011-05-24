@@ -198,4 +198,6 @@ class UI():
                     self.render.l_entities[int(cmd[2])].play_anim(name=cmd[3], loop=False)
                 except ValueError as e:
                     print(e)
+            elif cmd[0] == 'EFFECT':
+                self.render.effect(type=cmd[3], id=int(cmd[2]), target_id=int(cmd[4]), params=cmd[5:])
         del self.fight[pa]
