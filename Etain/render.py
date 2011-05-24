@@ -73,6 +73,8 @@ class Render():
         self.use_cursor(ARROW)
         self.s_queue.put('GET_ENTITIES')
 
+        self.play_music("sounds/battle.ogg")
+
 
     def run(self):
         """
