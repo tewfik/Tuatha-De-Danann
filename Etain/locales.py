@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pygame.locals import *
+
 # Render config
 ROWS = 24
 COLUMNS = 32
@@ -19,6 +21,7 @@ ENNEMY = 2
 RED = (200, 0, 0)
 BLUE = (0, 0, 150)
 GREEN = (0, 200, 0)
+BEIGE = (220, 220, 130)
 GREY = (128, 128, 128)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -29,6 +32,11 @@ FACTION_COLOR = {NEUTRE : GREY, ALLY : BLUE, ENNEMY : RED}
 # Menu config
 MENU_WIDTH = 500
 MENU_HEIGHT = 300
+
+# Dictionnary
+DICT = {K_a : 'a', K_b : 'b', K_c : 'c', K_d : 'd', K_e : 'e', K_f : 'f', K_g : 'g', K_h : 'h', K_i : 'i', K_j : 'j', K_k : 'k', K_l : 'l',
+        K_m : 'm', K_n : 'n', K_o : 'o', K_p : 'p', K_q : 'q', K_r : 'r', K_s : 's', K_t : 't', K_u : 'u', K_v : 'v', K_w : 'w', K_x : 'x',
+        K_y : 'y', K_z : 'z', K_COMMA : ',', K_PERIOD : '.', K_EXCLAIM : '!', K_QUESTION : '?', K_SPACE : ' '}
 
 # Cursor
 ARROW = ("arrow",

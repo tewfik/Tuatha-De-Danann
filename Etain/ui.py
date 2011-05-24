@@ -21,11 +21,17 @@ class UI():
         - `render`: the main render object used for display.
         - `alt`: Boolean representing the state of the LEFT_ALT key.
         - `spec`: A boolean setting whever the client can play or is a spectator.
+        - `fight`: A dictionnary which contains the actions to perform during render phase.
+        - `pa`: the current action being executed.
+        - `frame_render`: the current frame number.
         """
         self.render = render
         self.round_state = None
         self.alt = False
         self.spec = False
+        self.fight = {}
+        self.pa = 0
+        self.frame_render = FPS
 
 
     def run(self):
@@ -34,6 +40,18 @@ class UI():
         """
         while not self.render.r_queue.empty():
             self.process(self.render.r_queue.get().split(':'))
+
+        if self.round_state == 'RENDER':
+            self.frame_render += 1
+            if self.frame_render >= FPS:
+                self.frame_render = 0
+                if self.pa in self.fight:
+                    self.do_actions(self.pa)
+                    self.pa += 1
+                else:
+                    self.round_state = 'NEXT_ROUND'
+                    self.render.s_queue.put('RENDER_OK')
+                    self.render.banner_next = True
 
         if not self.spec:
             for event in pygame.event.get():
@@ -50,6 +68,16 @@ class UI():
                             self.render.grid_render = not self.render.grid_render
                         elif event.key == K_r:
                             self.render.fps_render = not self.render.fps_render
+                    elif event.key == K_RETURN:
+                        if self.render.chat[0]:
+                            self.render.chat = [False, '', 0]
+                            #TODO(Mika) : send chat message here
+                        else:
+                            self.render.chat[0] = True
+                    elif self.render.chat[0] and event.key in DICT:
+                        self.render.chat[1] += DICT[event.key]
+
+
                 elif event.type == KEYUP:
                     if event.key == K_LALT:
                         self.alt = False
@@ -70,6 +98,7 @@ class UI():
                         self.render.s_queue.put('ATTACK:attack:%d:%d' % mouse_pos)
                     else:
                         self.render.s_queue.put('MOVE:%d:%d' % mouse_pos)
+                        self.render.dest_square = (mouse_pos[0] * SQUARE_SIZE, mouse_pos[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
             else:
                 menu_x = (WIDTH - MENU_WIDTH) / 2
                 menu_y = (HEIGHT - MENU_HEIGHT) / 2
@@ -116,27 +145,21 @@ class UI():
         """
         if cmd[0] == 'ROUND_START':
             self.round_state = 'CHOICE'
+            self.render.banner_next = False
         elif cmd[0] == 'END_ROUND':
-            self.round_state = ''
+            self.round_state = 'NEXT_ROUND'
         elif cmd[0] == 'END_CHOICE':
             self.round_state = 'WAIT_ACTIONS'
-            # TODO(Mika) : display banner fight
+            self.render.dest_square = None
+            self.render.banner_fight = True
         elif cmd[0] == 'RENDER':
-            pass # TODO(Mika) : lancer l'affichage du combat'
+            self.round_state = 'RENDER'
+            self.render.banner_fight = False
+            # TODO(Mika) : lancer l'affichage du combat'
         elif cmd[0] == 'BATTLE_STATE':
             self.round_state = cmd[1].upper()
             if self.round_state != 'PLAYERS_CONNECTIONS':
                 self.spec = True
-        elif cmd[0] == 'MOVE':
-            try:
-                self.render.l_entities[int(cmd[2])].move(dest=(int(cmd[3]), int(cmd[4])), speed=1)
-            except ValueError as e:
-                print(e)
-        elif cmd[0] == 'ATTACK':
-            try:
-                self.render.l_entities[int(cmd[2])].play_anim(name=cmd[3], loop=False)
-            except ValueError as e:
-                print(e)
         elif cmd[0] == 'ENTITY' or cmd[0] == 'NEW_ENTITY':
             f = open('data/'+cmd[1]+'.cfg')
             data = f.readline().split('**')
@@ -149,3 +172,25 @@ class UI():
         elif cmd[0] == 'YOU':
             self.render.me = int(cmd[1])
             self.render.s_queue.put("GET_BATTLE_STATE")
+        elif cmd[0] in ('ATTACK', 'MOVE', 'EFFECT'):
+            try:
+                self.fight[int(cmd[1])].append(cmd)
+            except ValueError as e:
+                print(e)
+
+
+    def do_actions(self, pa):
+        """
+        """
+        for cmd in self.fight[pa]:
+            if cmd[0] == 'MOVE':
+                try:
+                    self.render.l_entities[int(cmd[2])].move(dest=(int(cmd[3]), int(cmd[4])), speed=1)
+                except ValueError as e:
+                    print(e)
+            elif cmd[0] == 'ATTACK':
+                try:
+                    self.render.l_entities[int(cmd[2])].play_anim(name=cmd[3], loop=False)
+                except ValueError as e:
+                    print(e)
+        del self.fight[pa]

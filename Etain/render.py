@@ -26,15 +26,21 @@ class Render():
         Attributes:
         - `font`: the font to use for texts.
         - `menu_font`: the font to use for menus.
+        - `banner_font`: the font to use for banners.
         - `speech_font`: the font to use for speech bubbles.
+        - `chat_font`: the font to use for chat.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
         - `menu`: a boolean telling render to display the menu or not.
+        - `chat`: a list [True|False, text, int], text is the text being written.
+        - `banner_fight`: True if render display the banner "Fight start".
+        - `banner_next`: True if render should display "Next Round" banner.
         - `l_entities`: list of entities currently on the map.
         - `UI`: the UI handler.
         - `s_queue`: the queue used to send commands to Dana.
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
+        - `dest_square`: The square the player wants to move to.
         - `clock`: A pygame timer.
         - `bubbles`: A dictionnary of all bubbles currently displaying.
         - `cursor`: current cursor used.
@@ -42,17 +48,22 @@ class Render():
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
         self.menu_font = pygame.font.SysFont(None, 16)
+        self.banner_font = pygame.font.SysFont(None, 128)
         self.speech_font = pygame.font.SysFont("Monospace", 12)
         self.speech_font.set_bold(True)
+        self.chat_font = pygame.font.SysFont(None, 16)
         self.fps_render = False
         self.grid_render = False
         self.menu = False
+        self.chat = [False, '', 0]
         self.banner_fight = False
+        self.banner_next = False
         self.l_entities = entity.List()
         self.UI = ui.UI(self)
         self.s_queue = send_queue
         self.r_queue = receive_queue
         self.me = None
+        self.dest_square = None
         self.clock = pygame.time.Clock()
         self.bubbles = {}
 
@@ -90,7 +101,12 @@ class Render():
         self.text(self.UI.round_state, left = 10, top = 10)
 
         if self.banner_fight:
-            pass
+            self.window.fill(BEIGE, (0, 200, WIDTH, HEIGHT - 400))
+            self.text("FIGHT !", font=self.banner_font, centerx=WIDTH / 2, centery=HEIGHT / 2, color=RED)
+
+        if self.banner_next:
+            self.window.fill(BEIGE, (0, 200, WIDTH, HEIGHT - 400))
+            self.text("NEXT ROUND !", font=self.banner_font, centerx=WIDTH / 2, centery=HEIGHT / 2, color=RED)
 
         # Speech bubbles
         del_uid = None
@@ -127,22 +143,46 @@ class Render():
             self.text("Afficher la grille.", self.menu_font, top=menu_y + 50, left=menu_x + 50)
             self.text("Afficher les IPS.", self.menu_font, top=menu_y + 90, left=menu_x + 50)
 
+        # Chat display
+        if self.chat[0]:
+            self.draw_chat()
 
-    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, color=(0, 0, 0), alias=True):
+
+    def draw_chat(self):
+        """
+        """
+        self.window.fill(WHITE, (2, HEIGHT - 17, WIDTH - 4, 15))
+        self.chat[2] += 1
+        if self.chat[2] >= FPS / 2:
+            self.text(self.chat[1] + '|', font=self.chat_font, top=HEIGHT - 15, left=4)
+            if self.chat[2] >= FPS:
+                self.chat[2] = 0
+        else:
+            self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 15, left=4)
+
+
+    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, centerx=None, centery=None, color=(0, 0, 0), alias=True):
         """
         """
         if font is None:
             font = self.font
         text = font.render(msg, alias, color)
         text_Rect = text.get_rect()
+
         if top is not None:
             text_Rect.top = top
-        else:
+        elif bottom is not None:
             text_Rect.bottom = bottom
+        else:
+            text_Rect.centerx = centerx
         if right is not None:
             text_Rect.right = right
-        else:
+        elif left is not None:
             text_Rect.left = left
+        else:
+            text_Rect.centery = centery
+
+        self.font = pygame.font.SysFont(None, 24)
         self.window.blit(text, text_Rect)
 
 
@@ -160,6 +200,8 @@ class Render():
                 pygame.draw.line(self.window, (50, 50, 50), (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT))
             for i in xrange(1, ROWS):
                 pygame.draw.line(self.window, (50, 50, 50), (0, i * SQUARE_SIZE), (WIDTH, i * SQUARE_SIZE))
+        if self.dest_square is not None:
+            self.window.fill(BLUE, self.dest_square)
 
 
     def register_entity(self, pos, width, height, max_hp, hp, faction, uid, anim_path):
