@@ -123,6 +123,9 @@ class Dana(threading.Thread):
             elif msg_tab[0] == 'PING':
                 self.ping_request(client_id, msg_tab[1])
 
+            elif msg_tab[0] == 'CHAT_MSG':
+                self.chat_msg(client_id, msg_tab[1])
+
             else:
                 print('Unknown request.')
         else:
@@ -329,6 +332,17 @@ class Dana(threading.Thread):
         - `ping_id`: identifier of the ping request (to differenciate several ping request).
         """
         self.clients_queues[client_id].put('PONG:%d' % ping_id)
+
+
+    def chat_msg(self, client_id, msg):
+        """
+        Send a chat message to other clients.
+
+        Arguments:
+        - `client_id`: id of client which send the message.
+        - `msg`: message to transmit to other clients.
+        """
+        self.send_to_all('CHAT_MSG:%d:%s' % (client_id, msg))
 
 
     def get_battle_state_request(self, client_id):
