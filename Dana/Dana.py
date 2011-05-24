@@ -16,8 +16,6 @@ import models.entity
 PLAYER_CONNECTION_TIME_INTERVAL = 20
 # interval in seconds when players are able to choose their actions
 CHOICE_TIME_INTERVAL = 5
-# interval in seconds of one action
-ACTION_TIME_INTERVAL = 2
 # number of actions allowed for one player in one turn
 NB_ACTIONS = 1
 # interval in seconds after which Dana stops to wait clients
@@ -125,6 +123,9 @@ class Dana(threading.Thread):
             elif msg_tab[0] == 'PING':
                 self.ping_request(client_id, msg_tab[1])
 
+            elif msg_tab[0] == 'CHAT_MSG':
+                self.chat_msg(client_id, msg_tab[1])
+
             else:
                 print('Unknown request.')
         else:
@@ -166,6 +167,7 @@ class Dana(threading.Thread):
             self.render_ok_event.wait(timeout=TIMEOUT)
             self.render_ok_event.clear()
             self.render_ok_list = []
+            time.sleep(0.5)
 
             self.round += 1
 
@@ -177,7 +179,6 @@ class Dana(threading.Thread):
         Render the battle based on actions choice that clients have previously done.
         """
         for count_actions in xrange(NB_ACTIONS):
-            self.send_to_all('BEGIN_ACTION:' + str(count_actions))
             # send all actions for a given action turn to the clients
             for client_actions in self.clients_actions.values():
                 try:
@@ -186,7 +187,6 @@ class Dana(threading.Thread):
                     ###############################################################################################################
                     # TODO(tewfik): write a better
                     self.send_to_all(action)
-                    time.sleep(ACTION_TIME_INTERVAL)
                     ###############################################################################################################
 
                 except IndexError as e:
@@ -332,6 +332,17 @@ class Dana(threading.Thread):
         - `ping_id`: identifier of the ping request (to differenciate several ping request).
         """
         self.clients_queues[client_id].put('PONG:%d' % ping_id)
+
+
+    def chat_msg(self, client_id, msg):
+        """
+        Send a chat message to other clients.
+
+        Arguments:
+        - `client_id`: id of client which send the message.
+        - `msg`: message to transmit to other clients.
+        """
+        self.send_to_all('CHAT_MSG:%d:%s' % (client_id, msg))
 
 
     def get_battle_state_request(self, client_id):
