@@ -486,11 +486,13 @@ def main(host, port):
 if __name__ == '__main__':
     # command line argument management
     if(len(sys.argv) >= 3):
-	host = sys.argv[1]
-	port = int(sys.argv[2])
+	    host = sys.argv[1]
+	    port = int(sys.argv[2])
     elif(len(sys.argv) >= 2):
+        host = 'localhost'
         port = int(sys.argv[1])
     else:
+        host = 'localhost'
         port = 1337
 
     main(host, port)
