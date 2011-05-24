@@ -53,7 +53,7 @@ class World(object):
         arbre1 = entity.Entity(id=2001, type='tree', faction_id=0)
         self.register(arbre1, entity_id=2001, faction_id=0, x=23, y=15)
         arbre2 = entity.Entity(id=2002, type='tree', faction_id=0)
-        self.register(arbre2, entity_id=2002, faction_id=0, x=10, y=25)
+        self.register(arbre2, entity_id=2002, faction_id=0, x=8, y=18)
 
 
     def get_object_by_position(self, position):
