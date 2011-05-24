@@ -63,16 +63,17 @@ class Entity(object):
         - `magic`: Amount of magic damage inflicted before damage reduction.
         - `true`: Amount of true damage inflicted.
 
-        Return : True if hp reachs 0, else False.
+        Return : a tuple (bool, dmg) True if hp reachs 0, else False. dmg is the damage dealt
         """
         normal_mul = 100 / (100 + self.armor)
         magic_mul = 100 / (100 + self.mresist)
-        self.hp -= true + normal * normal_mul + magic * magic_mul
+        dmg = true + normal * normal_mul + magic * magic_mul
+        self.hp -= dmg
         dead = False
         if self.hp < 0:
             self.hp = 0
             dead = True
-        return dead
+        return (dead, dmg)
 
 
 
