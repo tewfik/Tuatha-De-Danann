@@ -57,7 +57,7 @@ class Dana(threading.Thread):
         self.clients_actions = {}
         self.state = 'PLAYERS_CONNECTIONS'
         self.round = 0
-        self.render_ok = []
+        self.render_ok_list = []
         self.render_ok_event = threading.Event()
 
 
