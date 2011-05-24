@@ -102,6 +102,18 @@ class Dana(threading.Thread):
             if msg_tab[0] == 'GET_ENTITIES':
                 self.get_entities_request(client_id)
 
+            elif msg_tab[0] == 'GET_BATTLE_STATE':
+                self.get_battle_state_request(client_id)
+
+            elif msg_tab[0] == 'RENDER_OK':
+                self.render_ok_request(client_id)
+
+            elif msg_tab[0] == 'PING':
+                self.ping_request(client_id, msg_tab[1])
+
+            elif msg_tab[0] == 'CHAT_MSG':
+                self.chat_msg(client_id, msg_tab[1])
+
             elif self.state == 'ACTIONS_CHOICE':
                 # consider clients actions if and only if Dana is in choice state
                 if msg_tab[0] == 'MOVE':
@@ -115,18 +127,6 @@ class Dana(threading.Thread):
                         self.attack_request(client_id, name=msg_tab[1], x=int(msg_tab[2]), y=int(msg_tab[3]))
                     except ValueError as e:
                         print(e)
-
-            elif msg_tab[0] == 'GET_BATTLE_STATE':
-                self.get_battle_state_request(client_id)
-
-            elif msg_tab[0] == 'RENDER_OK':
-                self.render_ok_request(client_id)
-
-            elif msg_tab[0] == 'PING':
-                self.ping_request(client_id, msg_tab[1])
-
-            elif msg_tab[0] == 'CHAT_MSG':
-                self.chat_msg(client_id, msg_tab[1])
 
             else:
                 print('Unknown request.')
