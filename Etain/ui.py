@@ -70,6 +70,7 @@ class UI():
                         self.render.s_queue.put('ATTACK:attack:%d:%d' % mouse_pos)
                     else:
                         self.render.s_queue.put('MOVE:%d:%d' % mouse_pos)
+                        self.render.dest_square = (mouse_pos[0] * SQUARE_SIZE, mouse_pos[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
             else:
                 menu_x = (WIDTH - MENU_WIDTH) / 2
                 menu_y = (HEIGHT - MENU_HEIGHT) / 2
@@ -120,6 +121,7 @@ class UI():
             self.round_state = ''
         elif cmd[0] == 'END_CHOICE':
             self.round_state = 'WAIT_ACTIONS'
+            self.render.dest_square = None
             # TODO(Mika) : display banner fight
         elif cmd[0] == 'RENDER':
             pass # TODO(Mika) : lancer l'affichage du combat'

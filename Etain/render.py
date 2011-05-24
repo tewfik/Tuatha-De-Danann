@@ -35,6 +35,7 @@ class Render():
         - `s_queue`: the queue used to send commands to Dana.
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
+        - `dest_square`: The square the player wants to move to.
         - `clock`: A pygame timer.
         - `bubbles`: A dictionnary of all bubbles currently displaying.
         - `cursor`: current cursor used.
@@ -53,6 +54,7 @@ class Render():
         self.s_queue = send_queue
         self.r_queue = receive_queue
         self.me = None
+        self.dest_square = None
         self.clock = pygame.time.Clock()
         self.bubbles = {}
 
@@ -160,6 +162,8 @@ class Render():
                 pygame.draw.line(self.window, (50, 50, 50), (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT))
             for i in xrange(1, ROWS):
                 pygame.draw.line(self.window, (50, 50, 50), (0, i * SQUARE_SIZE), (WIDTH, i * SQUARE_SIZE))
+        if self.dest_square is not None:
+            self.window.fill(BLUE, self.dest_square)
 
 
     def register_entity(self, pos, width, height, max_hp, hp, faction, uid, anim_path):
