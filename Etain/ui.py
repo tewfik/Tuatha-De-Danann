@@ -176,7 +176,7 @@ class UI():
             self.render.me = int(cmd[1])
             self.render.s_queue.put("GET_BATTLE_STATE")
         elif cmd[0] == 'CHAT_MSG':
-            self.render.bubbles[int(cmd[1])] = (int(cmd[1]), cmd[2], BUBBLE_TTL)
+            self.render.bubbles[int(cmd[1])] = [int(cmd[1]), cmd[2], BUBBLE_TTL]
         elif cmd[0] in ('ATTACK', 'MOVE', 'EFFECT'):
             try:
                 self.fight[int(cmd[1])].append(cmd)
