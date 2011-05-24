@@ -93,7 +93,7 @@ class UI():
             if self.mouse_over((WIDTH - 18, 0, 18, 18), event.pos):
                 self.render.menu = not self.render.menu
             elif not self.render.menu:
-                if event.button == 1 and self.round_state == 'CHOICE' and not self.render.spec:
+                if event.button == 1 and self.round_state == 'CHOICE' and not self.spec:
                     if self.entity_on(mouse_pos):
                         self.render.s_queue.put('ATTACK:attack:%d:%d' % mouse_pos)
                     else:
