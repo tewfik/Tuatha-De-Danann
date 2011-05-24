@@ -189,7 +189,13 @@ class Dana(threading.Thread):
 
                     ###############################################################################################################
                     # TODO(tewfik): write a better
-                    self.send_to_all(action)
+                    if action.startswith('ATTACK') or action.startswith('MOVE'):
+                        action = action % (count_actions)
+                        self.send_to_all(action)
+                        # effect =
+                        # self.send_to_all(effect)
+                    else:
+                        self.send_to_all(action)
                     ###############################################################################################################
 
                 except IndexError as e:
@@ -430,7 +436,7 @@ class Dana(threading.Thread):
         #TODO(tewfik): check that the client don't move more than which he is allowed to move.
         try:
             self.world.move(client_id, x, y)
-            self.clients_actions[client_id].append('MOVE:%d:%d:%d' % (client_id, x, y))
+            self.clients_actions[client_id].append('MOVE:%d:{id}:{x}:{y}'.format(id=client_id, x=x, y=y))
             print 'client_position = (%d, %d)' % self.world.entities_pos[client_id] # DEBUG client position
         except models.world.ForbiddenMove as e:
             print(e)
@@ -449,7 +455,7 @@ class Dana(threading.Thread):
         target = self.world.get_object_by_position((x, y))
         if target is not None:
             self.world.entities[client_id].l_attacks[name].hit(target)
-            self.clients_actions[client_id].append('ATTACK:%d:%s:%d:%d' % (client_id, name, x, y))
+            self.clients_actions[client_id].append('ATTACK:%d:{id}:{name}:{x}:{y}'.format(id=client_id, name=name, x=x, y=y))
         # TODO(tewfik): manage attack fail
 
 
