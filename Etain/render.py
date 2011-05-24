@@ -31,6 +31,8 @@ class Render():
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
         - `menu`: a boolean telling render to display the menu or not.
+        - `banner_fight`: True if render display the banner "Fight start".
+        - `banner_next`: True if render should display "Next Round" banner.
         - `l_entities`: list of entities currently on the map.
         - `UI`: the UI handler.
         - `s_queue`: the queue used to send commands to Dana.
@@ -51,6 +53,7 @@ class Render():
         self.grid_render = False
         self.menu = False
         self.banner_fight = False
+        self.banner_next = False
         self.l_entities = entity.List()
         self.UI = ui.UI(self)
         self.s_queue = send_queue
@@ -96,6 +99,10 @@ class Render():
         if self.banner_fight:
             self.window.fill(BEIGE, (0, 200, WIDTH, HEIGHT - 400))
             self.text("FIGHT !", font=self.banner_font, centerx=WIDTH / 2, centery=HEIGHT / 2, color=RED)
+
+        if self.banner_next:
+            self.window.fill(BEIGE, (0, 200, WIDTH, HEIGHT - 400))
+            self.text("NEXT ROUND !", font=self.banner_font, centerx=WIDTH / 2, centery=HEIGHT / 2, color=RED)
 
         # Speech bubbles
         del_uid = None

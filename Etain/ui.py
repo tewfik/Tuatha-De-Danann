@@ -51,6 +51,7 @@ class UI():
                 else:
                     self.round_state = 'NEXT_ROUND'
                     self.render.s_queue.put('RENDER_OK')
+                    self.render.banner_next = True
 
         if not self.spec:
             for event in pygame.event.get():
@@ -134,6 +135,7 @@ class UI():
         """
         if cmd[0] == 'ROUND_START':
             self.round_state = 'CHOICE'
+            self.banner_next = False
         elif cmd[0] == 'END_ROUND':
             self.round_state = 'NEXT_ROUND'
         elif cmd[0] == 'END_CHOICE':
