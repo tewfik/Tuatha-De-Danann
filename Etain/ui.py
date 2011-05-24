@@ -20,10 +20,12 @@ class UI():
         Attributes:
         - `render`: the main render object used for display.
         - `alt`: Boolean representing the state of the LEFT_ALT key.
+        - `spec`: A boolean setting whever the client can play or is a spectator.
         """
         self.render = render
         self.round_state = None
         self.alt = False
+        self.spec = False
 
 
     def run(self):
@@ -33,79 +35,76 @@ class UI():
         while not self.render.r_queue.empty():
             self.process(self.render.r_queue.get().split(':'))
 
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                self.render.__del__()
-                sys.exit()
-            elif event.type == KEYDOWN:
-                if event.key == K_LALT:
-                    self.alt = True
-                elif self.alt == True:
-                    if event.key == K_RETURN:
-                        pygame.display.toggle_fullscreen()
-                    elif event.key == K_g:
-                        self.render.grid_render = not self.render.grid_render
-                    elif event.key == K_r:
-                        self.render.fps_render = not self.render.fps_render
-                elif self.round_state == 'CHOICE':
-                    pos = list(self.render.l_entities[self.render.me].pos)
-                    if event.key == K_UP:
-                        pos[1] -= 1
-                        self.render.s_queue.put('MOVE:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_RIGHT:
-                        pos[0] += 1
-                        self.render.s_queue.put('MOVE:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_DOWN:
-                        pos[1] += 1
-                        self.render.s_queue.put('MOVE:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_LEFT:
-                        pos[0] -= 1
-                        self.render.s_queue.put('MOVE:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_z:
-                        pos[1] -= 1
-                        self.render.s_queue.put('ATTACK:attack:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_d:
-                        pos[0] += 1
-                        self.render.s_queue.put('ATTACK:attack:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_s:
-                        pos[1] += 1
-                        self.render.s_queue.put('ATTACK:attack:'+str(pos[0])+':'+str(pos[1]))
-                    elif event.key == K_q:
-                        pos[0] -= 1
-                        self.render.s_queue.put('ATTACK:attack:'+str(pos[0])+':'+str(pos[1]))
-            elif event.type == KEYUP:
-                if event.key == K_LALT:
-                    self.alt = False
-            else:
-                self.mouse_event(event)
+        if not self.spec:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    self.render.__del__()
+                    sys.exit()
+                elif event.type == KEYDOWN:
+                    if event.key == K_LALT:
+                        self.alt = True
+                    elif self.alt == True:
+                        if event.key == K_RETURN:
+                            pygame.display.toggle_fullscreen()
+                        elif event.key == K_g:
+                            self.render.grid_render = not self.render.grid_render
+                        elif event.key == K_r:
+                            self.render.fps_render = not self.render.fps_render
+                elif event.type == KEYUP:
+                    if event.key == K_LALT:
+                        self.alt = False
+                else:
+                    self.mouse_event(event)
 
 
     def mouse_event(self, event):
         """
         """
         if event.type == MOUSEBUTTONDOWN:
-            if self.mouse_hitbox((WIDTH - 18, 0, 18, 18), event.pos):
+            mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
+            if self.mouse_over((WIDTH - 18, 0, 18, 18), event.pos):
                 self.render.menu = not self.render.menu
             elif not self.render.menu:
-                mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
                 if event.button == 1 and self.round_state == 'CHOICE':
-                    self.render.s_queue.put('MOVE:'+str(mouse_pos[0])+':'+str(mouse_pos[1]))
+                    if self.entity_on(mouse_pos):
+                        self.render.s_queue.put('ATTACK:attack:%d:%d' % mouse_pos)
+                    else:
+                        self.render.s_queue.put('MOVE:%d:%d' % mouse_pos)
             else:
                 menu_x = (WIDTH - MENU_WIDTH) / 2
                 menu_y = (HEIGHT - MENU_HEIGHT) / 2
-                if self.mouse_hitbox((menu_x + 30, menu_y + 50, 10, 10), event.pos):
+                if self.mouse_over((menu_x + 30, menu_y + 50, 10, 10), event.pos):
                         self.render.grid_render = not self.render.grid_render
-                elif self.mouse_hitbox((menu_x + 30, menu_y + 90, 10, 10), event.pos):
+                elif self.mouse_over((menu_x + 30, menu_y + 90, 10, 10), event.pos):
                         self.render.fps_render = not self.render.fps_render
+                elif self.mouse_over((menu_x + MENU_WIDTH - 16, menu_y + 3, 13, 13), event.pos):
+                        self.render.menu = not self.render.menu
+        elif event.type == MOUSEMOTION:
+            mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
+            if self.entity_on(mouse_pos):
+                self.render.use_cursor(SWORD)
+            elif self.render.cursor != ARROW[0]:
+                self.render.use_cursor(ARROW)
 
 
-    def mouse_hitbox(self, rect, pos):
+    def mouse_over(self, rect, pos):
         """
         """
         if pos[0] >= rect[0] and pos[0] <= rect[0] + rect[2] and pos[1] >= rect[1] and pos[1] <= rect[1] + rect[3]:
                return True
         else:
             return False
+
+
+    def entity_on(self, pos):
+        """
+        """
+        result = False
+        for entity in self.render.l_entities.get_layer(pos[1]).values():
+            if entity.pos[0] == pos[0]:
+                result = True
+                break
+        return result
 
 
     def process(self, cmd):
@@ -120,9 +119,14 @@ class UI():
         elif cmd[0] == 'END_ROUND':
             self.round_state = ''
         elif cmd[0] == 'END_CHOICE':
-            self.round_state = 'RENDER BATTLE'
-        elif cmd[0] == 'BEGIN_ACTION':
-            self.round_stat = 'ACTION '+str(cmd[1])
+            self.round_state = 'WAIT_ACTIONS'
+            # TODO(Mika) : display banner fight
+        elif cmd[0] == 'RENDER':
+            pass # TODO(Mika) : lancer l'affichage du combat'
+        elif cmd[0] == 'BATTLE_STATE':
+            self.round_state = cmd[1].upper()
+            if self.round_state != 'PLAYERS_CONNECTIONS':
+                self.spec = True
         elif cmd[0] == 'MOVE':
             try:
                 self.render.l_entities[int(cmd[2])].move(dest=(int(cmd[3]), int(cmd[4])), speed=1)
@@ -133,7 +137,7 @@ class UI():
                 self.render.l_entities[int(cmd[2])].play_anim(name=cmd[3], loop=False)
             except ValueError as e:
                 print(e)
-        elif cmd[0] == 'ENTITY':
+        elif cmd[0] == 'ENTITY' or cmd[0] == 'NEW_ENTITY':
             f = open('data/'+cmd[1]+'.cfg')
             data = f.readline().split('**')
             f.close()
@@ -144,3 +148,4 @@ class UI():
                 print(e)
         elif cmd[0] == 'YOU':
             self.render.me = int(cmd[1])
+            self.render.s_queue.put("GET_BATTLE_STATE")

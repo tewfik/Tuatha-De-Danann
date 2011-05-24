@@ -26,6 +26,7 @@ class Render():
         Attributes:
         - `font`: the font to use for texts.
         - `menu_font`: the font to use for menus.
+        - `speech_font`: the font to use for speech bubbles.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
         - `menu`: a boolean telling render to display the menu or not.
@@ -35,22 +36,30 @@ class Render():
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
         - `clock`: A pygame timer.
+        - `bubbles`: A dictionnary of all bubbles currently displaying.
+        - `cursor`: current cursor used.
         """
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
         self.menu_font = pygame.font.SysFont(None, 16)
+        self.speech_font = pygame.font.SysFont("Monospace", 12)
+        self.speech_font.set_bold(True)
         self.fps_render = False
         self.grid_render = False
         self.menu = False
+        self.banner_fight = False
         self.l_entities = entity.List()
         self.UI = ui.UI(self)
         self.s_queue = send_queue
         self.r_queue = receive_queue
         self.me = None
         self.clock = pygame.time.Clock()
+        self.bubbles = {}
 
         self.window = pygame.display.set_mode((WIDTH, HEIGHT), 0)
         pygame.display.set_caption(TITLE)
+        self.cursor = "arrow"
+        self.use_cursor(ARROW)
         self.s_queue.put('GET_ENTITIES')
 
 
@@ -80,12 +89,34 @@ class Render():
         # battle state displaying
         self.text(self.UI.round_state, left = 10, top = 10)
 
+        if self.banner_fight:
+            pass
+
+        # Speech bubbles
+        del_uid = None
+        for uid in self.bubbles:
+            bubble = self.bubbles[uid]
+            ent = self.l_entities[bubble[0]]
+            pos = (ent.pixel_pos[0] + ent.width, ent.pixel_pos[1])
+            pygame.draw.polygon(self.window, WHITE, ((pos[0] - 5, pos[1] + 10), (pos[0] + 40, pos[1] - 20), (pos[0] + 15, pos[1] - 20)))
+            pygame.draw.ellipse(self.window, WHITE, (pos[0] - 10, pos[1] - 50, 100, 50))
+            self.text(bubble[1], self.speech_font, top=pos[1] - 35, left=pos[0] + 5, alias=False)
+            bubble[2] -= 1
+            if bubble[2] <= 0:
+                del_uid = uid
+        if del_uid is not None:
+            del self.bubbles[del_uid]
+
         # Menu display
         if self.menu:
             menu_x = (WIDTH - MENU_WIDTH) / 2
             menu_y = (HEIGHT - MENU_HEIGHT) / 2
             self.window.fill(GREY, (menu_x, menu_y, MENU_WIDTH, MENU_HEIGHT))
 
+            X = menu_x + MENU_WIDTH - 10
+            Y = menu_y + 9
+            pygame.draw.polygon(self.window, RED, ((X - 2, Y), (X - 6, Y - 4), (X - 4, Y - 6), (X, Y - 2), (X + 4, Y - 6), (X + 6, Y - 4),
+                                                   (X + 2, Y), (X + 6, Y + 4), (X + 4, Y + 6), (X, Y + 2), (X - 4, Y + 6), (X - 6, Y + 4)))
             self.window.fill(WHITE, (menu_x + 30, menu_y + 50, 10, 10))
             self.window.fill(WHITE, (menu_x + 30, menu_y + 90, 10, 10))
             if self.grid_render:
@@ -97,12 +128,12 @@ class Render():
             self.text("Afficher les IPS.", self.menu_font, top=menu_y + 90, left=menu_x + 50)
 
 
-    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, color=(0, 0, 0)):
+    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, color=(0, 0, 0), alias=True):
         """
         """
         if font is None:
             font = self.font
-        text = font.render(msg, True, color)
+        text = font.render(msg, alias, color)
         text_Rect = text.get_rect()
         if top is not None:
             text_Rect.top = top
@@ -194,6 +225,29 @@ class Render():
         self.area = pickle.load(f_map)
         self.area.load_tiles()
         f_map.close()
+
+
+    def use_cursor(self, name):
+        """
+        """
+        self.cursor, cursor = name
+        hotspot = None
+        for y in range(len(cursor)):
+            for x in range(len(cursor[y])):
+                if cursor[y][x] in ['x', ',', 'O']:
+                    hotspot = x,y
+                    break
+            if hotspot != None:
+                break
+        if hotspot == None:
+            raise Exception("No hotspot specified for cursor !")
+        s = []
+        for line in cursor:
+            s.append(line.replace('x', 'X').replace(',', '.').replace('O', 'o'))
+        curs, mask = pygame.cursors.compile(s)
+        size = len(cursor[0]), len(cursor)
+        pygame.mouse.set_cursor(size, hotspot, curs, mask)
+
 
 
     def play_music(self, path):
