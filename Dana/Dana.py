@@ -102,6 +102,18 @@ class Dana(threading.Thread):
             if msg_tab[0] == 'GET_ENTITIES':
                 self.get_entities_request(client_id)
 
+            elif msg_tab[0] == 'GET_BATTLE_STATE':
+                self.get_battle_state_request(client_id)
+
+            elif msg_tab[0] == 'RENDER_OK':
+                self.render_ok_request(client_id)
+
+            elif msg_tab[0] == 'PING':
+                self.ping_request(client_id, msg_tab[1])
+
+            elif msg_tab[0] == 'CHAT_MSG':
+                self.chat_msg(client_id, msg_tab[1])
+
             elif self.state == 'ACTIONS_CHOICE':
                 # consider clients actions if and only if Dana is in choice state
                 if msg_tab[0] == 'MOVE':
@@ -115,18 +127,6 @@ class Dana(threading.Thread):
                         self.attack_request(client_id, name=msg_tab[1], x=int(msg_tab[2]), y=int(msg_tab[3]))
                     except ValueError as e:
                         print(e)
-
-            elif msg_tab[0] == 'GET_BATTLE_STATE':
-                self.get_battle_state_request(client_id)
-
-            elif msg_tab[0] == 'RENDER_OK':
-                self.render_ok_request(client_id)
-
-            elif msg_tab[0] == 'PING':
-                self.ping_request(client_id, msg_tab[1])
-
-            elif msg_tab[0] == 'CHAT_MSG':
-                self.chat_msg(client_id, msg_tab[1])
 
             else:
                 print('Unknown request.')
@@ -157,7 +157,7 @@ class Dana(threading.Thread):
             # send actions to clients, they will display them.
             self.state = 'RENDER_FIGHT'
             self.send_to_all('END_CHOICE:' + str(self.round))
-            time.sleep(0.5)  # let the time to display banner
+            time.sleep(1)  # let the time to display banner
 
             # render battle and send actions to display to clients
             self.render_battle()
@@ -170,7 +170,7 @@ class Dana(threading.Thread):
             self.render_ok_event.wait(timeout=TIMEOUT)
             self.render_ok_event.clear()
             self.render_ok_list = []
-            time.sleep(0.5)
+            time.sleep(1)  # let the time to clients to display banners.
 
             self.round += 1
 
@@ -189,7 +189,13 @@ class Dana(threading.Thread):
 
                     ###############################################################################################################
                     # TODO(tewfik): write a better
-                    self.send_to_all(action)
+                    if action.startswith('ATTACK') or action.startswith('MOVE'):
+                        action = action % (count_actions)
+                        self.send_to_all(action)
+                        # effect =
+                        # self.send_to_all(effect)
+                    else:
+                        self.send_to_all(action)
                     ###############################################################################################################
 
                 except IndexError as e:
@@ -430,7 +436,7 @@ class Dana(threading.Thread):
         #TODO(tewfik): check that the client don't move more than which he is allowed to move.
         try:
             self.world.move(client_id, x, y)
-            self.clients_actions[client_id].append('MOVE:%d:%d:%d' % (client_id, x, y))
+            self.clients_actions[client_id].append('MOVE:%d:{id}:{x}:{y}'.format(id=client_id, x=x, y=y))
             print 'client_position = (%d, %d)' % self.world.entities_pos[client_id] # DEBUG client position
         except models.world.ForbiddenMove as e:
             print(e)
@@ -449,7 +455,7 @@ class Dana(threading.Thread):
         target = self.world.get_object_by_position((x, y))
         if target is not None:
             self.world.entities[client_id].l_attacks[name].hit(target)
-            self.clients_actions[client_id].append('ATTACK:%d:%s:%d:%d' % (client_id, name, x, y))
+            self.clients_actions[client_id].append('ATTACK:%d:{id}:{name}:{x}:{y}'.format(id=client_id, name=name, x=x, y=y))
         # TODO(tewfik): manage attack fail
 
 
