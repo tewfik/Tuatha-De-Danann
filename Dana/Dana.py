@@ -34,6 +34,7 @@ class Dana(threading.Thread):
     - `shutdown`: if True => terminate Dana.
     - `queue`: queue Dana has to use to receive messages which are addressed to it.
     - `clients_queues`: dictionary of clients' queues. Format : clients_queues[client_id] = Queue object.
+    - `spectators_queues`: dictionary of spectators' queues. Format : spectators_queues[client_id] = Queue object.
     - `clients_actions` : actions of one turn choosen by each clients.
     - `state`: state of the game (PLAYERS_CONNECTION | ACTIONS_CHOICE | RENDER_FIGHT | WAIT_RENDER_OK).
     - `round`: round identifier. Start to zero and increment at each round.
@@ -54,6 +55,7 @@ class Dana(threading.Thread):
         self.shutdown = False
         self.queue = queue
         self.clients_queues = {}
+        self.spectators_queues = {}
         self.clients_actions = {}
         self.state = 'PLAYERS_CONNECTIONS'
         self.round = 0
@@ -206,35 +208,40 @@ class Dana(threading.Thread):
         # check that the message is a Queue
         if msg.__class__.__name__ == Queue.Queue.__name__:
             client_id = self.get_next_id()        # generate an available client id.
-            self.clients_queues[client_id] = msg  # register the client queue
 
             #
-            player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1)
-            player.add_attack('attack', (10, 0, 0))
-            x = random.randint(10, 22)
-            y = 22
-            while not self.world.square_available(x, y):
+            if self.state != 'PLAYERS_CONNECTIONS':
+                # register the client as spectator
+                self.spectators_queues[client_id] = msg
+            else:
+                self.clients_queues[client_id] = msg  # register the client queue
+
+                player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1)
+                player.add_attack('attack', (10, 0, 0))
                 x = random.randint(10, 22)
+                y = 22
+                while not self.world.square_available(x, y):
+                    x = random.randint(10, 22)
 
-            try:
-                self.world.register(entity=player, entity_id=client_id, faction_id=1, x=x, y=y)
+                try:
+                    self.world.register(entity=player, entity_id=client_id, faction_id=1, x=x, y=y)
 
-                # confirm the registration of the client's queue => send its client_id
-                self.clients_queues[client_id].put(str(client_id))
-                self.clients_queues[client_id].put('YOU:%d:%d' % (client_id, player.faction_id))
-                print('client N° %d has been registered' % client_id)
+                    # confirm the registration of the client's queue => send its client_id
+                    self.clients_queues[client_id].put(str(client_id))
+                    self.clients_queues[client_id].put('YOU:%d:%d' % (client_id, player.faction_id))
+                    print('client N° %d has been registered' % client_id)
 
-                # inform all the clients that there is a new entity
-                player_position = self.world.get_position_by_object_id(player.id)
-                self.send_to_all('NEW_ENTITY:{type}:{faction}:{id}:{x}:{y}:{hpm}:{hp}'.format(type=player.type,
-                                                                                              faction=player.faction_id,
-                                                                                              id=player.id,
-                                                                                              x=player_position[0],
-                                                                                              y=player_position[1],
-                                                                                              hpm=player.maxhp,
-                                                                                              hp=player.hp))
-            except ForbiddenMove as e:
-                print(e)
+                    # inform all the clients that there is a new entity
+                    player_position = self.world.get_position_by_object_id(player.id)
+                    self.send_to_all('NEW_ENTITY:{type}:{faction}:{id}:{x}:{y}:{hpm}:{hp}'.format(type=player.type,
+                                                                                                  faction=player.faction_id,
+                                                                                                  id=player.id,
+                                                                                                  x=player_position[0],
+                                                                                                  y=player_position[1],
+                                                                                                  hpm=player.maxhp,
+                                                                                                  hp=player.hp))
+                except ForbiddenMove as e:
+                    print(e)
 
         else:
             # error TODO(tewfik): create a ProtocolException
@@ -306,6 +313,8 @@ class Dana(threading.Thread):
         """
         for client_queue in self.clients_queues.values():
             client_queue.put(msg)
+        for spectator_queue in self.spectators_queues.values():
+            spectator_queue.put(msg)
 
 
     def clear_clients_actions(self):
