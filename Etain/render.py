@@ -130,21 +130,28 @@ class Render():
             self.text("Afficher les IPS.", self.menu_font, top=menu_y + 90, left=menu_x + 50)
 
 
-    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, color=(0, 0, 0), alias=True):
+    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, centerx=None, centery=None, color=(0, 0, 0), alias=True):
         """
         """
         if font is None:
             font = self.font
         text = font.render(msg, alias, color)
         text_Rect = text.get_rect()
+
         if top is not None:
             text_Rect.top = top
-        else:
+        elif bottom is not None:
             text_Rect.bottom = bottom
+        else:
+            text_Rect.centerx = centerx
         if right is not None:
             text_Rect.right = right
-        else:
+        elif left is not None:
             text_Rect.left = left
+        else:
+            text_Rect.centery = centery
+
+        self.font = pygame.font.SysFont(None, 24)
         self.window.blit(text, text_Rect)
 
 
