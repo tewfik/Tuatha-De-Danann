@@ -70,12 +70,15 @@ class UI():
                             self.render.fps_render = not self.render.fps_render
                     elif event.key == K_RETURN:
                         if self.render.chat[0]:
+                            self.render.s_queue.put('CHAT_MSG:%s' % self.render.chat[1])
                             self.render.chat = [False, '', 0]
-                            #TODO(Mika) : send chat message here
                         else:
                             self.render.chat[0] = True
-                    elif self.render.chat[0] and event.key in DICT:
-                        self.render.chat[1] += DICT[event.key]
+                    elif self.render.chat[0]:
+                        if event.key in DICT:
+                            self.render.chat[1] += DICT[event.key]
+                        elif event.key == K_BACKSPACE:
+                            self.render.chat[1] = self.render.chat[1][:-1]
 
 
                 elif event.type == KEYUP:
