@@ -51,6 +51,7 @@ class UI():
                 else:
                     self.round_state = 'NEXT_ROUND'
                     self.render.s_queue.put('RENDER_OK')
+                    self.pa = 0
                     self.render.banner_next = True
 
         for event in pygame.event.get():
@@ -144,6 +145,7 @@ class UI():
         - `cmd`: command from Dana.
         """
         if cmd[0] == 'ROUND_START':
+            self.fight = {}
             self.round_state = 'CHOICE'
             self.render.banner_next = False
         elif cmd[0] == 'END_ROUND':

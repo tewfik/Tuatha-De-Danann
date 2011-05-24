@@ -166,6 +166,8 @@ class Render():
         """
         if type.lower() == 'dmg':
             self.l_entities[target_id].hp -= params[0]
+        elif type.lower() == 'dead':
+            self.l_entities[target_id].die()
 
 
     def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, centerx=None, centery=None, color=(0, 0, 0), alias=True):

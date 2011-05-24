@@ -99,6 +99,7 @@ class Entity():
         - `height`: the height of the entity.
         - `max_hp`: Gives the max hp of the entity.
         - `hp`: Gives the current hp of the entity.
+        - `alive`: A boolean setting if the entity is alive or dead.
         - `faction`: identify of the faction the entity belongs to.
         - `current_anim`: the current played animation.
         - `default_anim`: the animation to play by default.
@@ -111,6 +112,7 @@ class Entity():
         self.height = height
         self.max_hp = max_hp
         self.hp = hp
+        self.alive = True
         self.faction = faction
         self.current_anim = "idle_down" # TODO(mika): initialize in a better way
         self.default_anim = "idle_down" # TODO(mika): initialize in a better way
@@ -134,6 +136,15 @@ class Entity():
             sprite = pygame.image.load('sprites/'+path)
             sprites.append(sprite)
         self.animations[name] = Animation(name, sprites, period, direction)
+
+
+    def die(self):
+        """
+        """
+        self.alive = False
+        if "dead" in self.animations:
+            self.play_anim("dead", loop=True)
+
 
     def move(self, dest, speed):
         """
