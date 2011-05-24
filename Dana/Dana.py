@@ -157,6 +157,7 @@ class Dana(threading.Thread):
             # send actions to clients, they will display them.
             self.state = 'RENDER_FIGHT'
             self.send_to_all('END_CHOICE:' + str(self.round))
+            time.sleep(0.5)  # let the time to display banner
 
             # render battle and send actions to display to clients
             self.render_battle()
