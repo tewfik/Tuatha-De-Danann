@@ -26,6 +26,7 @@ class Render():
         Attributes:
         - `font`: the font to use for texts.
         - `menu_font`: the font to use for menus.
+        - `banner_font`: the font to use for banners.
         - `speech_font`: the font to use for speech bubbles.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
@@ -43,6 +44,7 @@ class Render():
         pygame.init()
         self.font = pygame.font.SysFont(None, 24)
         self.menu_font = pygame.font.SysFont(None, 16)
+        self.banner_font = pygame.font.SysFont(None, 128)
         self.speech_font = pygame.font.SysFont("Monospace", 12)
         self.speech_font.set_bold(True)
         self.fps_render = False
@@ -92,7 +94,8 @@ class Render():
         self.text(self.UI.round_state, left = 10, top = 10)
 
         if self.banner_fight:
-            pass
+            self.window.fill(BEIGE, (0, 200, WIDTH, HEIGHT - 400))
+            self.text("FIGHT !", font=self.banner_font, centerx=WIDTH / 2, centery=HEIGHT / 2, color=RED)
 
         # Speech bubbles
         del_uid = None

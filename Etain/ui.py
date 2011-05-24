@@ -118,13 +118,15 @@ class UI():
         if cmd[0] == 'ROUND_START':
             self.round_state = 'CHOICE'
         elif cmd[0] == 'END_ROUND':
-            self.round_state = ''
+            self.round_state = 'NEXT_ROUND'
         elif cmd[0] == 'END_CHOICE':
             self.round_state = 'WAIT_ACTIONS'
             self.render.dest_square = None
-            # TODO(Mika) : display banner fight
+            self.render.banner_fight = True
         elif cmd[0] == 'RENDER':
-            pass # TODO(Mika) : lancer l'affichage du combat'
+            self.round_state = 'RENDER'
+            self.render.banner_fight = False
+            # TODO(Mika) : lancer l'affichage du combat'
         elif cmd[0] == 'BATTLE_STATE':
             self.round_state = cmd[1].upper()
             if self.round_state != 'PLAYERS_CONNECTIONS':
