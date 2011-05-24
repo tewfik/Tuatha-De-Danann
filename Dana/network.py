@@ -42,7 +42,8 @@ class TCPHandler(SocketServer.BaseRequestHandler):
 
             # send a client request
             try:
-                self.request.send(dana_request)
+                dana_request_length = str(len(dana_request)).rjust(4, '0')
+                self.request.send(dana_request_length + dana_request)
             except socket.error as e:
                 print(e)
                 close_connection = True

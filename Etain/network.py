@@ -122,7 +122,8 @@ class ThreadReceive(threading.Thread):
             self.sock.send("receive")
 
             print('Receive thread is waiting for client_id')
-            data = self.sock.recv(1024).strip()
+            data_length = int(self.sock.recv(4).strip())
+            data = self.sock.recv(data_length).strip()
             if not data:
                 close_connection = True
 
@@ -165,7 +166,8 @@ class ThreadReceive(threading.Thread):
             data = None
             try:
                 print("Etain: receive thread is listenning")
-                data = self.sock.recv(1024).strip()
+                data_length = int(self.sock.recv(4).strip())
+                data = self.sock.recv(data_length).strip()
             except socket.error as e:
                 print(e)
                 close_connection = True
