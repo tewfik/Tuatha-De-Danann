@@ -460,7 +460,7 @@ class Dana(threading.Thread):
 
 
 
-def main(port):
+def main(host, port):
     """Main program.
 
     Arguments:
@@ -476,7 +476,7 @@ def main(port):
     print('Dana thread launched')
 
     # launch network listnening (blocking call waiting for stopping of the network engine)
-    network.connection_start(dana_queue, port=port)
+    network.connection_start(dana_queue, host=host, port=port)
 
     dana.shutdown = True
     dana.join()
@@ -485,9 +485,12 @@ def main(port):
 
 if __name__ == '__main__':
     # command line argument management
+    if(len(sys.argv) >= 3):
+	host = int(sys.argv[1])
+	port = int(sys.argv[2])
     if(len(sys.argv) >= 2):
         port = int(sys.argv[1])
     else:
         port = 1337
 
-    main(port)
+    main(host, port)
