@@ -166,6 +166,7 @@ class Dana(threading.Thread):
             self.render_ok_event.wait(timeout=TIMEOUT)
             self.render_ok_event.clear()
             self.render_ok_list = []
+            time.sleep(0.5)
 
             self.round += 1
 
