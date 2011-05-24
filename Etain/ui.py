@@ -174,10 +174,10 @@ class UI():
         elif cmd[0] == 'CHAT_MSG':
             self.render.bubbles[int(cmd[1])] = [int(cmd[1]), cmd[2], BUBBLE_TTL]
         elif cmd[0] in ('ATTACK', 'MOVE', 'EFFECT'):
-            try:
+            if int(cmd[1]) in self.fight:
                 self.fight[int(cmd[1])].append(cmd)
-            except ValueError as e:
-                print(e)
+            else:
+                self.fight[int(cmd[1])] = [cmd]
 
 
     def do_actions(self, pa):
