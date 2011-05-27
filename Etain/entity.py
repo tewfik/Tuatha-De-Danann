@@ -21,18 +21,6 @@ class List():
         self.entities = {}
 
 
-    def __getitem__(self, uid):
-        """
-        allow the user to get entity from the list with list_obj[uid].
-
-        Arguments:
-        - `uid`:  the uid of the entity we want to get.
-
-        Return: An entity object from the list.
-        """
-        return self.entities[uid]
-
-
     def get_layer(self, i):
         """
         Give a sub-dictionnary of entity of the given layer.
@@ -72,6 +60,19 @@ class List():
         f.close()
 
 
+    def values(self):
+        """
+        """
+        for entity in self.entities.values():
+            yield entity
+
+
+    def __iter__(self):
+        """
+        """
+        return self.entities.__iter__()
+
+
     def __delitem__(self, uid):
         """
         Remove an entity to free its memory.
@@ -80,6 +81,18 @@ class List():
         - `uid`: the unique id (int) of the entity to delete.
         """
         del self.entities[uid]
+
+
+    def __getitem__(self, uid):
+        """
+        allow the user to get entity from the list with list_obj[uid].
+
+        Arguments:
+        - `uid`:  the uid of the entity we want to get.
+
+        Return: An entity object from the list.
+        """
+        return self.entities[uid]
 
 
     def __setitem__(self, uid, entity):
@@ -221,6 +234,15 @@ class Entity():
         """
         anim_idle = "idle_"+self.animations[self.current_anim].direction
         self.play_anim(anim_idle, True)
+
+
+    def is_still_animated(self):
+        """
+        """
+        if self.current_anim.startswith('idle'):
+            return False
+        else:
+            return True
 
 
 

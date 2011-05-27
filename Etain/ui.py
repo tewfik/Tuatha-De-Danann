@@ -24,7 +24,6 @@ class UI():
         - `spec`: A boolean setting whever the client can play or is a spectator.
         - `fight`: A dictionnary which contains the actions to perform during render phase.
         - `pa`: the current action being executed.
-        - `frame_render`: the current frame number.
         - `buffer_pa`: a list storing actions before sending them to Dana.
         """
         self.render = render
@@ -33,7 +32,6 @@ class UI():
         self.spec = False
         self.fight = {}
         self.pa = 0
-        self.frame_render = FPS
         self.buffer_pa = deque()
 
 
@@ -45,9 +43,7 @@ class UI():
             self.process(self.render.r_queue.get().split(':'))
 
         if self.round_state == 'RENDER':
-            self.frame_render += 1
-            if self.frame_render >= FPS:
-                self.frame_render = 0
+            if self.render.end_anims():
                 if self.pa in self.fight:
                     self.do_actions(self.pa)
                     self.pa += 1

@@ -223,6 +223,17 @@ class Render():
                 self.window.blit(image, entity.pixel_pos)
 
 
+    def end_anims(self):
+        """
+        """
+        result = True
+        for entity in self.l_entities.values():
+            if entity.is_still_animated():
+                result = False
+                break
+        return result
+
+
     def draw_entity_HUD(self, faction, hp, max_hp, pos, height, width):
         """
         """
