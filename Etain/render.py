@@ -169,6 +169,9 @@ class Render():
         else:
             self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 15, left=4)
 
+        # Chat history
+        self.fill_gradient(self.window, (0, 0, 0, 255), (0, 0, 0, 150), (2, HEIGHT - 220, WIDTH - 4, 200))
+
 
     def effect(self, type, id=None, target_id=None, params=None):
         """
@@ -308,6 +311,48 @@ class Render():
         size = len(cursor[0]), len(cursor)
         pygame.mouse.set_cursor(size, hotspot, curs, mask)
 
+
+    def fill_gradient(self, surface, color, gradient, rect=None, vertical=True):
+        """
+        fill a surface with a gradient pattern
+
+        Arguments:
+        - `color`: starting color.
+        - `gradient`: final color.
+        - `rect`: the rect to fill.
+        - `'vertical`: True=vertical, False=horizontal.
+        """
+        if rect is None:
+            rect = surface.get_rect()
+            x1, x2 = rect.left, rect.right
+            y1, y2 = rect.top, rect.bottom
+        else:
+            x1, y1, x2, y2 = rect[0], rect[1], rect[0] + rect[2], rect[1] + rect[3]
+        if vertical:
+            h = y2 - y1
+        else:
+            h = x2 - x1
+        if len(color) == 3:
+            rate = (float(gradient[0] - color[0])/h, float(gradient[1] - color[1])/h, float(gradient[2] - color[2])/h)
+            if vertical:
+                for line in range(y1, y2):
+                    color = (color[0] + rate[0], color[1] + rate[1], color[2] + rate[2])
+                    pygame.draw.line(surface, color, (x1, line), (x2, line))
+            else:
+                for col in range(x1, x2):
+                    color = (color[0] + rate[0], color[1] + rate[1], color[2] + rate[2])
+                    pygame.draw.line(surface, color, (col, y1), (col, y2))
+        elif len(color) == 4:
+            rate = (float(gradient[0] - color[0])/h, float(gradient[1] - color[1])/h, float(gradient[2] - color[2])/h,
+                    float(gradient[3] - color[3])/h)
+            if vertical:
+                for line in range(y1, y2):
+                    color = (color[0] + rate[0], color[1] + rate[1], color[2] + rate[2], color[3] + rate[3])
+                    self.window.fill(color, (x1, line, x2 - x1 +1 , 1))
+            else:
+                for col in range(x1, x2):
+                    color = (color[0] + rate[0], color[1] + rate[1], color[2] + rate[2], colot[3] + rate[3])
+                    self.window.fill(color, (x1, line, x2 - x1 +1 , 1))
 
 
     def play_music(self, path):
