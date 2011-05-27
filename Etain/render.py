@@ -43,15 +43,19 @@ class Render():
         - `dest_square`: The square the player wants to move to.
         - `clock`: A pygame timer.
         - `bubbles`: A dictionnary of all bubbles currently displaying.
+        - `Surfaces`: A dictionnary of pygame.Surface.
         - `cursor`: current cursor used.
         """
         pygame.init()
+
+        # Fonts
         self.font = pygame.font.SysFont(None, 24)
         self.menu_font = pygame.font.SysFont(None, 16)
         self.banner_font = pygame.font.SysFont(None, 128)
         self.speech_font = pygame.font.SysFont("Monospace", 12)
         self.speech_font.set_bold(True)
         self.chat_font = pygame.font.SysFont(None, 16)
+
         self.fps_render = False
         self.grid_render = False
         self.menu = False
@@ -67,12 +71,18 @@ class Render():
         self.clock = pygame.time.Clock()
         self.bubbles = {}
 
-        self.window = pygame.display.set_mode((WIDTH, HEIGHT), 0)
+        # Surfaces and graphics loading
+        self.Surface = {'map' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE),
+                        'grid' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE | SRCALPHA)}
+        self.preload(path)
+
+        # Set display
+        self.window = pygame.display.set_mode((WIDTH, HEIGHT), FULLSCREEN | HWSURFACE | DOUBLEBUF)
         pygame.display.set_caption(TITLE)
         self.cursor = "arrow"
         self.use_cursor(ARROW)
-        self.s_queue.put('GET_ENTITIES')
 
+        self.s_queue.put('GET_ENTITIES')
         self.play_music("sounds/battle.ogg")
 
 
@@ -83,7 +93,12 @@ class Render():
         gear = pygame.image.load("sprites/gear.png")
         while(True):
             self.UI.run()
-            self.draw_world()
+
+            self.window.blit(self.Surface['map'], (0, 0))
+            if self.grid_render:
+                self.window.blit(self.Surface['grid'], (0, 0))
+            if self.dest_square is not None:
+                self.window.fill(BLUE, self.dest_square)
             self.draw_entities()
             self.draw_overlay()
             self.window.blit(gear, (WIDTH - 18, 2))
@@ -207,48 +222,6 @@ class Render():
         self.window.blit(text, text_Rect)
 
 
-    def draw_world(self):
-        """
-        Display the ground's tiles'.
-        """
-        for j in xrange(0, ROWS):
-            top = j * SQUARE_SIZE
-            for i in xrange(0, COLUMNS):
-                left = i * SQUARE_SIZE
-                self.window.blit(self.area.tiles[self.area[j][i]], (left, top))
-        if self.grid_render:
-            for i in xrange(1, COLUMNS):
-                pygame.draw.line(self.window, (50, 50, 50), (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT))
-            for i in xrange(1, ROWS):
-                pygame.draw.line(self.window, (50, 50, 50), (0, i * SQUARE_SIZE), (WIDTH, i * SQUARE_SIZE))
-        if self.dest_square is not None:
-            self.window.fill(BLUE, self.dest_square)
-
-
-    def register_entity(self, pos, width, height, max_hp, hp, faction, uid, anim_path):
-        """
-        Register a New graphic entity to the world.
-
-        Arguments:
-        - `pos`: a tuple (x, y) giving the coordinates where to spawn the entity.
-        - `width`: the width of the entity (used for display only).
-        - `height`: the height of the entity (used for display only).
-        - `max_hp`: max hp of the entity.
-        - `hp`: current hp of the entity.
-        - `faction`: the identifier of the faction the entity belongs to.
-        - `uid`: the unique id of the entity (int).
-        - `anim_path`: the anim file of the entity.
-        """
-        self.l_entities.add_entity(pos, width, height, max_hp, hp, faction, uid, anim_path)
-
-
-    def remove_entity(self, uid):
-        """
-        Remove a graphical entity from the world.
-        """
-        del self.l_entities[uid]
-
-
     def draw_entities(self):
         """
         Draw every entities on the map in their current state of animation.
@@ -277,17 +250,28 @@ class Render():
                                                                              SQUARE_SIZE - 2, 8), 1)
 
 
-    def load_map(self, path):
+    def preload(self, map_path):
         """
-        Load the map and entities' informations from a file.
+        Preload graphics from the files.
 
         Arguments:
         - `path`: the path to the save file of the map to load.
         """
-        f_map = open(path, 'r')
-        self.area = pickle.load(f_map)
-        self.area.load_tiles()
+        f_map = open(map_path, 'r')
+        area = pickle.load(f_map)
+        area.load_tiles()
         f_map.close()
+        for j in xrange(0, ROWS):
+            top = j * SQUARE_SIZE
+            for i in xrange(0, COLUMNS):
+                left = i * SQUARE_SIZE
+                self.Surface['map'].blit(area.tiles[area[j][i]], (left, top))
+
+        # Create the grid
+        for i in xrange(1, COLUMNS):
+            pygame.draw.line(self.Surface['grid'], (50, 50, 50), (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT))
+        for i in xrange(1, ROWS):
+            pygame.draw.line(self.Surface['grid'], (50, 50, 50), (0, i * SQUARE_SIZE), (WIDTH, i * SQUARE_SIZE))
 
 
     def use_cursor(self, name):

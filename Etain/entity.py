@@ -82,6 +82,13 @@ class List():
         del self.entities[uid]
 
 
+    def __setitem__(self, uid, entity):
+        """
+        Allow to create items with allocations.
+        """
+        self.add_entity(entity[0], entity[1], entity[2], entity[3], entity[4], entity[5], uid, entity[6])
+
+
 
 class Entity():
     """
