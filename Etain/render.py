@@ -19,7 +19,7 @@ class Render():
     Display entities, map and catch mouse and keyboard input to transfer them to the event handler.
     """
 
-    def __init__(self, send_queue, receive_queue):
+    def __init__(self, send_queue, receive_queue, path):
         """
         Initialize the window's display.
 

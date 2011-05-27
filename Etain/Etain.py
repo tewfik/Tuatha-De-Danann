@@ -30,6 +30,5 @@ if __name__ == '__main__':
     print('network engine is running')
 
     # render's operations have to be in the main thread.
-    display = render.Render(send_queue, receive_queue)
-    display.load_map('../shared/etain.map')  # TODO(mika): if we launch display.run() before load_map(), it may cause a crash
+    display = render.Render(send_queue, receive_queue, '../shared/etain.map')
     display.run()
