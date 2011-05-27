@@ -73,7 +73,9 @@ class UI():
                         self.render.fps_render = not self.render.fps_render
                 elif event.key == K_RETURN:
                     if self.render.chat[0]:
-                        self.render.s_queue.put('CHAT_MSG:%s' % self.render.chat[1])
+                        self.render.chat[1].strip()
+                        if self.render.chat[1]:
+                            self.render.s_queue.put('CHAT_MSG:%s' % self.render.chat[1])
                         self.render.chat = [False, '', 0]
                     else:
                         self.render.chat[0] = True
