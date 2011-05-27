@@ -73,7 +73,8 @@ class Render():
 
         # Surfaces and graphics loading
         self.Surface = {'map' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE),
-                        'grid' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE | SRCALPHA)}
+                        'grid' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE | SRCALPHA),
+                        'menu' : pygame.Surface((MENU_WIDTH, MENU_HEIGHT), HWSURFACE)}
         self.preload(path)
 
         # Set display
@@ -99,6 +100,7 @@ class Render():
                 self.window.blit(self.Surface['grid'], (0, 0))
             if self.dest_square is not None:
                 self.window.fill(BLUE, self.dest_square)
+
             self.draw_entities()
             self.draw_overlay()
             self.window.blit(gear, (WIDTH - 18, 2))
@@ -151,21 +153,11 @@ class Render():
         if self.menu:
             menu_x = (WIDTH - MENU_WIDTH) / 2
             menu_y = (HEIGHT - MENU_HEIGHT) / 2
-            self.window.fill(GREY, (menu_x, menu_y, MENU_WIDTH, MENU_HEIGHT))
-
-            X = menu_x + MENU_WIDTH - 10
-            Y = menu_y + 9
-            pygame.draw.polygon(self.window, RED, ((X - 2, Y), (X - 6, Y - 4), (X - 4, Y - 6), (X, Y - 2), (X + 4, Y - 6), (X + 6, Y - 4),
-                                                   (X + 2, Y), (X + 6, Y + 4), (X + 4, Y + 6), (X, Y + 2), (X - 4, Y + 6), (X - 6, Y + 4)))
-            self.window.fill(WHITE, (menu_x + 30, menu_y + 50, 10, 10))
-            self.window.fill(WHITE, (menu_x + 30, menu_y + 90, 10, 10))
+            self.window.blit(self.Surface['menu'], (menu_x, menu_y))
             if self.grid_render:
                 self.window.fill(BLACK, (menu_x + 32, menu_y + 52, 6, 6))
             if self.fps_render:
                 self.window.fill(BLACK, (menu_x + 32, menu_y + 92, 6, 6))
-
-            self.text("Afficher la grille.", self.menu_font, top=menu_y + 50, left=menu_x + 50)
-            self.text("Afficher les IPS.", self.menu_font, top=menu_y + 90, left=menu_x + 50)
 
         # Chat display
         if self.chat[0]:
@@ -197,11 +189,14 @@ class Render():
             self.l_entities[target_id].die()
 
 
-    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, centerx=None, centery=None, color=(0, 0, 0), alias=True):
+    def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, centerx=None, centery=None,
+             color=(0, 0, 0), alias=True, surf=None):
         """
         """
         if font is None:
             font = self.font
+        if surf is None:
+            surf = self.window
         text = font.render(msg, alias, color)
         text_Rect = text.get_rect()
 
@@ -219,7 +214,7 @@ class Render():
             text_Rect.centery = centery
 
         self.font = pygame.font.SysFont(None, 24)
-        self.window.blit(text, text_Rect)
+        surf.blit(text, text_Rect)
 
 
     def draw_entities(self):
@@ -272,6 +267,17 @@ class Render():
             pygame.draw.line(self.Surface['grid'], (50, 50, 50), (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT))
         for i in xrange(1, ROWS):
             pygame.draw.line(self.Surface['grid'], (50, 50, 50), (0, i * SQUARE_SIZE), (WIDTH, i * SQUARE_SIZE))
+
+        # Create the menu
+        self.Surface['menu'].fill(GREY)
+        self.Surface['menu'].fill(WHITE, (30, 50, 10, 10))
+        self.Surface['menu'].fill(WHITE, (30, 90, 10, 10))
+        self.text("Afficher la grille.", self.menu_font, top=50, left=50, surf=self.Surface['menu'])
+        self.text("Afficher les IPS.", self.menu_font, top=90, left=50, surf=self.Surface['menu'])
+        pygame.draw.polygon(self.Surface['menu'], RED, ((MENU_WIDTH - 12, 9), (MENU_WIDTH - 16, 5), (MENU_WIDTH - 14, 3),
+                                                        (MENU_WIDTH - 10, 7), (MENU_WIDTH - 6, 3), (MENU_WIDTH - 4, 5),
+                                                        (MENU_WIDTH - 8, 9), (MENU_WIDTH - 4, 13), (MENU_WIDTH - 6, 15),
+                                                        (MENU_WIDTH - 10, 11), (MENU_WIDTH - 14, 15), (MENU_WIDTH - 16, 13)))
 
 
     def use_cursor(self, name):
