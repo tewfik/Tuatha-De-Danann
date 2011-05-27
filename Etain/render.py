@@ -74,14 +74,17 @@ class Render():
         # Surfaces and graphics loading
         self.Surface = {'map' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE),
                         'grid' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE | SRCALPHA),
-                        'menu' : pygame.Surface((MENU_WIDTH, MENU_HEIGHT), HWSURFACE)}
-        self.preload(path)
+                        'menu' : pygame.Surface((MENU_WIDTH, MENU_HEIGHT), HWSURFACE),
+                        'chat' : pygame.Surface((CHAT_WIDTH, CHAT_HEIGHT), HWSURFACE | SRCALPHA),
+                        'health' : {ALLY : pygame.Surface((H_WIDTH, H_HEIGHT), HWSURFACE | SRCALPHA),
+                                    ENNEMY : pygame.Surface((H_WIDTH, H_HEIGHT), HWSURFACE | SRCALPHA)}}
 
         # Set display
         self.window = pygame.display.set_mode((WIDTH, HEIGHT), FULLSCREEN | HWSURFACE | DOUBLEBUF)
         pygame.display.set_caption(TITLE)
         self.cursor = "arrow"
         self.use_cursor(ARROW)
+        self.preload(path)
 
         self.s_queue.put('GET_ENTITIES')
         self.play_music("sounds/battle.ogg")
@@ -161,23 +164,14 @@ class Render():
 
         # Chat display
         if self.chat[0]:
-            self.draw_chat()
-
-
-    def draw_chat(self):
-        """
-        """
-        self.window.fill(WHITE, (2, HEIGHT - 17, WIDTH - 4, 15))
-        self.chat[2] += 1
-        if self.chat[2] >= FPS / 2:
-            self.text(self.chat[1] + '|', font=self.chat_font, top=HEIGHT - 15, left=4)
-            if self.chat[2] >= FPS:
-                self.chat[2] = 0
-        else:
-            self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 15, left=4)
-
-        # Chat history
-        self.fill_gradient(self.window, (0, 0, 0, 255), (0, 0, 0, 150), (2, HEIGHT - 220, WIDTH - 4, 200))
+            self.window.blit(self.Surface['chat'], (4, HEIGHT - CHAT_HEIGHT - 4))
+            self.chat[2] += 1
+            if self.chat[2] >= FPS / 2:
+                self.text(self.chat[1] + '|', font=self.chat_font, top=HEIGHT - 17, left=8)
+                if self.chat[2] >= FPS:
+                    self.chat[2] = 0
+            else:
+                self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 17, left=8)
 
 
     def effect(self, type, id=None, target_id=None, params=None):
@@ -238,11 +232,9 @@ class Render():
             pygame.draw.ellipse(self.window, FACTION_COLOR[faction], ellipse_Rect , 2)
 
             # health bar
-            self.window.fill((0, 0, 0, 200), (pos[0] + (width- SQUARE_SIZE) / 2 + 2, pos[1] - 10, SQUARE_SIZE - 4, 6))
+            self.window.blit(self.Surface['health'][faction], (pos[0] + (width - SQUARE_SIZE)/2, pos[1] - 10))
             hp_ratio = hp/float(max_hp)
-            self.window.fill(GREEN, (pos[0] + (width - SQUARE_SIZE) / 2 + 2, pos[1] - 10, round(hp_ratio*(SQUARE_SIZE - 4)), 6))
-            pygame.draw.rect(self.window, FACTION_COLOR[faction], (pos[0] + (width - SQUARE_SIZE) / 2 + 1, pos[1] - 11,
-                                                                             SQUARE_SIZE - 2, 8), 1)
+            self.window.fill(GREEN, (pos[0] + (width - SQUARE_SIZE) / 2 + 1, pos[1] - 9, round(hp_ratio*(H_WIDTH - 2)), H_HEIGHT - 2))
 
 
     def preload(self, map_path):
@@ -278,6 +270,15 @@ class Render():
                                                         (MENU_WIDTH - 10, 7), (MENU_WIDTH - 6, 3), (MENU_WIDTH - 4, 5),
                                                         (MENU_WIDTH - 8, 9), (MENU_WIDTH - 4, 13), (MENU_WIDTH - 6, 15),
                                                         (MENU_WIDTH - 10, 11), (MENU_WIDTH - 14, 15), (MENU_WIDTH - 16, 13)))
+
+        # Create Chat window
+        self.Surface['chat'].fill(WHITE, (0, CHAT_HEIGHT - 15, CHAT_WIDTH, 15))
+        self.fill_gradient(self.Surface['chat'], (0, 0, 0, 0), (0, 0, 0, 255), (0, 0, CHAT_WIDTH, 200))
+
+        # Create Health bars
+        for faction in self.Surface['health']:
+            self.Surface['health'][faction].fill((0, 0, 0, 200))
+            pygame.draw.rect(self.Surface['health'][faction], FACTION_COLOR[faction], (0, 0, H_WIDTH, H_HEIGHT), 1)
 
 
     def use_cursor(self, name):
@@ -338,11 +339,11 @@ class Render():
             if vertical:
                 for line in range(y1, y2):
                     color = (color[0] + rate[0], color[1] + rate[1], color[2] + rate[2], color[3] + rate[3])
-                    self.window.fill(color, (x1, line, x2 - x1 +1 , 1))
+                    pygame.draw.line(surface, color, (x1, line), (x2 , line))
             else:
                 for col in range(x1, x2):
                     color = (color[0] + rate[0], color[1] + rate[1], color[2] + rate[2], colot[3] + rate[3])
-                    self.window.fill(color, (x1, line, x2 - x1 +1 , 1))
+                    pygame.draw.line(surface, color, (x1, line), (x2 , line))
 
 
     def play_music(self, path):

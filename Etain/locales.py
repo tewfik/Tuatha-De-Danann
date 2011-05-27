@@ -14,11 +14,17 @@ FPS = 40
 
 # Chat
 BUBBLE_TTL = FPS * 4
+CHAT_WIDTH = WIDTH - 8
+CHAT_HEIGHT = 217
 
 # Factions
 NEUTRE = 0
 ALLY = 1
 ENNEMY = 2
+
+# Health bars
+H_WIDTH = SQUARE_SIZE
+H_HEIGHT = 8
 
 # Colors
 RED = (200, 0, 0)
