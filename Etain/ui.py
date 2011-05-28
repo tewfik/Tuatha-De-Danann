@@ -28,6 +28,7 @@ class UI():
         """
         self.render = render
         self.round_state = None
+        self.confirm = False
         self.alt = False
         self.spec = False
         self.fight = {}
@@ -105,6 +106,7 @@ class UI():
                         while len(self.buffer_pa):
                             self.render.s_queue.put(self.buffer_pa.popleft())
                         self.render.s_queue.put("CONFIRM_CHOICE")
+                        self.confirm = True
                     else:
                         self.buffer_pa.append('MOVE:%d:%d' % mouse_pos)
                         self.render.dest_square = (mouse_pos[0] * SQUARE_SIZE, mouse_pos[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)

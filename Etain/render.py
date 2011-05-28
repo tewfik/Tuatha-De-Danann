@@ -146,7 +146,7 @@ class Render():
             del self.bubbles[del_uid]
 
         # Actions buttons
-        if self.UI.round_state == 'CHOICE':
+        if self.UI.round_state == 'CHOICE' and not self.UI.confirm:
             self.window.fill(GREEN, (20, HEIGHT - 70, 90, 20))
             self.text('Confirmer', top=HEIGHT - 67, left=25)
             self.window.fill(RED, (20, HEIGHT - 40, 90, 20))
