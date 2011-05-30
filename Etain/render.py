@@ -41,6 +41,7 @@ class Render():
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
         - `dest_square`: The square the player wants to move to.
+        - `attack_squares`: The squares the player wants to attack.
         - `clock`: A pygame timer.
         - `bubbles`: A dictionnary of all bubbles currently displaying.
         - `Surfaces`: A dictionnary of pygame.Surface.
@@ -68,6 +69,7 @@ class Render():
         self.r_queue = receive_queue
         self.me = None
         self.dest_square = None
+        self.attack_squares = None
         self.clock = pygame.time.Clock()
         self.bubbles = {}
 
@@ -103,6 +105,8 @@ class Render():
                 self.window.blit(self.Surface['grid'], (0, 0))
             if self.dest_square is not None:
                 self.window.fill(BLUE, self.dest_square)
+            if self.attack_squares is not None:
+                self.window.fill(RED, self.attack_squares)
 
             self.draw_entities()
             self.draw_overlay()
