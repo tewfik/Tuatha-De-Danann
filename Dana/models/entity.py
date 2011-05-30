@@ -70,7 +70,7 @@ class Entity(object):
         dmg = true + normal * normal_mul + magic * magic_mul
         self.hp -= dmg
         dead = False
-        if self.hp < 0:
+        if self.hp <= 0:
             self.hp = 0
             dead = True
         return (dead, dmg)
