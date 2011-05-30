@@ -9,7 +9,9 @@ sys.path.append("../shared/")
 from area import Area
 import entity
 import ui
+import particle
 from locales import *
+from math import sqrt
 
 
 class Render():
@@ -29,6 +31,7 @@ class Render():
         - `banner_font`: the font to use for banners.
         - `speech_font`: the font to use for speech bubbles.
         - `chat_font`: the font to use for chat.
+        - `particles`: list of current particles.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
         - `menu`: a boolean telling render to display the menu or not.
@@ -57,6 +60,7 @@ class Render():
         self.speech_font.set_bold(True)
         self.chat_font = pygame.font.SysFont(None, 16)
 
+        self.particles = []
         self.fps_render = False
         self.grid_render = True
         self.menu = False
@@ -72,6 +76,7 @@ class Render():
         self.target = None
         self.clock = pygame.time.Clock()
         self.bubbles = {}
+        self.start_choice = 0
 
         # Surfaces and graphics loading
         self.Surface = {'map' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE),
@@ -108,6 +113,7 @@ class Render():
                 self.window.fill(BLUE, self.dest_square)
 
             self.draw_entities()
+            self.draw_particles()
             self.draw_overlay()
 
             if self.target is not None:
@@ -120,6 +126,18 @@ class Render():
             self.clock.tick(FPS)
 
 
+    def draw_particles(self):
+        """
+        """
+        for particle in self.particles:
+            self.window.blit(particle.update(), particle.pos)
+
+        for i in xrange(len(self.particles)):
+            if self.particles[i].dead:
+                del self.particles[i]
+                break
+
+
     def draw_overlay(self):
         """
         """
@@ -128,7 +146,7 @@ class Render():
             self.text("%1.1f" % self.clock.get_fps(), top = 2, right = WIDTH - 18)
 
         # battle state displaying
-        self.text(self.UI.round_state, left = 10, top = 10)
+        self.text(self.UI.round_state, left = 35, top = 10)
 
         if self.banner_fight:
             self.window.fill(BEIGE, (0, 200, WIDTH, HEIGHT - 400))
@@ -173,6 +191,10 @@ class Render():
         # Chat display
         if self.chat[0]:
             self.window.blit(self.Surface['chat'], (4, HEIGHT - CHAT_HEIGHT - 4))
+            history_y = HEIGHT - CHAT_HEIGHT
+            for text in self.UI.chat_history:
+                self.text(text, font=self.chat_font, top=history_y, left=8, color=WHITE)
+                history_y += 15
             self.chat[2] += 1
             if self.chat[2] >= FPS / 2:
                 self.text(self.chat[1] + '|', font=self.chat_font, top=HEIGHT - 17, left=8)
@@ -181,12 +203,55 @@ class Render():
             else:
                 self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 17, left=8)
 
+        # Timer choice display
+        if self.UI.round_state == 'CHOICE':
+            pygame.draw.circle(self.window, GREY, (15, 15), 10)
+            time_left = max(0, TIME_CHOICE + self.start_choice - pygame.time.get_ticks())
+            angle = ((time_left / TIME_CHOICE) * 3 + 1) * PI / 2
+            diag = sqrt(2) * 5
+            pointlist = [(15, 15), (15, 5)]
+            s_angle = 0.5
+            if angle > PI / 2:
+                s_angle = 0.75
+                pointlist.append((15 - diag, 15 - diag))
+            if angle > PI * 0.75:
+                s_angle = 1
+                pointlist.append(( 5, 15))
+            if angle > PI:
+                s_angle = 1.25
+                pointlist.append((15 - diag, 15 + diag))
+            if angle > PI * 1.25:
+                s_angle = 1.5
+                pointlist.append((15, 25))
+            if angle > PI * 1.5:
+                s_angle = 1.75
+                pointlist.append((15 + diag, 15 + diag))
+            if angle > PI * 1.75:
+                s_angle = 2
+                pointlist.append((25, 15))
+            if angle > PI * 2:
+                s_angle = 2.25
+                pointlist.append((15 + diag, 15))
+            if angle > PI * 2.5:
+                s_angle = 2.5
+                pointlist.append((15, 5))
+            pointlist.append((15, 15))
+            pygame.draw.polygon(self.window, WHITE, tuple(pointlist))
+            pygame.draw.arc(self.window, WHITE, (5, 5, 20, 20), PI / 2, s_angle * PI, 2)
+            if time_left < 3000 :
+                pygame.draw.circle(self.window, RED, (15, 15), 12, 2)
+            else:
+                pygame.draw.circle(self.window, GREEN, (15, 15), 12, 2)
+
 
     def effect(self, type, id=None, target_id=None, params=None):
         """
         """
         if type.lower() == 'dmg':
-            self.l_entities[target_id].hp -= int(params[0])
+            entity = self.l_entities[target_id]
+            entity.hp -= int(params[0])
+            pos = (entity.pixel_pos[0] + entity.width / 2, entity.pixel_pos[1] + 30)
+            self.particles.append(Particle('dmg', (params[0]), FPS * 2), pos)
         elif type.lower() == 'dead':
             self.l_entities[target_id].die()
 
@@ -292,7 +357,7 @@ class Render():
 
         # Create Chat window
         self.Surface['chat'].fill(WHITE, (0, CHAT_HEIGHT - 15, CHAT_WIDTH, 15))
-        self.fill_gradient(self.Surface['chat'], (0, 0, 0, 0), (0, 0, 0, 255), (0, 0, CHAT_WIDTH, 200))
+        self.fill_gradient(self.Surface['chat'], (0, 0, 0, 50), (0, 0, 0, 255), (0, 0, CHAT_WIDTH, 200))
 
         # Create Health bars
         for faction in self.Surface['health']:

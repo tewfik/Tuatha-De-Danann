@@ -12,7 +12,14 @@ WIDTH = COLUMNS * SQUARE_SIZE
 TITLE = 'Tuatha dé Danann'
 FPS = 40
 
+# Game
+TIME_CHOICE = 5000.0
+
+# Constantes
+PI = 3.141593
+
 # Chat
+HISTORY_SIZE = 13
 BUBBLE_TTL = FPS * 4
 CHAT_WIDTH = WIDTH - 8
 CHAT_HEIGHT = 217
