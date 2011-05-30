@@ -250,8 +250,8 @@ class Render():
         if type.lower() == 'dmg':
             entity = self.l_entities[target_id]
             entity.hp -= int(params[0])
-            pos = (entity.pixel_pos[0] + entity.width / 2, entity.pixel_pos[1] + 30)
-            self.particles.append(Particle('dmg', (params[0]), FPS * 2), pos)
+            pos = (entity.pixel_pos[0] + entity.width / 2, entity.pixel_pos[1] + 20)
+            self.particles.append(particle.Particle('dmg', params, FPS * 2, pos))
         elif type.lower() == 'dead':
             self.l_entities[target_id].die()
 
