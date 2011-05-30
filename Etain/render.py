@@ -41,7 +41,7 @@ class Render():
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
         - `dest_square`: The square the player wants to move to.
-        - `attack_squares`: The squares the player wants to attack.
+        - `target`: The target the player wants to attack.
         - `clock`: A pygame timer.
         - `bubbles`: A dictionnary of all bubbles currently displaying.
         - `Surfaces`: A dictionnary of pygame.Surface.
@@ -69,7 +69,7 @@ class Render():
         self.r_queue = receive_queue
         self.me = None
         self.dest_square = None
-        self.attack_squares = None
+        self.target = None
         self.clock = pygame.time.Clock()
         self.bubbles = {}
 
@@ -97,6 +97,7 @@ class Render():
         Main programm's loop (process, display and inputs).
         """
         gear = pygame.image.load("sprites/gear.png")
+        fight = pygame.image.load("sprites/fight.png")
         while(True):
             self.UI.run()
 
@@ -105,11 +106,14 @@ class Render():
                 self.window.blit(self.Surface['grid'], (0, 0))
             if self.dest_square is not None:
                 self.window.fill(BLUE, self.dest_square)
-            if self.attack_squares is not None:
-                self.window.fill(RED, self.attack_squares)
 
             self.draw_entities()
             self.draw_overlay()
+
+            if self.target is not None:
+                square_pos = (self.target.pixel_pos[0] + (self.target.width - SQUARE_SIZE) / 2, self.target.pixel_pos[1] - SQUARE_SIZE - 8)
+                self.window.blit(fight, square_pos)
+
             self.window.blit(gear, (WIDTH - 18, 2))
 
             pygame.display.flip()

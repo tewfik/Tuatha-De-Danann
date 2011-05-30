@@ -99,11 +99,11 @@ class UI():
                 if event.button == 1 and self.round_state == 'CHOICE' and not self.spec and self.render.l_entities[self.render.me].alive:
                     if self.entity_on(mouse_pos):
                         self.buffer_pa.append('ATTACK:attack:%d:%d' % mouse_pos)
-                        self.render.attack_squares = (mouse_pos[0] * SQUARE_SIZE, mouse_pos[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
+                        self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
                     elif self.mouse_over((20, HEIGHT - 40, 90, 20), event.pos):
                         self.buffer_pa.clear()
                         self.render.dest_square = None
-                        self.render.attack_squares = None
+                        self.render.target = None
                     elif self.mouse_over((20, HEIGHT - 70, 90, 20), event.pos):
                         while len(self.buffer_pa):
                             self.render.s_queue.put(self.buffer_pa.popleft())
@@ -166,7 +166,7 @@ class UI():
         elif cmd[0] == 'END_CHOICE':
             self.round_state = 'WAIT_ACTIONS'
             self.render.dest_square = None
-            self.render.attack_squares = None
+            self.render.target = None
             self.render.banner_fight = True
             self.buffer_pa.clear()
         elif cmd[0] == 'RENDER':
