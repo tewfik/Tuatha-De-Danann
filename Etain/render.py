@@ -175,6 +175,10 @@ class Render():
         # Chat display
         if self.chat[0]:
             self.window.blit(self.Surface['chat'], (4, HEIGHT - CHAT_HEIGHT - 4))
+            history_y = HEIGHT - CHAT_HEIGHT
+            for text in self.UI.chat_history:
+                self.text(text, font=self.chat_font, top=history_y, left=8, color=WHITE)
+                history_y += 15
             self.chat[2] += 1
             if self.chat[2] >= FPS / 2:
                 self.text(self.chat[1] + '|', font=self.chat_font, top=HEIGHT - 17, left=8)
@@ -334,7 +338,7 @@ class Render():
 
         # Create Chat window
         self.Surface['chat'].fill(WHITE, (0, CHAT_HEIGHT - 15, CHAT_WIDTH, 15))
-        self.fill_gradient(self.Surface['chat'], (0, 0, 0, 0), (0, 0, 0, 255), (0, 0, CHAT_WIDTH, 200))
+        self.fill_gradient(self.Surface['chat'], (0, 0, 0, 50), (0, 0, 0, 255), (0, 0, CHAT_WIDTH, 200))
 
         # Create Health bars
         for faction in self.Surface['health']:

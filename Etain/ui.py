@@ -25,6 +25,7 @@ class UI():
         - `fight`: A dictionnary which contains the actions to perform during render phase.
         - `pa`: the current action being executed.
         - `buffer_pa`: a list storing actions before sending them to Dana.
+        - `chat_history`: a list storing chat log.
         """
         self.render = render
         self.round_state = None
@@ -34,6 +35,7 @@ class UI():
         self.fight = {}
         self.pa = 0
         self.buffer_pa = deque()
+        self.chat_history = []
 
 
     def run(self):
@@ -191,6 +193,9 @@ class UI():
             self.render.s_queue.put("GET_BATTLE_STATE")
         elif cmd[0] == 'CHAT_MSG':
             self.render.bubbles[int(cmd[1])] = [int(cmd[1]), cmd[2], BUBBLE_TTL]
+            self.chat_history.append(cmd[1] + ' : ' + cmd[2])
+            if len(self.chat_history) > HISTORY_SIZE:
+                del self.chat_history[0]
         elif cmd[0] in ('ATTACK', 'MOVE', 'EFFECT'):
             if int(cmd[1]) in self.fight:
                 self.fight[int(cmd[1])].append(cmd)
