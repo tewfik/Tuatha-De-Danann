@@ -35,7 +35,9 @@ class Dana(threading.Thread):
     - `queue`: queue Dana has to use to receive messages which are addressed to it.
     - `clients_queues`: dictionary of clients' queues. Format : clients_queues[client_id] = Queue object.
     - `spectators_queues`: dictionary of spectators' queues. Format : spectators_queues[client_id] = Queue object.
-    - `clients_actions` : actions of one turn choosen by each clients.
+    - `next_action_id`: unique identifier to allocate to the next actions.
+    - `clients_actions`: actions choosen by each clients => clients_actions[client_id] = deque((action_id, action), ...).
+    - `actions_effects`: effects of actions => action_effects[action_id] = 'EFFECT:%d:pa:id:type:target_id:nb_damage'
     - `state`: state of the game (PLAYERS_CONNECTION | ACTIONS_CHOICE | RENDER_FIGHT | WAIT_RENDER_OK).
     - `round`: round identifier. Start to zero and increment at each round.
     - `render_ok_list`: list of clients which have finished to render.
@@ -56,7 +58,9 @@ class Dana(threading.Thread):
         self.queue = queue
         self.clients_queues = {}
         self.spectators_queues = {}
+        self.next_action_id = 1
         self.clients_actions = {}
+        self.actions_effects = {}
         self.state = 'PLAYERS_CONNECTIONS'
         self.round = 0
         self.render_ok_list = []
@@ -185,15 +189,17 @@ class Dana(threading.Thread):
             # send all actions for a given action turn to the clients
             for client_actions in self.clients_actions.values():
                 try:
-                    action = client_actions.popleft()
+                    action_id, action = client_actions.popleft()
 
                     ###############################################################################################################
                     # TODO(tewfik): write a better
                     if action.startswith('ATTACK') or action.startswith('MOVE'):
                         action = action % (count_actions)
                         self.send_to_all(action)
-                        # effect =
-                        # self.send_to_all(effect)
+
+                        if action.startswith('ATTACK'):
+                            effect = self.actions_effects[action_id] % (count_actions)
+                            self.send_to_all(effect)
                     else:
                         self.send_to_all(action)
                     ###############################################################################################################
@@ -223,7 +229,7 @@ class Dana(threading.Thread):
             else:
                 self.clients_queues[client_id] = msg  # register the client queue
 
-                player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1)
+                player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1, hp=30)
                 player.add_attack('attack', (10, 0, 0))
                 x = random.randint(10, 22)
                 y = 22
@@ -256,6 +262,28 @@ class Dana(threading.Thread):
                   'have to be a Queue reference.')
 
         return client_id
+
+
+    def client_die(self, id, killer_id=0, action_id=0):
+        """
+        Register the death of a client.
+
+        Arguments:
+        - `id`: identifier of dead client.
+        - `killer_id`: killer identifier.
+        - `action_id`: id of action which killed the client.
+        """
+        self.add_effect(action_id, killer_id, 'dead', target.id, 0)
+
+
+    def client_is_dead(self, client_id):
+        """
+        Is a given client is dead ?
+
+        Arguments:
+        - `client_id`: client identifier.
+        """
+        return self.world.entities[client_id].is_dead()
 
 
     def get_next_id(self):
@@ -324,11 +352,22 @@ class Dana(threading.Thread):
             spectator_queue.put(msg)
 
 
+    def get_next_action_id(self):
+        """
+        Return the unique identifier to allocate to the next action.
+        """
+        next_action_id = self.next_action_id
+        self.next_action_id += 1
+        return next_action_id
+
+
     def clear_clients_actions(self):
         """
         Reinitialize to a void list all clients' actions lists.
         """
+        self.next_action_id = 1
         self.clients_actions = {}
+        self.actions_effects = {}
         for client_id in self.get_clients_ids():
             self.clients_actions[client_id] = collections.deque()
 
@@ -424,6 +463,21 @@ class Dana(threading.Thread):
                 self.render_ok_event.set()
 
 
+    def add_effect(self, action_id, client_id, type, target_id, nb_dmg):
+        """
+        Associate an effect to an action.
+
+        Arguments:
+        - `action_id`: action's unique identifier.
+        - `client_id`: client's unique identifier.
+        - `type`: effect's type.
+        - `target_id`: target identifier.
+        - `nb_dmg`: number of damages.
+        """
+        self.actions_effects[action_id] = \
+            'EFFECT:%d:{id}:{type}:{target_id}:{dmg}'.format(id=client_id, type=type, target_id=target_id, dmg=nb_dmg)
+
+
     def move_request(self, client_id, x, y):
         """
         An entity ask for move.
@@ -434,12 +488,16 @@ class Dana(threading.Thread):
         - `y`: y position
         """
         #TODO(tewfik): check that the client don't move more than which he is allowed to move.
-        try:
-            self.world.move(client_id, x, y)
-            self.clients_actions[client_id].append('MOVE:%d:{id}:{x}:{y}'.format(id=client_id, x=x, y=y))
-            print 'client_position = (%d, %d)' % self.world.entities_pos[client_id] # DEBUG client position
-        except models.world.ForbiddenMove as e:
-            print(e)
+        if not self.client_is_dead(client_id):
+            try:
+                self.world.move(client_id, x, y)
+
+                action_id = self.get_next_action_id()
+
+                self.clients_actions[client_id].append((action_id, 'MOVE:%d:{id}:{x}:{y}'.format(id=client_id, x=x, y=y)))
+                print 'client_position = (%d, %d)' % self.world.entities_pos[client_id] # DEBUG client position
+            except models.world.ForbiddenMove as e:
+                print(e)
 
 
     def attack_request(self, client_id, name, x, y):
@@ -453,9 +511,16 @@ class Dana(threading.Thread):
         - `y`: target y pos.
         """
         target = self.world.get_object_by_position((x, y))
-        if target is not None:
-            self.world.entities[client_id].l_attacks[name].hit(target)
-            self.clients_actions[client_id].append('ATTACK:%d:{id}:{name}:{x}:{y}'.format(id=client_id, name=name, x=x, y=y))
+        if not self.client_is_dead(client_id) or target is not None:
+            action_id = self.get_next_action_id()
+
+            target_is_dead, nb_dmg = self.world.entities[client_id].l_attacks[name].hit(target)
+
+            self.clients_actions[client_id].append((action_id, 'ATTACK:%d:{id}:{name}:{x}:{y}'.format(id=client_id, name=name, x=x, y=y)))
+            self.add_effect(action_id, client_id, name, target.id, nb_dmg)
+
+            if target_is_dead:
+                self.client_die(id=target.id, killer_id=client_id, action_id=action_id)
         # TODO(tewfik): manage attack fail
 
 
