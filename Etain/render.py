@@ -57,7 +57,7 @@ class Render():
         self.chat_font = pygame.font.SysFont(None, 16)
 
         self.fps_render = False
-        self.grid_render = False
+        self.grid_render = True
         self.menu = False
         self.chat = [False, '', 0]
         self.banner_fight = False
