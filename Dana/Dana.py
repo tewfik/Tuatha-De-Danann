@@ -516,16 +516,21 @@ class Dana(threading.Thread):
         - `y`: target y pos.
         """
         target = self.world.get_object_by_position((x, y))
-        if not self.client_is_dead(client_id) or target is not None:
+        client = self.world.entities[client_id]
+        if not client.is_dead() or target is not None:
             action_id = self.get_next_action_id()
 
-            target_is_dead, nb_dmg = self.world.entities[client_id].l_attacks[name].hit(target)
+            attack = self.world.entities[client_id].l_attacks[name]
+            if self.world.distance_from_square(client_id, (x, y)) > attack.max_range:
+                print("Client %d : square (%d, %d) out of range." % (client_id, x, y))
+            else:
+                target_is_dead, nb_dmg = attack.hit(target)
 
-            self.clients_actions[client_id].append((action_id, 'ATTACK:%d:{id}:{name}:{x}:{y}'.format(id=client_id, name=name, x=x, y=y)))
-            self.add_effect(action_id, client_id, 'dmg', target.id, nb_dmg)
+                self.clients_actions[client_id].append((action_id, 'ATTACK:%d:{id}:{name}:{x}:{y}'.format(id=client_id, name=name, x=x, y=y)))
+                self.add_effect(action_id, client_id, 'dmg', target.id, nb_dmg)
 
-            if target_is_dead:
-                self.client_die(id=target.id, killer_id=client_id, action_id=action_id)
+                if target_is_dead:
+                    self.client_die(id=target.id, killer_id=client_id, action_id=action_id)
         # TODO(tewfik): manage attack fail
 
 
