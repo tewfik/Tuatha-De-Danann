@@ -10,6 +10,7 @@ from area import Area
 import entity
 import ui
 from locales import *
+from math import sqrt
 
 
 class Render():
@@ -72,6 +73,7 @@ class Render():
         self.target = None
         self.clock = pygame.time.Clock()
         self.bubbles = {}
+        self.start_choice = 0
 
         # Surfaces and graphics loading
         self.Surface = {'map' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE),
@@ -180,6 +182,46 @@ class Render():
                     self.chat[2] = 0
             else:
                 self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 17, left=8)
+
+        # Timer choice display
+        if self.UI.round_state == 'CHOICE':
+            pygame.draw.circle(self.window, GREY, (15, 15), 10)
+            time_left = max(0, TIME_CHOICE + self.start_choice - pygame.time.get_ticks())
+            angle = ((time_left / TIME_CHOICE) * 3 + 1) * PI / 2
+            diag = sqrt(2) * 5
+            pointlist = [(15, 15), (15, 5)]
+            s_angle = 0.5
+            if angle > PI / 2:
+                s_angle = 0.75
+                pointlist.append((15 - diag, 15 - diag))
+            if angle > PI * 0.75:
+                s_angle = 1
+                pointlist.append(( 5, 15))
+            if angle > PI:
+                s_angle = 1.25
+                pointlist.append((15 - diag, 15 + diag))
+            if angle > PI * 1.25:
+                s_angle = 1.5
+                pointlist.append((15, 25))
+            if angle > PI * 1.5:
+                s_angle = 1.75
+                pointlist.append((15 + diag, 15 + diag))
+            if angle > PI * 1.75:
+                s_angle = 2
+                pointlist.append((25, 15))
+            if angle > PI * 2:
+                s_angle = 2.25
+                pointlist.append((15 + diag, 15))
+            if angle > PI * 2.5:
+                s_angle = 2.5
+                pointlist.append((15, 5))
+            pointlist.append((15, 15))
+            pygame.draw.polygon(self.window, WHITE, tuple(pointlist))
+            pygame.draw.arc(self.window, WHITE, (5, 5, 20, 20), PI / 2, s_angle * PI, 2)
+            if time_left < 3000 :
+                pygame.draw.circle(self.window, RED, (15, 15), 12, 2)
+            else:
+                pygame.draw.circle(self.window, GREEN, (15, 15), 12, 2)
 
 
     def effect(self, type, id=None, target_id=None, params=None):

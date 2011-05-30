@@ -159,6 +159,7 @@ class UI():
         if cmd[0] == 'ROUND_START':
             self.fight = {}
             self.round_state = 'CHOICE'
+            self.render.start_choice = pygame.time.get_ticks()
             self.confirm = False
             self.render.banner_next = False
         elif cmd[0] == 'END_ROUND':
