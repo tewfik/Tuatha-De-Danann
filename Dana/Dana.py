@@ -20,6 +20,8 @@ CHOICE_TIME_INTERVAL = 5
 NB_ACTIONS = 1
 # interval in seconds after which Dana stops to wait clients
 TIMEOUT = 10
+# number of squares max that an entity is allowed to move
+NB_SQUARE_MOVE_MAX = 5
 
 
 class Dana(threading.Thread):
@@ -493,7 +495,7 @@ class Dana(threading.Thread):
         - `y`: y position
         """
         #TODO(tewfik): check that the client don't move more than which he is allowed to move.
-        if not self.client_is_dead(client_id):
+        if not self.client_is_dead(client_id) and self.world.distance_from_square(client_id, x, y) <= NB_SQUARE_MOVE_MAX:
             try:
                 self.world.move(client_id, x, y)
 
@@ -521,7 +523,7 @@ class Dana(threading.Thread):
             action_id = self.get_next_action_id()
 
             attack = self.world.entities[client_id].l_attacks[name]
-            if self.world.distance_from_square(client_id, (x, y)) > attack.max_range:
+            if self.world.distance_from_square(client_id, x, y) > attack.max_range:
                 print("Client %d : square (%d, %d) out of range." % (client_id, x, y))
             else:
                 target_is_dead, nb_dmg = attack.hit(target)
