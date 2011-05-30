@@ -99,9 +99,10 @@ class UI():
                 self.render.menu = not self.render.menu
             elif not self.render.menu:
                 if event.button == 1 and self.round_state == 'CHOICE' and not self.spec and self.render.l_entities[self.render.me].alive:
-                    if self.entity_on(mouse_pos):
-                        self.buffer_pa.append('ATTACK:attack:%d:%d' % mouse_pos)
-                        self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
+                    if self.entity_on(mouse_pos) is not None:
+                        if self.entity_on(mouse_pos).alive:
+                            self.buffer_pa.append('ATTACK:attack:%d:%d' % mouse_pos)
+                            self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
                     elif self.mouse_over((20, HEIGHT - 40, 90, 20), event.pos):
                         self.buffer_pa.clear()
                         self.render.dest_square = None
@@ -125,8 +126,9 @@ class UI():
                         self.render.menu = not self.render.menu
         elif event.type == MOUSEMOTION:
             mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
-            if self.entity_on(mouse_pos):
-                self.render.use_cursor(SWORD)
+            if self.entity_on(mouse_pos) is not None:
+                if self.entity_on(mouse_pos).alive:
+                    self.render.use_cursor(SWORD)
             elif self.render.cursor != ARROW[0]:
                 self.render.use_cursor(ARROW)
 
@@ -143,12 +145,7 @@ class UI():
     def entity_on(self, pos):
         """
         """
-        result = False
-        for entity in self.render.l_entities.get_layer(pos[1]).values():
-            if entity.pos[0] == pos[0]:
-                result = True
-                break
-        return result
+        return self.render.l_entities.get_by_pos(pos)
 
 
     def process(self, cmd):
