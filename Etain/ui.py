@@ -112,7 +112,7 @@ class UI():
                             self.render.s_queue.put(self.buffer_pa.popleft())
                         self.render.s_queue.put("CONFIRM_CHOICE")
                         self.confirm = True
-                    elif self.render.dest_square is None:
+                    elif self.render.dest_square is None and self.reachable(mouse_pos):
                         self.buffer_pa.append('MOVE:%d:%d' % mouse_pos)
                         self.render.dest_square = (mouse_pos[0] * SQUARE_SIZE, mouse_pos[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
             else:
@@ -132,6 +132,15 @@ class UI():
             elif self.render.cursor != ARROW[0]:
                 self.render.use_cursor(ARROW)
 
+
+    def reachable(self, pos):
+        """
+        """
+        entity = self.render.l_entities[self.render.me]
+        if abs(entity.pos[0] - pos[0]) + abs(entity.pos[1] - pos[1]) <= MOVE_DIST:
+            return True
+        else:
+            return False
 
     def mouse_over(self, rect, pos):
         """

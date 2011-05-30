@@ -14,6 +14,7 @@ FPS = 40
 
 # Game
 TIME_CHOICE = 5000.0
+MOVE_DIST = 5
 
 # Constantes
 PI = 3.141593
