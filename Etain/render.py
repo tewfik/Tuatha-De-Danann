@@ -9,6 +9,7 @@ sys.path.append("../shared/")
 from area import Area
 import entity
 import ui
+import particle
 from locales import *
 from math import sqrt
 
@@ -30,6 +31,7 @@ class Render():
         - `banner_font`: the font to use for banners.
         - `speech_font`: the font to use for speech bubbles.
         - `chat_font`: the font to use for chat.
+        - `particles`: list of current particles.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
         - `menu`: a boolean telling render to display the menu or not.
@@ -58,6 +60,7 @@ class Render():
         self.speech_font.set_bold(True)
         self.chat_font = pygame.font.SysFont(None, 16)
 
+        self.particles = []
         self.fps_render = False
         self.grid_render = True
         self.menu = False
@@ -110,6 +113,7 @@ class Render():
                 self.window.fill(BLUE, self.dest_square)
 
             self.draw_entities()
+            self.draw_particles()
             self.draw_overlay()
 
             if self.target is not None:
@@ -120,6 +124,18 @@ class Render():
 
             pygame.display.flip()
             self.clock.tick(FPS)
+
+
+    def draw_particles(self):
+        """
+        """
+        for particle in self.particles:
+            self.window.blit(particle.update(), particle.pos)
+
+        for i in xrange(len(self.particles)):
+            if self.particles[i].dead:
+                del self.particles[i]
+                break
 
 
     def draw_overlay(self):
@@ -232,7 +248,10 @@ class Render():
         """
         """
         if type.lower() == 'dmg':
-            self.l_entities[target_id].hp -= params[0]
+            entity = self.l_entities[target_id]
+            entity.hp -= params[0]
+            pos = (entity.pixel_pos[0] + entity.width / 2, entity.pixel_pos[1] + 30)
+            self.particles.append(Particle('dmg', (params[0]), FPS * 2), pos)
         elif type.lower() == 'dead':
             self.l_entities[target_id].die()
 
