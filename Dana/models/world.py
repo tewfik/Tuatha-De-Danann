@@ -162,6 +162,22 @@ class World(object):
         return result
 
 
+    def distance_from_square(self, entity_id, x, y):
+        """
+        Get the distance between an entity and a given saqure.
+
+        Arguments:
+        - `id`: entity identifier.
+        - `x`: square x.
+        - `y`: square y.
+
+        Return: the distance in square (int).
+        """
+        entity_x, entity_y = self.get_position_by_object_id(entity_id)
+
+        return abs(x - entity_x) + abs(y - entity_y)
+
+
     def move(self, id, dest_x, dest_y):
         """
         An entity ask to move.

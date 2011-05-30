@@ -147,7 +147,7 @@ class Attack():
     Represent an attack of an entity.
     """
 
-    def __init__(self, entity, base, ratioStr, ratioInt):
+    def __init__(self, entity, base, ratioStr, ratioInt, max_range=1):
         """
         Initialize the propertie of the attack.
 
@@ -156,11 +156,13 @@ class Attack():
         - `base`: a tuple (normal, magic, true) corresponding to the base dmg of the attack.
         - `rStr`: a tuple (normal, magic, true) corresponding to the ratio of strength for each dmg's type.
         - `rInt`: a tuple (normal, magic, true) corresponding to the raiot of intelligence for each dmg's type.
+        - `range`: attack maximum range.
         """
         self.ent = entity
         self.base = base
         self.rStr = ratioStr
         self.rInt = ratioInt
+        self.max_range = max_range
 
 
     def hit(self, target):
