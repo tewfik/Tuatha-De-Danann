@@ -198,8 +198,9 @@ class Dana(threading.Thread):
                         self.send_to_all(action)
 
                         if action.startswith('ATTACK'):
-                            effect = self.actions_effects[action_id] % (count_actions)
-                            self.send_to_all(effect)
+                            while len(self.actions_effects[action_id]) > 0:
+                                effect = self.actions_effects[action_id].popleft()
+                                self.send_to_all(effect % (count_actions))
                     else:
                         self.send_to_all(action)
                     ###############################################################################################################
@@ -229,7 +230,7 @@ class Dana(threading.Thread):
             else:
                 self.clients_queues[client_id] = msg  # register the client queue
 
-                player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1, hp=30)
+                player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1)
                 player.add_attack('attack', (10, 0, 0))
                 x = random.randint(10, 22)
                 y = 22
@@ -273,7 +274,8 @@ class Dana(threading.Thread):
         - `killer_id`: killer identifier.
         - `action_id`: id of action which killed the client.
         """
-        self.add_effect(action_id, killer_id, 'dead', target.id, 0)
+        print "client N° %d die" % id
+        self.add_effect(action_id, killer_id, 'dead', id, 0)
 
 
     def client_is_dead(self, client_id):
@@ -474,8 +476,11 @@ class Dana(threading.Thread):
         - `target_id`: target identifier.
         - `nb_dmg`: number of damages.
         """
-        self.actions_effects[action_id] = \
-            'EFFECT:%d:{id}:{type}:{target_id}:{dmg}'.format(id=client_id, type=type, target_id=target_id, dmg=nb_dmg)
+        if not self.actions_effects.has_key(action_id):
+            self.actions_effects[action_id] = collections.deque()
+
+        self.actions_effects[action_id].append('EFFECT:%d:{id}:{type}:{target_id}:{dmg}' \
+                                                   .format(id=client_id, type=type, target_id=target_id, dmg=nb_dmg))
 
 
     def move_request(self, client_id, x, y):
@@ -517,7 +522,7 @@ class Dana(threading.Thread):
             target_is_dead, nb_dmg = self.world.entities[client_id].l_attacks[name].hit(target)
 
             self.clients_actions[client_id].append((action_id, 'ATTACK:%d:{id}:{name}:{x}:{y}'.format(id=client_id, name=name, x=x, y=y)))
-            self.add_effect(action_id, client_id, name, target.id, nb_dmg)
+            self.add_effect(action_id, client_id, 'dmg', target.id, nb_dmg)
 
             if target_is_dead:
                 self.client_die(id=target.id, killer_id=client_id, action_id=action_id)
