@@ -76,6 +76,13 @@ class Entity(object):
         return (dead, dmg)
 
 
+    def is_dead(self):
+        """
+        Return: true if the entity is dead, else false.
+        """
+        return self.hp < 0
+
+
 
 class LivingEntity(Entity):
     """
