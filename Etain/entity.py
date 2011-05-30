@@ -197,7 +197,7 @@ class Entity():
                 self.play_anim('move_left', True)
 
         self.pos = dest
-        self.dest = ((dest[0] + 1)*SQUARE_SIZE - self.width, (dest[1] + 1)*SQUARE_SIZE - self.height)
+        self.dest = ((dest[0] + 0.5)*SQUARE_SIZE - self.width/2, (dest[1] + 1)*SQUARE_SIZE - self.height)
 
         self.speed = speed
 
