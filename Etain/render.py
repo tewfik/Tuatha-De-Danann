@@ -186,7 +186,7 @@ class Render():
         """
         """
         if type.lower() == 'dmg':
-            self.l_entities[target_id].hp -= params[0]
+            self.l_entities[target_id].hp -= int(params[0])
         elif type.lower() == 'dead':
             self.l_entities[target_id].die()
 
