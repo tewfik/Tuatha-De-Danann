@@ -173,8 +173,8 @@ class Entity():
         """
         """
         self.alive = False
-        if "dead" in self.animations:
-            self.play_anim("dead", loop=True)
+        if "idle_dead" in self.animations:
+            self.play_anim("idle_dead", loop=True)
 
 
     def move(self, dest, speed):
