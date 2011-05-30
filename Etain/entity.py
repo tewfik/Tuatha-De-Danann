@@ -35,6 +35,17 @@ class List():
         return layer
 
 
+    def get_by_pos(self, pos):
+        """
+        """
+        entity = None
+        for uid in self.entities:
+            if self.entities[uid].pos == pos:
+                entity = self.entities[uid]
+                break
+        return entity
+
+
     def add_entity(self, pos, width, height, max_hp, hp, faction, uid, anim_path):
         """
         Create a new entity and store it in the list with is uid.
