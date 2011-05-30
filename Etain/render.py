@@ -130,7 +130,7 @@ class Render():
             self.text("%1.1f" % self.clock.get_fps(), top = 2, right = WIDTH - 18)
 
         # battle state displaying
-        self.text(self.UI.round_state, left = 10, top = 10)
+        self.text(self.UI.round_state, left = 35, top = 10)
 
         if self.banner_fight:
             self.window.fill(BEIGE, (0, 200, WIDTH, HEIGHT - 400))
