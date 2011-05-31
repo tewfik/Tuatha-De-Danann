@@ -26,7 +26,7 @@ class UI():
         - `pa`: the current action being executed.
         - `buffer_pa`: a list storing actions before sending them to Dana.
         - `chat_history`: a list storing chat log.
-        - `names`: list of clients names.
+        - `names`: list of clients nicknames.
         - `map`: client-side map impassable square.
         """
         self.render = render
@@ -54,7 +54,8 @@ class UI():
         Get the events currently in the queue and add new event to the send queue.
         """
         while not self.render.r_queue.empty():
-            self.process(self.render.r_queue.get().split(':'))
+            cmd = self.render.r_queue.get()
+            self.process(cmd.split())
 
         if self.round_state == 'RENDER':
             if self.render.end_anims():
@@ -219,6 +220,7 @@ class UI():
             if self.round_state != 'PLAYERS_CONNECTION':
                 self.spec = True
         elif cmd[0] == 'ENTITY' or cmd[0] == 'NEW_ENTITY':
+            print cmd
             f = open('data/'+cmd[1]+'.cfg')
             data = f.readline().split('**')
             f.close()
@@ -242,7 +244,7 @@ class UI():
             else:
                 self.fight[int(cmd[1])] = [cmd]
         elif cmd[0] == 'SET':
-            if cmd[1] == 'pseudo':
+            if cmd[1] == 'nickname':
                 self.names[cmd[2]] = cmd[3]
         elif cmd[0] == 'END_GAME':
             self.render.banner_fight = False
