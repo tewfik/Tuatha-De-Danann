@@ -13,7 +13,7 @@ import models.world
 import models.entity
 
 # interval in seconds when players are able to choose their actions
-CHOICE_TIME_INTERVAL = 5
+ACTION_CHOICE_TIMEOUT = 30
 # number of actions allowed for one player in one turn
 NB_ACTIONS = 1
 # interval in seconds after which Dana stops to wait clients
@@ -44,7 +44,8 @@ class Dana(threading.Thread):
     - `players_ready`: list of ready players.
     - `render_ok_list`: list of clients which have finished to render.
     - `render_ok_event`: notice battle thread that all clients have finished to render.
-
+    - `choice_ok_list`: list of clients which have chose their actions.
+    - `choice_ok_event`: notice battle thread that all clients have chose their actions.
     """
 
     def __init__(self, queue):
@@ -69,6 +70,8 @@ class Dana(threading.Thread):
         self.players_ready = []
         self.render_ok_list = []
         self.render_ok_event = threading.Event()
+        self.choice_ok_list = []
+        self.choice_ok_event = threading.Event()
 
 
     def run(self):
@@ -115,6 +118,9 @@ class Dana(threading.Thread):
 
             elif msg_tab[0] == 'GET_BATTLE_STATE':
                 self.get_battle_state_request(client_id)
+
+            elif msg_tab[0] == 'CONFIRM_CHOICE':
+                self.choice_ok_request(client_id)
 
             elif msg_tab[0] == 'RENDER_OK':
                 self.render_ok_request(client_id)
@@ -169,7 +175,11 @@ class Dana(threading.Thread):
             self.clear_clients_actions()
             self.state = 'ACTIONS_CHOICE'
             self.send_to_all('ROUND_START:' + str(self.round))
-            time.sleep(CHOICE_TIME_INTERVAL)  # wait that clients finish to choose their actions
+
+            # wait that clients finish to choose their actions
+            self.choice_ok_event.wait(timeout=ACTION_CHOICE_TIMEOUT)
+            self.choice_ok_event.clear()
+            self.choice_ok_list = []
 
             # send actions to clients, they will display them.
             self.state = 'RENDER_FIGHT'
@@ -507,6 +517,20 @@ class Dana(threading.Thread):
             # if all clients have finished to render, awake battle thread
             if len(self.render_ok_list) == len(self.clients_queues):
                 self.render_ok_event.set()
+
+
+    def choice_ok_request(self, client_id):
+        """
+        A clint notices that he has chosen its actions.
+
+        Arguments:
+        - `client_id`: client identifier
+        """
+        if self.state == 'ACTIONS_CHOICE':
+            self.choice_ok_list.append(client_id)
+            # if all clients have chosen, awake battle thread
+            if len(self.choice_ok_list) == len(self.clients_queues):
+                self.choice_ok_event.set()
 
 
     def add_effect(self, action_id, client_id, type, target_id, nb_dmg):
