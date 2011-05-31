@@ -121,6 +121,21 @@ class World(object):
         self.entities[entity_id].faction = faction_id
 
 
+    def faction_lost(self, faction_id):
+        """
+        Determine if a given faction has lost.
+
+        Arguments:
+        - `faction_id`: faction identifier.
+        """
+        lost = True
+        for entity_id in self.factions[faction_id]:
+            if not self.entities[entity_id].is_dead():
+                lost = False
+
+        return lost
+
+
     def unregister(self, entity_id, faction_id=None):
         """
         Delete an entity from the world.
