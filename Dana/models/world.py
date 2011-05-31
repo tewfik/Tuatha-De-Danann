@@ -53,7 +53,7 @@ class World(object):
     def load_fixtures(self):
         """
         """
-        epouvantail = entity.Entity(id=1001, type='scarecrow', faction_id=2)
+        epouvantail = entity.Entity(id=1001, type='scarecrow', faction_id=2, hp=30)
         self.register(epouvantail, entity_id=1001, faction_id=2, x=16, y=21)
 
         arbre1 = entity.Entity(id=2001, type='tree', faction_id=0, hp=10)
