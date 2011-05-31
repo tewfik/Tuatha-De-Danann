@@ -11,6 +11,8 @@ import entity
 # square states
 FREE = 0
 BLOCK = 1
+COLUMNS = 32
+ROWS = 24
 
 # exceptions
 class ForbiddenMove(Exception):
@@ -35,10 +37,14 @@ class World(object):
         - `entities_pos`: list of entities' positions [(x1, y1), (x2, y2) ...].
         - `factions`: dictionnary of factions {0:[id1, id2, id3], 1:[id4, id5], 2:[id6]}
         """
-        # f_map = open('../../shared/etain.map', 'r')
-        # self.map = pickle.load(f_map)
-        # f_map.close()
         self.map = [[0 for col in xrange(32)] for row in xrange(24)]  # DEBUG: a map without blocking square
+        f = open("../shared/village.collide", 'r')
+        for i in xrange(ROWS):
+            line = f.readline()[:-1]
+            row = line.split(' ')
+            for j in xrange(COLUMNS):
+                self.map[i][j] = int(row[j])
+        f.close()
         self.entities = {}
         self.entities_pos = {}
         self.factions = {}
