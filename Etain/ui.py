@@ -65,13 +65,12 @@ class UI():
                     self.pa = 0
                     self.render.banner_next = True
 
-        elif self.round_state in ('LOSE', 'WIN'):
-            return
-
         for event in pygame.event.get():
             if event.type == QUIT:
                 self.render.__del__()
                 sys.exit()
+            elif self.round_state in ('LOSE', 'WIN'):
+                return
             elif event.type == KEYDOWN:
                 if event.key == K_LALT:
                     self.alt = True
