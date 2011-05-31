@@ -80,7 +80,7 @@ class Entity(object):
         """
         Return: true if the entity is dead, else false.
         """
-        return self.hp < 0
+        return self.hp <= 0
 
 
 
