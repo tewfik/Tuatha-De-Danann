@@ -226,7 +226,7 @@ class UI():
             else:
                 self.fight[int(cmd[1])] = [cmd]
         elif cmd[0] == 'END_GAME':
-            if self.render.l_entities[self.me].faction == int(cmd[1]):
+            if self.render.l_entities[self.render.me].faction == int(cmd[1]):
                 self.round_state = 'WIN'
             else:
                 self.round_state = 'LOSE'
