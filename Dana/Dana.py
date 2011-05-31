@@ -484,7 +484,7 @@ class Dana(threading.Thread):
         - `hp_max`: maximum hp.
         - `hp`: current hp.
         """
-        entity = self.wolrd.entities[client_id]
+        entity = self.world.entities[client_id]
         response = 'ENTITY:%s:%d:%d:%s:%d:%d:%d:%d' % (type, faction_id, entity_id, entity.nickname, x, y, hp_max, hp)
         self.clients_queues[client_id].put(response)
 
