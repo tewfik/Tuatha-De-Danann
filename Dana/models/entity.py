@@ -6,7 +6,7 @@ class Entity(object):
     A player, a monster, a vehicle ...
     """
 
-    def __init__(self, id, type, faction_id=0, hp=100, armor=0, mresist=0):
+    def __init__(self, id, type, faction_id=0, hp=100, armor=0, mresist=0, nickname=''):
         """
         Entity creation.
 
@@ -18,6 +18,7 @@ class Entity(object):
         - `maxhp`: the maximum and base health point of the entity.
         - `armor`: reduce incoming physical damage (100 armor = 100% increased effective health).
         - `mresist`: reduce incoming magic damage (100 mresist = 100% increased effective health).
+        - `nickname`: entity nickname.
         """
         self.id = id
         self.type = type
@@ -26,6 +27,7 @@ class Entity(object):
         self.maxhp = hp
         self.armor = armor
         self.mresist = mresist
+        self.nickname = nickname
 
 
     def __getitem__(self, stat):
@@ -74,6 +76,17 @@ class Entity(object):
             self.hp = 0
             dead = True
         return (dead, dmg)
+
+
+    def set_nickname(self, nickname):
+        """
+        Initialize entity's nickname.
+
+        Arguments:
+        - `nickname`:
+        """
+        self.nickname = nickname
+
 
 
     def is_dead(self):

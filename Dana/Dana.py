@@ -279,13 +279,15 @@ class Dana(threading.Thread):
 
                     # inform all the clients that there is a new entity
                     player_position = self.world.get_position_by_object_id(player.id)
-                    self.send_to_all('NEW_ENTITY:{type}:{faction}:{id}:{x}:{y}:{hpm}:{hp}'.format(type=player.type,
-                                                                                                  faction=player.faction_id,
-                                                                                                  id=player.id,
-                                                                                                  x=player_position[0],
-                                                                                                  y=player_position[1],
-                                                                                                  hpm=player.maxhp,
-                                                                                                  hp=player.hp))
+                    self.send_to_all('NEW_ENTITY:{type}:{faction}:{id}:{nickname}:{x}:{y}:{hpm}:{hp}'. \
+                                         format(type=player.type,
+                                                faction=player.faction_id,
+                                                id=player.id,
+                                                nickname=self.world.entities[player.id].nickname,
+                                                x=player_position[0],
+                                                y=player_position[1],
+                                                hpm=player.maxhp,
+                                                hp=player.hp))
                 except ForbiddenMove as e:
                     print(e)
 
@@ -440,12 +442,12 @@ class Dana(threading.Thread):
 
         Arguments:
         - `client_id`: client identifier.
-        - `item_name`: item name ('pseudo').
+        - `item_name`: item name ('nickname').
         - `value`: item value, expected to be a str or an int.
         """
-        if item_name == 'pseudo':
-            self.clients_config[client_id]['pseudo'] = value
-            self.send_to_all('SET:pseudo:%d:%s' % (client_id, value))
+        if item_name == 'nickname':
+            self.world.entities[client_id].set_nickname(value)
+            self.send_to_all('SET:nickname:%d:%s' % (client_id, value))
 
 
     def chat_msg(self, client_id, msg):
@@ -482,7 +484,8 @@ class Dana(threading.Thread):
         - `hp_max`: maximum hp.
         - `hp`: current hp.
         """
-        response = 'ENTITY:%s:%d:%d:%s:%d:%d:%d:%d' % (type, faction_id, entity_id, self.clients_config[entity_id]['pseudo'], x, y, hp_max, hp)
+        entity = self.wolrd.entities[client_id]
+        response = 'ENTITY:%s:%d:%d:%s:%d:%d:%d:%d' % (type, faction_id, entity_id, entity.nickname, x, y, hp_max, hp)
         self.clients_queues[client_id].put(response)
 
 
