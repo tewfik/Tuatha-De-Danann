@@ -263,7 +263,7 @@ class Render():
             self.text("YOU WIN !", surf=self.Surface['end'], font=self.banner_font, centerx=WIDTH / 2,
                       centery=HEIGHT / 2, color=YELLOW)
             self.window.blit(self.Surface['end'], (0, 0))
-        elif self.UI.round_state == 'LOSE' or True:
+        elif self.UI.round_state == 'LOSE':
             self.end_frame = min(255, self.end_frame + 1)
             self.Surface['end'].fill((180, 0, 0, self.end_frame), (0, 0, WIDTH, HEIGHT))
             self.text("YOU LOSE !", surf=self.Surface['end'], font=self.banner_font, centerx=WIDTH / 2,
