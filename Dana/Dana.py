@@ -12,8 +12,6 @@ import network
 import models.world
 import models.entity
 
-# interval in seconds when players are allowed to connect.
-PLAYER_CONNECTION_TIME_INTERVAL = 20
 # interval in seconds when players are able to choose their actions
 CHOICE_TIME_INTERVAL = 5
 # number of actions allowed for one player in one turn
@@ -40,8 +38,10 @@ class Dana(threading.Thread):
     - `next_action_id`: unique identifier to allocate to the next actions.
     - `clients_actions`: actions choosen by each clients => clients_actions[client_id] = deque((action_id, action), ...).
     - `actions_effects`: effects of actions => action_effects[action_id] = 'EFFECT:%d:pa:id:type:target_id:nb_damage'
-    - `state`: state of the game (PLAYERS_CONNECTION | ACTIONS_CHOICE | RENDER_FIGHT | WAIT_RENDER_OK).
+    - `state`: state of the game (PLAYERS_CONNECTION | PLAYERS_CONNECTION_LOCK | ACTIONS_CHOICE | RENDER_FIGHT | WAIT_RENDER_OK).
     - `round`: round identifier. Start to zero and increment at each round.
+    - `players_ready_event`: notice battle thread that all clients are ready.
+    - `players_ready`: list of ready players.
     - `render_ok_list`: list of clients which have finished to render.
     - `render_ok_event`: notice battle thread that all clients have finished to render.
 
@@ -63,8 +63,10 @@ class Dana(threading.Thread):
         self.next_action_id = 1
         self.clients_actions = {}
         self.actions_effects = {}
-        self.state = 'PLAYERS_CONNECTIONS'
+        self.state = 'PLAYERS_CONNECTION'
         self.round = 0
+        self.players_ready_event = threading.Event()
+        self.players_ready = []
         self.render_ok_list = []
         self.render_ok_event = threading.Event()
 
@@ -108,6 +110,9 @@ class Dana(threading.Thread):
             if msg_tab[0] == 'GET_ENTITIES':
                 self.get_entities_request(client_id)
 
+            elif msg_tab[0] == 'READY_TO_PLAY':
+                self.ready_to_play_request(client_id)
+
             elif msg_tab[0] == 'GET_BATTLE_STATE':
                 self.get_battle_state_request(client_id)
 
@@ -147,10 +152,14 @@ class Dana(threading.Thread):
 
         This function describe the flow of a battle
         """
+        self.players_ready = []
+        self.state = 'PLAYERS_CONNECTION'
+
         self.world.load_fixtures()
 
-        # wait for players connection
-        time.sleep(PLAYER_CONNECTION_TIME_INTERVAL)
+        self.players_ready_event.wait()
+        self.players_ready_event.clear()
+
 
         # rounds loop
         battle_is_finished = False
@@ -231,7 +240,7 @@ class Dana(threading.Thread):
             client_id = self.get_next_id()        # generate an available client id.
 
             #
-            if self.state != 'PLAYERS_CONNECTIONS':
+            if self.state != 'PLAYERS_CONNECTION':
                 # register the client as spectator
                 self.spectators_queues[client_id] = msg
             else:
@@ -467,6 +476,23 @@ class Dana(threading.Thread):
                 hp_max=entity.maxhp,
                 hp=entity.hp
                 )
+
+
+    def ready_to_play_request(self, client_id):
+        """
+        A client notice that he is ready to play.
+
+        Arguments:
+        - `client_id`: client unique identifier
+        """
+        self.players_ready.append(client_id)
+
+        if len(self.players_ready) == len(self.clients_queues):
+            # lock connection to be sure that all connected clients are ready.
+            self.state = 'PLAYERS_CONNECTION_LOCK'
+
+        if len(self.players_ready) == len(self.clients_queues):
+            self.players_ready_event.set()
 
 
     def render_ok_request(self, client_id):

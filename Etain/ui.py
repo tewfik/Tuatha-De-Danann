@@ -127,7 +127,7 @@ class UI():
                     elif self.render.dest_square is None and self.reachable(mouse_pos, MOVE_DIST):
                         self.buffer_pa.append('MOVE:%d:%d' % mouse_pos)
                         self.render.dest_square = (mouse_pos[0] * SQUARE_SIZE, mouse_pos[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
-                elif self.round_state == 'PLAYERS_CONNECTIONS' and self.mouse_over(((WIDTH - 200)/2,
+                elif self.round_state == 'PLAYERS_CONNECTION' and self.mouse_over(((WIDTH - 200)/2,
                      (HEIGHT - 50)/2, 200, 50), event.pos) and not self.render.rdy:
                     self.render.rdy = True
                     self.render.s_queue.put("READY_TO_PLAY")
@@ -201,7 +201,7 @@ class UI():
             self.render.banner_fight = False
         elif cmd[0] == 'BATTLE_STATE':
             self.round_state = cmd[1].upper()
-            if self.round_state != 'PLAYERS_CONNECTIONS':
+            if self.round_state != 'PLAYERS_CONNECTION':
                 self.spec = True
         elif cmd[0] == 'ENTITY' or cmd[0] == 'NEW_ENTITY':
             f = open('data/'+cmd[1]+'.cfg')
