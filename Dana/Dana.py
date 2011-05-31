@@ -37,6 +37,7 @@ class Dana(threading.Thread):
     - `spectators_queues`: dictionary of spectators' queues. Format : spectators_queues[client_id] = Queue object.
     - `next_action_id`: unique identifier to allocate to the next actions.
     - `clients_actions`: actions choosen by each clients => clients_actions[client_id] = deque((action_id, action), ...).
+    - `clients_config`: clients configuration item => clients_config['client_id'][item_name] = item_value.
     - `actions_effects`: effects of actions => action_effects[action_id] = 'EFFECT:%d:pa:id:type:target_id:nb_damage'
     - `state`: state of the game (PLAYERS_CONNECTION | PLAYERS_CONNECTION_LOCK | ACTIONS_CHOICE | RENDER_FIGHT | WAIT_RENDER_OK).
     - `round`: round identifier. Start to zero and increment at each round.
@@ -60,6 +61,7 @@ class Dana(threading.Thread):
         self.shutdown = False
         self.queue = queue
         self.clients_queues = {}
+        self.clients_config = {}
         self.spectators_queues = {}
         self.next_action_id = 1
         self.clients_actions = {}
@@ -127,6 +129,9 @@ class Dana(threading.Thread):
 
             elif msg_tab[0] == 'PING':
                 self.ping_request(client_id, msg_tab[1])
+
+            elif msg_tab[0] == 'SET':
+                self.set_request(client_id, name=msg_tab[1], value=msg_tab[2])
 
             elif msg_tab[0] == 'CHAT_MSG':
                 self.chat_msg(client_id, msg_tab[1])
@@ -255,6 +260,7 @@ class Dana(threading.Thread):
                 self.spectators_queues[client_id] = msg
             else:
                 self.clients_queues[client_id] = msg  # register the client queue
+                self.clients_config[client_id] = {}
 
                 player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1 if client_id % 2 == 0 else 2)
                 player.add_attack('attack', (10, 0, 0))
@@ -428,6 +434,20 @@ class Dana(threading.Thread):
         self.clients_queues[client_id].put('PONG:%d' % ping_id)
 
 
+    def set_request(self, client_id, item_name, value):
+        """
+        Initialize a configuration item for a given client.
+
+        Arguments:
+        - `client_id`: client identifier.
+        - `item_name`: item name ('pseudo').
+        - `value`: item value, expected to be a str or an int.
+        """
+        if name = 'pseudo':
+            self.clients_config[client_id]['pseudo'] = value
+            self.send_to_all('SET:pseudo:id:%s' % (client_id, value))
+
+
     def chat_msg(self, client_id, msg):
         """
         Send a chat message to other clients.
@@ -462,7 +482,7 @@ class Dana(threading.Thread):
         - `hp_max`: maximum hp.
         - `hp`: current hp.
         """
-        response = 'ENTITY:%s:%d:%d:%d:%d:%d:%d' % (type, faction_id, entity_id, x, y, hp_max, hp)
+        response = 'ENTITY:%s:%d:%d:%s:%d:%d:%d:%d' % (type, faction_id, entity_id, self.clients_config[entity_id]['pseudo'], x, y, hp_max, hp)
         self.clients_queues[client_id].put(response)
 
 
