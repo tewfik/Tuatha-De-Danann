@@ -184,6 +184,7 @@ class Dana(threading.Thread):
 
             battle_is_finished, winner = self.battle_is_finished()
 
+        print("Battle is finished. Winner : %d" % winner)
         self.send_to_all('END_GAME:%d' % winner)
 
 
@@ -389,8 +390,10 @@ class Dana(threading.Thread):
 
         if not faction1_lost and faction2_lost:
             winner = 1
-        else:
+        elif faction1_lost and not faction2_lost:
             winner = 2
+        else:
+            winner = 0
 
         return (faction1_lost or faction2_lost), winner
 
