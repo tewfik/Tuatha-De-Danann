@@ -30,5 +30,5 @@ if __name__ == '__main__':
     print('network engine is running')
 
     # render's operations have to be in the main thread.
-    display = render.Render(send_queue, receive_queue, '../shared/etain.map')
+    display = render.Render(send_queue, receive_queue, '../shared/village.map')
     display.run()
