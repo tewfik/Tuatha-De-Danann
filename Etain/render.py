@@ -221,7 +221,7 @@ class Render():
                 self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 17, left=8)
 
         # Ready to play button
-        if self.UI.round_state == 'PLAYERS_CONNECTIONS':
+        if self.UI.round_state == 'PLAYERS_CONNECTION':
             if not self.rdy:
                 self.window.fill(GREY, ((WIDTH - 200)/2, (HEIGHT - 50)/2, 200, 50))
             else:
