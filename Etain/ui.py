@@ -97,8 +97,8 @@ class UI():
             mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
             if self.mouse_over((WIDTH - 18, 0, 18, 18), event.pos):
                 self.render.menu = not self.render.menu
-            elif not self.render.menu:
-                if event.button == 1 and self.round_state == 'CHOICE' and not self.spec and self.render.l_entities[self.render.me].alive:
+            elif not self.render.menu and event.button == 1:
+                if self.round_state == 'CHOICE' and not self.spec and self.render.l_entities[self.render.me].alive:
                     if self.reachable(mouse_pos, MELEE_RANGE) and self.entity_on(mouse_pos) is not None:
                         if self.entity_on(mouse_pos).alive and self.render.target is None:
                             self.buffer_pa.append('ATTACK:attack:%d:%d' % mouse_pos)
@@ -115,6 +115,10 @@ class UI():
                     elif self.render.dest_square is None and self.reachable(mouse_pos, MOVE_DIST):
                         self.buffer_pa.append('MOVE:%d:%d' % mouse_pos)
                         self.render.dest_square = (mouse_pos[0] * SQUARE_SIZE, mouse_pos[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
+                elif self.round_state == 'PLAYERS_CONNECTIONS' and self.mouse_over(((WIDTH - 200)/2,
+                     (HEIGHT - 50)/2, 200, 50), event.pos) and not self.render.rdy:
+                    self.render.rdy = True
+                    self.render.s_queue.put("READY_TO_PLAY")
             else:
                 menu_x = (WIDTH - MENU_WIDTH) / 2
                 menu_y = (HEIGHT - MENU_HEIGHT) / 2

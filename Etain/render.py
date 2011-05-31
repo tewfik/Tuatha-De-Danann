@@ -32,6 +32,7 @@ class Render():
         - `speech_font`: the font to use for speech bubbles.
         - `chat_font`: the font to use for chat.
         - `particles`: list of current particles.
+        - `rdy`: set if the player is ready to play.
         - `fps_render`: a boolean telling render to display fps or not.
         - `grid_render`: a boolean telling render to display the grid or not.
         - `menu`: a boolean telling render to display the menu or not.
@@ -54,6 +55,8 @@ class Render():
 
         # Fonts
         self.font = pygame.font.SysFont(None, 24)
+        self.button_font = pygame.font.SysFont(None, 48)
+        self.button_font.set_bold(True)
         self.menu_font = pygame.font.SysFont(None, 16)
         self.banner_font = pygame.font.SysFont(None, 128)
         self.speech_font = pygame.font.SysFont("Monospace", 12)
@@ -61,6 +64,7 @@ class Render():
         self.chat_font = pygame.font.SysFont(None, 16)
 
         self.particles = []
+        self.rdy = False
         self.fps_render = False
         self.grid_render = True
         self.menu = False
@@ -202,6 +206,14 @@ class Render():
                     self.chat[2] = 0
             else:
                 self.text(self.chat[1], font=self.chat_font, top=HEIGHT - 17, left=8)
+
+        # Ready to play button
+        if self.UI.round_state == 'PLAYERS_CONNECTIONS':
+            if not self.rdy:
+                self.window.fill(GREY, ((WIDTH - 200)/2, (HEIGHT - 50)/2, 200, 50))
+            else:
+                self.window.fill(DARKGREEN, ((WIDTH - 200)/2, (HEIGHT - 50)/2, 200, 50))
+            self.text('READY !', font=self.button_font, centerx=WIDTH/2, centery=HEIGHT/2, color=WHITE)
 
         # Timer choice display
         if self.UI.round_state == 'CHOICE':
