@@ -153,7 +153,11 @@ class World(object):
         result = True
 
         # if square is not free
-        if self.map[y][x] != FREE:
+        if len(self.map) <= y:
+            result = True
+        elif len(self.map[y]) <= x:
+            result = True
+        elif self.map[y][x] != FREE:
             result = False
         # if there is another entity on the square
         if self.get_object_by_position((x, y)):
