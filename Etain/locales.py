@@ -13,7 +13,7 @@ TITLE = 'Tuatha dé Danann'
 FPS = 40
 
 # Game
-TIME_CHOICE = 5000.0
+TIME_CHOICE = 30000.0
 MOVE_DIST = 5
 MELEE_RANGE = 1
 
