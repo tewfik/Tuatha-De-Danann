@@ -153,7 +153,9 @@ class Dana(threading.Thread):
         time.sleep(PLAYER_CONNECTION_TIME_INTERVAL)
 
         # rounds loop
-        while not self.battle_is_finished():
+        battle_is_finished = False
+        winner = 0
+        while not battle_is_finished:
             # actions choice phase
             self.clear_clients_actions()
             self.state = 'ACTIONS_CHOICE'
@@ -180,7 +182,10 @@ class Dana(threading.Thread):
 
             self.round += 1
 
-        self.send_to_all('BATTLE_END')
+            battle_is_finished, winner = self.battle_is_finished()
+
+        print("Battle is finished. Winner : %d" % winner)
+        self.send_to_all('END_GAME:%d' % winner)
 
 
     def render_battle(self):
@@ -380,7 +385,18 @@ class Dana(threading.Thread):
         """
         Return: True if the battle is finished.
         """
-        return False
+        faction1_lost = self.world.faction_lost(1)
+        faction2_lost = self.world.faction_lost(2)
+
+        if not faction1_lost and faction2_lost:
+            winner = 1
+        elif faction1_lost and not faction2_lost:
+            winner = 2
+        else:
+            winner = 0
+
+        return (faction1_lost or faction2_lost), winner
+
 
     def ping_request(self, client_id, ping_id):
         """

@@ -53,7 +53,7 @@ class World(object):
     def load_fixtures(self):
         """
         """
-        epouvantail = entity.Entity(id=1001, type='scarecrow', faction_id=2)
+        epouvantail = entity.Entity(id=1001, type='scarecrow', faction_id=2, hp=30)
         self.register(epouvantail, entity_id=1001, faction_id=2, x=16, y=21)
 
         arbre1 = entity.Entity(id=2001, type='tree', faction_id=0, hp=10)
@@ -148,6 +148,21 @@ class World(object):
             self.factions[faction_id] = []
         self.factions[faction_id].append(entity_id)
         self.entities[entity_id].faction = faction_id
+
+
+    def faction_lost(self, faction_id):
+        """
+        Determine if a given faction has lost.
+
+        Arguments:
+        - `faction_id`: faction identifier.
+        """
+        lost = True
+        for entity_id in self.factions[faction_id]:
+            if not self.entities[entity_id].is_dead():
+                lost = False
+
+        return lost
 
 
     def unregister(self, entity_id, faction_id=None):
