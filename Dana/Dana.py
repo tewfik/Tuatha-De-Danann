@@ -256,7 +256,7 @@ class Dana(threading.Thread):
             else:
                 self.clients_queues[client_id] = msg  # register the client queue
 
-                player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1)
+                player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1 if client_id % 2 == 0 else 2)
                 player.add_attack('attack', (10, 0, 0))
                 x = random.randint(10, 22)
                 y = 22
