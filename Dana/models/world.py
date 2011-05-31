@@ -11,6 +11,8 @@ import entity
 # square states
 FREE = 0
 BLOCK = 1
+COLUMNS = 32
+ROWS = 24
 
 # exceptions
 class ForbiddenMove(Exception):
@@ -35,10 +37,14 @@ class World(object):
         - `entities_pos`: list of entities' positions [(x1, y1), (x2, y2) ...].
         - `factions`: dictionnary of factions {0:[id1, id2, id3], 1:[id4, id5], 2:[id6]}
         """
-        # f_map = open('../../shared/etain.map', 'r')
-        # self.map = pickle.load(f_map)
-        # f_map.close()
         self.map = [[0 for col in xrange(32)] for row in xrange(24)]  # DEBUG: a map without blocking square
+        f = open("../shared/village.collide", 'r')
+        for i in xrange(ROWS):
+            line = f.readline()[:-1]
+            row = line.split(' ')
+            for j in xrange(COLUMNS):
+                self.map[i][j] = int(row[j])
+        f.close()
         self.entities = {}
         self.entities_pos = {}
         self.factions = {}
@@ -50,10 +56,33 @@ class World(object):
         epouvantail = entity.Entity(id=1001, type='scarecrow', faction_id=2)
         self.register(epouvantail, entity_id=1001, faction_id=2, x=16, y=21)
 
-        arbre1 = entity.Entity(id=2001, type='tree', faction_id=0)
-        self.register(arbre1, entity_id=2001, faction_id=0, x=23, y=15)
-        arbre2 = entity.Entity(id=2002, type='tree', faction_id=0)
-        self.register(arbre2, entity_id=2002, faction_id=0, x=8, y=18)
+        arbre1 = entity.Entity(id=2001, type='tree', faction_id=0, hp=10)
+        self.register(arbre1, entity_id=2001, faction_id=0, x=28, y=5)
+        arbre2 = entity.Entity(id=2002, type='tree', faction_id=0, hp=10)
+        self.register(arbre2, entity_id=2002, faction_id=0, x=29, y=12)
+        arbre3 = entity.Entity(id=2003, type='tree', faction_id=0, hp=10)
+        self.register(arbre3, entity_id=2003, faction_id=0, x=29, y=18)
+        arbre4 = entity.Entity(id=2004, type='tree', faction_id=0, hp=10)
+        self.register(arbre4, entity_id=2004, faction_id=0, x=20, y=21)
+        arbre5 = entity.Entity(id=2005, type='tree', faction_id=0, hp=10)
+        self.register(arbre5, entity_id=2005, faction_id=0, x=14, y=25)
+        arbre6 = entity.Entity(id=2006, type='tree', faction_id=0, hp=10)
+        self.register(arbre6, entity_id=2006, faction_id=0, x=6, y=20)
+        arbre7 = entity.Entity(id=2007, type='tree', faction_id=0, hp=10)
+        self.register(arbre7, entity_id=2007, faction_id=0, x=6, y=11)
+        arbre8 = entity.Entity(id=2008, type='tree', faction_id=0, hp=10)
+        self.register(arbre8, entity_id=2008, faction_id=0, x=8, y=5)
+        arbre9 = entity.Entity(id=2009, type='tree', faction_id=0, hp=10)
+        self.register(arbre9, entity_id=2009, faction_id=0, x=16, y=3)
+        arbre10 = entity.Entity(id=2010, type='tree', faction_id=0, hp=10)
+        self.register(arbre10, entity_id=2010, faction_id=0, x=22, y=5)
+        arbre11 = entity.Entity(id=2011, type='tree', faction_id=0, hp=10)
+        self.register(arbre11, entity_id=2011, faction_id=0, x=21, y=12)
+        arbre12 = entity.Entity(id=2012, type='tree', faction_id=0, hp=10)
+        self.register(arbre12, entity_id=2012, faction_id=0, x=13, y=14)
+
+        house = entity.Entity(id=3000, type='house', faction_id=0, hp=500)
+        self.register(house, entity_id=3000, faction_id=0, x=18, y=14)
 
 
     def get_object_by_position(self, position):
@@ -168,7 +197,11 @@ class World(object):
         result = True
 
         # if square is not free
-        if self.map[x][y] != FREE:
+        if len(self.map) <= y:
+            result = True
+        elif len(self.map[y]) <= x:
+            result = True
+        elif self.map[y][x] != FREE:
             result = False
         # if there is another entity on the square
         if self.get_object_by_position((x, y)):
