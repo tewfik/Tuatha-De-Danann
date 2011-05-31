@@ -64,6 +64,7 @@ class Render():
         self.chat_font = pygame.font.SysFont(None, 16)
 
         self.particles = []
+        self.end_frame = 0
         self.rdy = False
         self.fps_render = False
         self.grid_render = True
@@ -87,6 +88,7 @@ class Render():
                         'grid' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE | SRCALPHA),
                         'menu' : pygame.Surface((MENU_WIDTH, MENU_HEIGHT), HWSURFACE),
                         'chat' : pygame.Surface((CHAT_WIDTH, CHAT_HEIGHT), HWSURFACE | SRCALPHA),
+                        'end' : pygame.Surface((WIDTH, HEIGHT), HWSURFACE | SRCALPHA),
                         'health' : {ALLY : pygame.Surface((H_WIDTH, H_HEIGHT), HWSURFACE | SRCALPHA),
                                     ENNEMY : pygame.Surface((H_WIDTH, H_HEIGHT), HWSURFACE | SRCALPHA)}}
 
@@ -254,6 +256,19 @@ class Render():
                 pygame.draw.circle(self.window, RED, (15, 15), 12, 2)
             else:
                 pygame.draw.circle(self.window, GREEN, (15, 15), 12, 2)
+
+        if self.UI.round_state == 'WIN':
+            self.end_frame = min(255, self.end_frame + 1)
+            self.Surface['end'].fill((255, 255, 255, self.end_frame), (0, 0, WIDTH, HEIGHT))
+            self.text("YOU WIN !", surf=self.Surface['end'], font=self.banner_font, centerx=WIDTH / 2,
+                      centery=HEIGHT / 2, color=YELLOW)
+            self.window.blit(self.Surface['end'], (0, 0))
+        elif self.UI.round_state == 'LOSE' or True:
+            self.end_frame = min(255, self.end_frame + 1)
+            self.Surface['end'].fill((180, 0, 0, self.end_frame), (0, 0, WIDTH, HEIGHT))
+            self.text("YOU LOSE !", surf=self.Surface['end'], font=self.banner_font, centerx=WIDTH / 2,
+                      centery=HEIGHT / 2, color=BLACK)
+            self.window.blit(self.Surface['end'], (0, 0))
 
 
     def effect(self, type, id=None, target_id=None, params=None):

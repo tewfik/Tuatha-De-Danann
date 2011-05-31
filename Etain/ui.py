@@ -56,6 +56,9 @@ class UI():
                     self.pa = 0
                     self.render.banner_next = True
 
+        elif self.round_state in ('LOSE', 'WIN'):
+            return
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 self.render.__del__()
@@ -128,7 +131,7 @@ class UI():
                         self.render.fps_render = not self.render.fps_render
                 elif self.mouse_over((menu_x + MENU_WIDTH - 16, menu_y + 3, 13, 13), event.pos):
                         self.render.menu = not self.render.menu
-        elif event.type == MOUSEMOTION:
+        elif event.type == MOUSEMOTION and self.render.me is not None:
             mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
             if self.reachable(mouse_pos, MELEE_RANGE) and self.entity_on(mouse_pos) is not None and self.round_state == 'CHOICE':
                 if self.entity_on(mouse_pos).alive:
@@ -211,6 +214,11 @@ class UI():
                 self.fight[int(cmd[1])].append(cmd)
             else:
                 self.fight[int(cmd[1])] = [cmd]
+        elif cmd[0] == 'END_GAME':
+            if self.render.l_entities[self.me].faction == int(cmd[1]):
+                self.round_state = 'WIN'
+            else:
+                self.round_state = 'LOSE'
 
 
     def do_actions(self, pa):
