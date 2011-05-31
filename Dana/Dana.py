@@ -131,7 +131,7 @@ class Dana(threading.Thread):
                 self.ping_request(client_id, msg_tab[1])
 
             elif msg_tab[0] == 'SET':
-                self.set_request(client_id, name=msg_tab[1], value=msg_tab[2])
+                self.set_request(client_id, item_name=msg_tab[1], value=msg_tab[2])
 
             elif msg_tab[0] == 'CHAT_MSG':
                 self.chat_msg(client_id, msg_tab[1])
@@ -443,9 +443,9 @@ class Dana(threading.Thread):
         - `item_name`: item name ('pseudo').
         - `value`: item value, expected to be a str or an int.
         """
-        if name = 'pseudo':
+        if item_name == 'pseudo':
             self.clients_config[client_id]['pseudo'] = value
-            self.send_to_all('SET:pseudo:id:%s' % (client_id, value))
+            self.send_to_all('SET:pseudo:%d:%s' % (client_id, value))
 
 
     def chat_msg(self, client_id, msg):
