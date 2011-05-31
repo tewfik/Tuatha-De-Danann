@@ -2,8 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import pygame
-from pygame.locals import *
+try:
+    import pygame
+    from pygame.locals import *
+except ImportError:
+    print "Veuillez installer la bibliothèque pygame : http://www.pygame.org/"
+    sys.exit()
 import pickle
 sys.path.append("../shared/")
 from area import Area
