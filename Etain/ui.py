@@ -69,8 +69,6 @@ class UI():
             if event.type == QUIT:
                 self.render.__del__()
                 sys.exit()
-            elif self.round_state in ('LOSE', 'WIN'):
-                return
             elif event.type == KEYDOWN:
                 if event.key == K_LALT:
                     self.alt = True
@@ -81,7 +79,7 @@ class UI():
                         self.render.grid_render = not self.render.grid_render
                     elif event.key == K_r:
                         self.render.fps_render = not self.render.fps_render
-                elif event.key == K_RETURN:
+                elif event.key == K_RETURN and self.round_state not in ('LOSE', 'WIN'):
                     if self.render.chat[0]:
                         self.render.chat[1].strip()
                         if self.render.chat[1]:
@@ -97,6 +95,8 @@ class UI():
             elif event.type == KEYUP:
                 if event.key == K_LALT:
                     self.alt = False
+            elif self.round_state in ('LOSE', 'WIN'):
+                return
             else:
                 self.mouse_event(event)
 
@@ -225,6 +225,8 @@ class UI():
             else:
                 self.fight[int(cmd[1])] = [cmd]
         elif cmd[0] == 'END_GAME':
+            self.render.banner_fight = False
+            self.render.banner_next = False
             if self.render.l_entities[self.render.me].faction == int(cmd[1]):
                 self.round_state = 'WIN'
             else:
