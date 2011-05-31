@@ -19,6 +19,8 @@ MELEE_RANGE = 1
 
 # Constantes
 PI = 3.141593
+FREE = 0
+BLOCK = 1
 
 # Chat
 HISTORY_SIZE = 13

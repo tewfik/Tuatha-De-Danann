@@ -26,6 +26,7 @@ class UI():
         - `pa`: the current action being executed.
         - `buffer_pa`: a list storing actions before sending them to Dana.
         - `chat_history`: a list storing chat log.
+        - `map`: client-side map impassable square.
         """
         self.render = render
         self.round_state = None
@@ -36,6 +37,14 @@ class UI():
         self.pa = 0
         self.buffer_pa = deque()
         self.chat_history = []
+        self.map = [[0]*COLUMNS for i in xrange(ROWS)]
+        f = open("../shared/village.collide", 'r')
+        for i in xrange(ROWS):
+            line = f.readline()[:-1]
+            row = line.split(' ')
+            for j in xrange(COLUMNS):
+                self.map[i][j] = int(row[j])
+        f.close()
 
 
     def run(self):
@@ -144,7 +153,9 @@ class UI():
         """
         """
         entity = self.render.l_entities[self.render.me]
-        if abs(entity.pos[0] - pos[0]) + abs(entity.pos[1] - pos[1]) <= range:
+        if self.map[pos[1]][pos[0]] == BLOCK:
+            return False
+        elif abs(entity.pos[0] - pos[0]) + abs(entity.pos[1] - pos[1]) <= range:
             return True
         else:
             return False
@@ -215,7 +226,7 @@ class UI():
             else:
                 self.fight[int(cmd[1])] = [cmd]
         elif cmd[0] == 'END_GAME':
-            if self.render.l_entities[self.me].faction == int(cmd[1]):
+            if self.render.l_entities[self.render.me].faction == int(cmd[1]):
                 self.round_state = 'WIN'
             else:
                 self.round_state = 'LOSE'
