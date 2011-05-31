@@ -26,6 +26,7 @@ class UI():
         - `pa`: the current action being executed.
         - `buffer_pa`: a list storing actions before sending them to Dana.
         - `chat_history`: a list storing chat log.
+        - `names`: list of clients names.
         - `map`: client-side map impassable square.
         """
         self.render = render
@@ -37,6 +38,7 @@ class UI():
         self.pa = 0
         self.buffer_pa = deque()
         self.chat_history = []
+        self.names = {}
         self.map = [[0]*COLUMNS for i in xrange(ROWS)]
         f = open("../shared/village.collide", 'r')
         for i in xrange(ROWS):
@@ -220,8 +222,9 @@ class UI():
             f = open('data/'+cmd[1]+'.cfg')
             data = f.readline().split('**')
             f.close()
+            self.names[cmd[3]] = cmd[4]
             try:
-                self.render.l_entities[int(cmd[3])] = ((int(cmd[4]), int(cmd[5])), int(data[0]), int(data[1]), int(cmd[6]), int(cmd[7]),
+                self.render.l_entities[int(cmd[3])] = ((int(cmd[5]), int(cmd[6])), int(data[0]), int(data[1]), int(cmd[7]), int(cmd[8]),
                                                        int(cmd[2]), data[2])
             except ValueError as e:
                 print(e)
@@ -230,7 +233,7 @@ class UI():
             self.render.s_queue.put("GET_BATTLE_STATE")
         elif cmd[0] == 'CHAT_MSG':
             self.render.bubbles[int(cmd[1])] = [int(cmd[1]), cmd[2], BUBBLE_TTL]
-            self.chat_history.append(cmd[1] + ' : ' + cmd[2])
+            self.chat_history.append(self.names[cmd[1]] + ' : ' + cmd[2])
             if len(self.chat_history) > HISTORY_SIZE:
                 del self.chat_history[0]
         elif cmd[0] in ('ATTACK', 'MOVE', 'EFFECT'):
@@ -238,6 +241,9 @@ class UI():
                 self.fight[int(cmd[1])].append(cmd)
             else:
                 self.fight[int(cmd[1])] = [cmd]
+        elif cmd[0] == 'SET':
+            if cmd[1] == 'pseudo':
+                self.names[cmd[2]] = cmd[3]
         elif cmd[0] == 'END_GAME':
             self.render.banner_fight = False
             self.render.banner_next = False
