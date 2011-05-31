@@ -136,8 +136,8 @@ class Render():
         """
         """
         result = None
-        for uid in l_entities:
-            if l_entities[uid] == entity:
+        for uid in self.l_entities:
+            if self.l_entities[uid] == entity:
                 result = uid
                 break
         return result
@@ -268,6 +268,7 @@ class Render():
             else:
                 pygame.draw.circle(self.window, GREEN, (15, 15), 12, 2)
 
+        # Win/Lose screens
         if self.UI.round_state == 'WIN':
             self.end_frame = min(255, self.end_frame + 1)
             self.Surface['end'].fill((255, 255, 255, self.end_frame), (0, 0, WIDTH, HEIGHT))
