@@ -174,6 +174,20 @@ class UI():
         return self.render.l_entities.get_by_pos(pos)
 
 
+    def is_facing(self, entity, pos):
+        """
+        """
+        dir = (entity.pos[0] - pos[0], entity.pos[1] - pos[1])
+        if dir[1] > 0:
+            return 'up'
+        if dir[0] > 0:
+            return 'left'
+        if dir[0] < 0:
+            return 'right'
+        else:
+            return 'down'
+
+
     def process(self, cmd):
         """
         Process a command from Dana.
@@ -244,10 +258,12 @@ class UI():
                     print(e)
             elif cmd[0] == 'ATTACK':
                 try:
-                    self.render.l_entities[int(cmd[2])].play_anim(name=cmd[3], loop=False)
+                    entity = self.render.l_entities[int(cmd[2])]
+                    entity.play_anim(name=cmd[3]+'_'+self.is_facing(entity, (int(cmd[4]), int(cmd[5]))), loop=False)
+
                     if cmd[3] == 'attack':
-                        entity = self.entity_on((int(cmd[4]), int(cmd[5])))
-                        uid = self.render.get_uid(entity)
+                        target = self.entity_on((int(cmd[4]), int(cmd[5])))
+                        uid = self.render.get_uid(target)
                         self.render.effect(type='blow', id=int(cmd[2]), target_id=uid)
                 except ValueError as e:
                     print(e)

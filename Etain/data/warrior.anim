@@ -6,5 +6,8 @@ move_up**20**up**warrior_move_up_1.png**warrior_move_up_2.png**warrior_move_up_3
 move_right**20**right**warrior_move_right_1.png**warrior_move_right_2.png**warrior_move_right_3.png**warrior_move_right_4.png**
 move_down**20**down**warrior_move_down_1.png**warrior_move_down_2.png**warrior_move_down_3.png**warrior_move_down_4.png**
 move_left**20**left**warrior_move_left_1.png**warrior_move_left_2.png**warrior_move_left_3.png**warrior_move_left_4.png**
-attack**10**right**guerrier_attack_1.png**guerrier_attack_2.png**guerrier_attack_3.png**
+attack_up**100**up**warrior_idle_up.png**
+attack_right**40**right**warrior_idle_right.png**
+attack_down**40**down**warrior_idle_down.png**
+attack_left**40**left**warrior_idle_left.png**
 idle_dead**100**down**grave_flower.png**
