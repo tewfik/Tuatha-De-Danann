@@ -132,6 +132,17 @@ class Render():
             self.clock.tick(FPS)
 
 
+    def get_uid(self, entity):
+        """
+        """
+        result = None
+        for uid in l_entities:
+            if l_entities[uid] == entity:
+                result = uid
+                break
+        return result
+
+
     def draw_particles(self):
         """
         """
@@ -279,12 +290,12 @@ class Render():
             entity.hp -= int(params[0])
             pos = (entity.pixel_pos[0] + entity.width / 2, entity.pixel_pos[1] + 20)
             self.particles.append(particle.Particle('dmg', params, FPS * 2, pos))
-        elif type.lower() == 'pyrotechnic':
-            entity = self.l_entities[target_id]
-            pos = (entity.pixel_pos[0] + entity.width / 2, entity.pixel_pos[1] + entity.height / 2)
-            self.particles.append(particle.Particle('pyrotechnic', params, 100, pos))
         elif type.lower() == 'dead':
             self.l_entities[target_id].die()
+        else:
+            entity = self.l_entities[target_id]
+            pos = (entity.pixel_pos[0] + entity.width / 2, entity.pixel_pos[1] + entity.height / 2)
+            self.particles.append(particle.Particle(type, params, 100, pos))
 
 
     def text(self, msg, font=None, top=None, right=None, left=None, bottom=None, centerx=None, centery=None,
