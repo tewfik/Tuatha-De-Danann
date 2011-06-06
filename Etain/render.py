@@ -114,6 +114,9 @@ class Render():
         """
         gear = pygame.image.load("sprites/gear.png")
         fight = pygame.image.load("sprites/fight.png")
+        attack = pygame.image.load("sprites/attack.png")
+        pyrotechnic = pygame.image.load("sprites/pyrotechnic.png")
+        windblow = pygame.image.load("sprites/windblow.png")
         while(True):
             self.UI.run()
 
@@ -134,6 +137,10 @@ class Render():
                 self.window.blit(fight, square_pos)
 
             self.window.blit(gear, (WIDTH - 18, 2))
+
+            self.window.blit(attack, (WIDTH / 2 - 29, HEIGHT - 26))
+            self.window.blit(pyrotechnic, (WIDTH / 2 - 8 , HEIGHT - 26))
+            self.window.blit(windblow, (WIDTH / 2 + 13, HEIGHT - 26))
 
             pygame.display.flip()
             self.clock.tick(FPS)
