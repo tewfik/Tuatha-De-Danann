@@ -48,7 +48,7 @@ class Render():
         - `s_queue`: the queue used to send commands to Dana.
         - `r_queue`: the queue used to receive commands from Dana.
         - `me`: uid of the entity controlled by the player.
-        - `dest_square`: The square the player wants to move to.
+        - `path`: The path the player wants to move on.
         - `target`: The target the player wants to attack.
         - `clock`: A pygame timer.
         - `bubbles`: A dictionnary of all bubbles currently displaying.
@@ -81,7 +81,7 @@ class Render():
         self.s_queue = send_queue
         self.r_queue = receive_queue
         self.me = None
-        self.dest_square = None
+        self.path = None
         self.target = None
         self.clock = pygame.time.Clock()
         self.bubbles = {}
@@ -120,8 +120,10 @@ class Render():
             self.window.blit(self.Surface['map'], (0, 0))
             if self.grid_render:
                 self.window.blit(self.Surface['grid'], (0, 0))
-            if self.dest_square is not None:
-                self.window.fill(BLUE, self.dest_square)
+            if self.path is not None:
+                for pos in self.path:
+                    square = (self.path[0] * SQUARE_SIZE, self.path[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
+                    self.window.fill(BLUE, square)
 
             self.draw_entities()
             self.draw_particles()

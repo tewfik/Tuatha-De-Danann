@@ -131,7 +131,7 @@ class Entity():
         - `max_hp`: Gives the max hp of the entity.
         - `hp`: Gives the current hp of the entity.
         - `alive`: A boolean setting if the entity is alive or dead.
-        - `faction`: identify of the faction the entity belongs to.
+        - `faction`: identifier of the faction the entity belongs to.
         - `current_anim`: the current played animation.
         - `default_anim`: the animation to play by default.
         - `pixel_pos`: the current position (in pixels).
