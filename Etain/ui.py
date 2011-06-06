@@ -157,7 +157,10 @@ class UI():
     def get_collide_map(self):
         """
         """
-        map = self.map
+        map = [[0]* COLUMNS for i in xrange(ROWS)]
+        for i in xrange(ROWS):
+            for j in xrange(COLUMNS):
+                map[i][j] = self.map[i][j]
         for entity in self.render.l_entities.values():
             x = entity.pos[0]
             y = entity.pos[1]
