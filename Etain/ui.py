@@ -57,7 +57,7 @@ class UI():
         """
         while not self.render.r_queue.empty():
             cmd = self.render.r_queue.get()
-            self.process(cmd.split())
+            self.process(cmd.split(':'))
 
         if self.round_state == 'RENDER':
             if self.render.end_anims():
@@ -230,7 +230,6 @@ class UI():
             if self.round_state != 'PLAYERS_CONNECTION':
                 self.spec = True
         elif cmd[0] == 'ENTITY' or cmd[0] == 'NEW_ENTITY':
-            print cmd
             f = open('data/'+cmd[1]+'.cfg')
             data = f.readline().split('**')
             f.close()
