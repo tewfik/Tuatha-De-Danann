@@ -264,7 +264,7 @@ class Dana(threading.Thread):
 
                 player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1 if client_id % 2 == 0 else 2)
                 player.add_attack('attack', (20, 0, 0))
-                player.add_attack('pyrotechnic', (15, 0, 0))
+                player.add_attack('pyrotechnic', (0, 15, 0))
                 x = random.randint(10, 22)
                 y = 22
                 while not self.world.square_available(x, y):
