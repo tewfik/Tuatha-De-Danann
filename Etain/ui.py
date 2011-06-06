@@ -140,11 +140,13 @@ class UI():
                 menu_x = (WIDTH - MENU_WIDTH) / 2
                 menu_y = (HEIGHT - MENU_HEIGHT) / 2
                 if self.mouse_over((menu_x + 30, menu_y + 50, 10, 10), event.pos):
-                        self.render.grid_render = not self.render.grid_render
+                    self.render.grid_render = not self.render.grid_render
                 elif self.mouse_over((menu_x + 30, menu_y + 90, 10, 10), event.pos):
-                        self.render.fps_render = not self.render.fps_render
+                    self.render.fps_render = not self.render.fps_render
                 elif self.mouse_over((menu_x + MENU_WIDTH - 16, menu_y + 3, 13, 13), event.pos):
-                        self.render.menu = not self.render.menu
+                    self.render.menu = not self.render.menu
+                elif self.mouse_over((menu_x + 410, menu_y + 270, 82, 20), event.pos):
+                    pygame.event.post(pygame.event.Event(QUIT, {}))
         elif event.type == MOUSEMOTION and self.render.me is not None:
             mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
             if self.reachable(mouse_pos, MELEE_RANGE) and self.entity_on(mouse_pos) is not None and self.round_state == 'CHOICE':

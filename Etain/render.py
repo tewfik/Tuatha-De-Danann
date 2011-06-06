@@ -398,8 +398,10 @@ class Render():
         self.Surface['menu'].fill(GREY)
         self.Surface['menu'].fill(WHITE, (30, 50, 10, 10))
         self.Surface['menu'].fill(WHITE, (30, 90, 10, 10))
+        self.Surface['menu'].fill(RED, (410, 270, 82, 20))
         self.text("Afficher la grille.", self.menu_font, top=50, left=50, surf=self.Surface['menu'])
         self.text("Afficher les IPS.", self.menu_font, top=90, left=50, surf=self.Surface['menu'])
+        self.text("Quitter le jeu", self.menu_font, top=275, left=415, surf=self.Surface['menu'])
         pygame.draw.polygon(self.Surface['menu'], RED, ((MENU_WIDTH - 12, 9), (MENU_WIDTH - 16, 5), (MENU_WIDTH - 14, 3),
                                                         (MENU_WIDTH - 10, 7), (MENU_WIDTH - 6, 3), (MENU_WIDTH - 4, 5),
                                                         (MENU_WIDTH - 8, 9), (MENU_WIDTH - 4, 13), (MENU_WIDTH - 6, 15),
