@@ -25,7 +25,7 @@ class Render():
     Display entities, map and catch mouse and keyboard input to transfer them to the event handler.
     """
 
-    def __init__(self, send_queue, receive_queue, path, pseudo):
+    def __init__(self, send_queue, receive_queue, path, nickname):
         """
         Initialize the window's display.
 
@@ -103,7 +103,7 @@ class Render():
         self.use_cursor(ARROW)
         self.preload(path)
 
-        self.s_queue.put('SET:pseudo:'+pseudo.replace(':', ' '))
+        self.s_queue.put('SET:nickname:' + nickname.replace(':', ' '))
         self.s_queue.put('GET_ENTITIES')
         self.play_music("sounds/battle.ogg")
 
