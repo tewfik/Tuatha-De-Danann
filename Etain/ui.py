@@ -164,9 +164,12 @@ class UI():
         elif event.type == MOUSEMOTION and self.render.me is not None:
             mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
             if self.entity_on(mouse_pos) is not None and self.round_state == 'CHOICE':
-                if (self.attack == 'attack' and self.reachable(mouse_pos, MELEE_RANGE)) or (self.attack == 'pyrotechnic' and
-                    self.reachable(mouse_pos, PYRO_RANGE)) or (self.attack == 'windblow' and self.reachable(mouse_pos, WIND_RANGE)):
+                if self.attack == 'attack' and self.reachable(mouse_pos, MELEE_RANGE):
                     self.render.use_cursor(SWORD)
+                elif self.attack == 'pyrotechnic' and self.reachable(mouse_pos, PYRO_RANGE):
+                    self.render.use_cursor(PYRO)
+                elif self.attack == 'windblow' and self.reachable(mouse_pos, WIND_RANGE):
+                    self.render.use_cursor(WIND)
             elif self.render.cursor != ARROW[0]:
                 self.render.use_cursor(ARROW)
 
