@@ -42,6 +42,16 @@ def get(elt, lst):
 
 def Astar(map, pos, dest, free, block):
     """
+
+    Parameters:
+    - `map`: a 2D array which represent the map.
+    - `pos`: tuple (x, y) => initial position.
+    - `dest`: tuple (x, y) => destination.
+    - `free`: list of free square code.
+    - `block`: list of impassable square code.
+
+    Return: list of successive squares in the path to reach dest.
+            The initial position isn't included, but destination is.
     """
     row = len(map)
     column = len(map[0])
