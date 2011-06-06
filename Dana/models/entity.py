@@ -141,7 +141,7 @@ class LivingEntity(Entity):
             Entity.__getitem__(stat)
 
 
-    def add_attack(self, name, base=(0, 0, 0), ratioStr=(0, 0, 0), ratioInt=(0, 0, 0)):
+    def add_attack(self, name, base=(0, 0, 0), ratioStr=(0, 0, 0), ratioInt=(0, 0, 0), max_range=1):
         """
         Add a new attack to the Entity.
 
@@ -151,7 +151,7 @@ class LivingEntity(Entity):
         - `ratioStr`: a tuple (phys, mag, true) of the ratio of strength used for the attack.
         - `ratioInt`: a tuple (phys, mag, true) of the ratio of intell used for the attack.
         """
-        self.l_attacks[name] = Attack(self, base, ratioStr, ratioInt)
+        self.l_attacks[name] = Attack(self, base, ratioStr, ratioInt, max_range)
 
 
 
