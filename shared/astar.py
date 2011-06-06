@@ -141,7 +141,10 @@ def Astar(map, pos, dest, free, block):
         return None
     else:
         square = get(dest, close)
-        while square[2] is not None:
-            lastsquare = square
-            square = lastsquare[2]
-        return (lastsquare[0], lastsquare[1])
+        path = [(square[0], square[1])]
+        while True:
+            square = square[2]
+            if square[2] is None:
+                break
+            path.insert(0, (square[0], square[1]))
+        return path
