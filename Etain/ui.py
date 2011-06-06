@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import sys
+sys.path.append("../shared/")
 from collections import deque
 import pygame
 from pygame.locals import *
 from locales import *
+from astar import Astar
 
 class UI():
     """
@@ -119,16 +121,16 @@ class UI():
                             self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
                     elif self.mouse_over((20, HEIGHT - 40, 90, 20), event.pos):
                         self.buffer_pa.clear()
-                        self.render.dest_square = None
+                        self.render.path = None
                         self.render.target = None
                     elif self.mouse_over((20, HEIGHT - 70, 90, 20), event.pos):
                         while len(self.buffer_pa):
                             self.render.s_queue.put(self.buffer_pa.popleft())
                         self.render.s_queue.put("CONFIRM_CHOICE")
                         self.confirm = True
-                    elif self.render.dest_square is None and self.reachable(mouse_pos, MOVE_DIST):
+                    elif self.render.path is None and self.reachable(mouse_pos, MOVE_DIST):
                         self.buffer_pa.append('MOVE:%d:%d' % mouse_pos)
-                        self.render.dest_square = (mouse_pos[0] * SQUARE_SIZE, mouse_pos[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
+                        self.render.path = (Astar(self.get_collide_map(), self.render.l_entities[self.me].pos, mouse_pos, [0], [BLOCK]))
                 elif self.round_state == 'PLAYERS_CONNECTION' and self.mouse_over(((WIDTH - 200)/2,
                      (HEIGHT - 50)/2, 200, 50), event.pos) and not self.render.rdy:
                     self.render.rdy = True
@@ -150,6 +152,14 @@ class UI():
             elif self.render.cursor != ARROW[0]:
                 self.render.use_cursor(ARROW)
 
+
+    def get_collide_map():
+        """
+        """
+        map = self.map
+        for entity in self.render.l_entities.values():
+            map[entity.pos[1]][entity.pos[0]] = BLOCK
+        return map
 
     def reachable(self, pos, range):
         """
@@ -208,7 +218,7 @@ class UI():
             self.round_state = 'NEXT_ROUND'
         elif cmd[0] == 'END_CHOICE':
             self.round_state = 'WAIT_ACTIONS'
-            self.render.dest_square = None
+            self.render.path = None
             self.render.target = None
             self.render.banner_fight = True
             self.buffer_pa.clear()
