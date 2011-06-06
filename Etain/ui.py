@@ -287,10 +287,12 @@ class UI():
                     entity = self.render.l_entities[int(cmd[2])]
                     entity.play_anim(name=cmd[3]+'_'+self.is_facing(entity, (int(cmd[4]), int(cmd[5]))), loop=False)
 
+                    target = self.entity_on((int(cmd[4]), int(cmd[5])))
+                    uid = self.render.get_uid(target)
                     if cmd[3] == 'attack':
-                        target = self.entity_on((int(cmd[4]), int(cmd[5])))
-                        uid = self.render.get_uid(target)
                         self.render.effect(type='blow', id=int(cmd[2]), target_id=uid)
+                    elif cmd[3] == 'pyrotechnic':
+                        self.render.effect(type='pyrotechnic', id=int(cmd[2]), target_id=uid)
                 except ValueError as e:
                     print(e)
             elif cmd[0] == 'EFFECT':
