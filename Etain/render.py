@@ -122,7 +122,7 @@ class Render():
                 self.window.blit(self.Surface['grid'], (0, 0))
             if self.path is not None:
                 for pos in self.path:
-                    square = (self.path[0] * SQUARE_SIZE, self.path[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
+                    square = (pos[0] * SQUARE_SIZE, pos[1] * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
                     self.window.fill(BLUE, square)
 
             self.draw_entities()

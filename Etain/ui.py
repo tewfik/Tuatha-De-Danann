@@ -57,7 +57,7 @@ class UI():
         """
         while not self.render.r_queue.empty():
             cmd = self.render.r_queue.get()
-            self.process(cmd.split())
+            self.process(cmd.split(':'))
 
         if self.round_state == 'RENDER':
             if self.render.end_anims():
@@ -130,7 +130,8 @@ class UI():
                         self.confirm = True
                     elif self.render.path is None and self.reachable(mouse_pos, MOVE_DIST):
                         self.buffer_pa.append('MOVE:%d:%d' % mouse_pos)
-                        self.render.path = (Astar(self.get_collide_map(), self.render.l_entities[self.me].pos, mouse_pos, [0], [BLOCK]))
+                        start_pos = self.render.l_entities[self.render.me].pos
+                        self.render.path = (Astar(self.get_collide_map(), start_pos, mouse_pos, [0], [BLOCK]))
                 elif self.round_state == 'PLAYERS_CONNECTION' and self.mouse_over(((WIDTH - 200)/2,
                      (HEIGHT - 50)/2, 200, 50), event.pos) and not self.render.rdy:
                     self.render.rdy = True
@@ -153,12 +154,15 @@ class UI():
                 self.render.use_cursor(ARROW)
 
 
-    def get_collide_map():
+    def get_collide_map(self):
         """
         """
         map = self.map
         for entity in self.render.l_entities.values():
-            map[entity.pos[1]][entity.pos[0]] = BLOCK
+            x = entity.pos[0]
+            y = entity.pos[1]
+            if x > 0 and x < COLUMNS and y > 0 and y < ROWS:
+                map[y][x] = BLOCK
         return map
 
     def reachable(self, pos, range):
@@ -230,7 +234,6 @@ class UI():
             if self.round_state != 'PLAYERS_CONNECTION':
                 self.spec = True
         elif cmd[0] == 'ENTITY' or cmd[0] == 'NEW_ENTITY':
-            print cmd
             f = open('data/'+cmd[1]+'.cfg')
             data = f.readline().split('**')
             f.close()
