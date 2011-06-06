@@ -1,0 +1,13 @@
+idle_up**100**up**wizard_idle_up.png**
+idle_right**100**right**wizard_idle_right.png**
+idle_down**100**down**wizard_idle_down.png**
+idle_left**100**left**wizard_idle_left.png**
+move_up**20**up**wizard_move_up_1.png**wizard_move_up_2.png**wizard_move_up_3.png**wizard_move_up_4.png**
+move_right**20**right**wizard_move_right_1.png**wizard_move_right_2.png**wizard_move_right_3.png**wizard_move_right_4.png**
+move_down**20**down**wizard_move_down_1.png**wizard_move_down_2.png**wizard_move_down_3.png**wizard_move_down_4.png**
+move_left**20**left**wizard_move_left_1.png**wizard_move_left_2.png**wizard_move_left_3.png**wizard_move_left_4.png**
+attack_up**100**up**wizard_idle_up.png**
+attack_right**40**right**wizard_idle_right.png**
+attack_down**40**down**wizard_idle_down.png**
+attack_left**40**left**wizard_idle_left.png**
+idle_dead**100**down**grave_flower.png**
