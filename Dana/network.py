@@ -68,10 +68,16 @@ class TCPHandler(SocketServer.BaseRequestHandler):
         global _dana_queue
 
         # main loop
+        invalid_msg = False
         while True:
             try:
                 # wait for request
-                data = self.request.recv(1024).strip()
+                try:
+                    data_length = int(self.request.recv(4).strip())
+                    data = self.request.recv(data_length).strip()
+                    invalid_msg = False
+                except ValueError:
+                    invalid_msg = True
             except socket.error as e:
                 print(e)
                 data = ""
@@ -90,8 +96,11 @@ class TCPHandler(SocketServer.BaseRequestHandler):
                 break
 
             # send the request to Dana
-            _dana_queue.put(tuple(data.split(":", 1)))
-            print('%s wrote: %s' % (self.client_address[0], data))
+            if invalid_msg:
+                print('Invalid message : protocol error')
+            else:
+                _dana_queue.put(tuple(data.split(":", 1)))
+                print('%s wrote: %s' % (self.client_address[0], data))
 
 
     def handle(self):

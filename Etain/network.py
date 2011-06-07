@@ -65,7 +65,8 @@ class ThreadSend(threading.Thread):
         while(not close_connection):
             try:
                 msg = str(_client_id) +':'+ _send_queue.get()
-                self.sock.send(msg)
+                msg_len = str(len(msg)).rjust(4, '0')
+                self.sock.send(msg_len + msg)
                 print('msg "%s" sent' % msg)
             except socket.error as e:
                 print(e)
