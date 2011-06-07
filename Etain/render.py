@@ -316,6 +316,8 @@ class Render():
             self.particles.append(particle.Particle('dmg', params, FPS * 2, pos))
         elif type.lower() == 'dead':
             self.l_entities[target_id].die()
+        elif type.lower() == 'push':
+            self.l_entities[target_id].move(dest=(params[0], params[1]), speed=32, pushed=True)
         else:
             entity = self.l_entities[target_id]
             pos = (entity.pixel_pos[0] + entity.width / 2, entity.pixel_pos[1] + entity.height / 2)
