@@ -140,7 +140,8 @@ class UI():
                             self.buffer_pa.append('ATTACK:pyrotechnic:%d:%d' % mouse_pos)
                             self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
                         elif self.attack == 'windblow' and self.reachable(mouse_pos, WIND_RANGE) and self.render.target is None:
-                            self.buffer_pa.append('ATTACK:windblow:%d:%d' % mouse_pos)
+                            #self.buffer_pa.append('ATTACK:windblow:%d:%d' % mouse_pos)
+                            self.buffer_pa.append('ATTACK:attack:%d:%d' % mouse_pos)
                             self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
                     elif self.render.path is None and self.reachable(mouse_pos, MOVE_DIST):
                         self.buffer_pa.append('MOVE:%d:%d' % mouse_pos)
@@ -311,6 +312,9 @@ class UI():
                         self.render.effect(type='blow', id=int(cmd[2]), target_id=uid)
                     elif cmd[3] == 'pyrotechnic':
                         self.render.effect(type='pyrotechnic', id=int(cmd[2]), target_id=uid)
+                    elif cmd[3] == 'windblow':
+                        self.render.effect(type='windblow', id=int(cmd[2]), target_id=uid)
+                        #self.render.l_entities[uid].move(dest=(), speed=32, pushed=True) #TODO(Mika): finish cmd according to protocole
                 except ValueError as e:
                     print(e)
             elif cmd[0] == 'EFFECT':

@@ -177,7 +177,7 @@ class Entity():
             self.play_anim("idle_dead", loop=True)
 
 
-    def move(self, dest, speed):
+    def move(self, dest, speed, pushed=False):
         """
         Move the entity to a new location at a given speed.
 
@@ -185,16 +185,17 @@ class Entity():
         - `dest`: a tuple (x, y) giving the destination's coordinates.
         - `speed`: movespeed in pixel per frame.
         """
-        if (abs(dest[1] - self.pos[1]) >= abs(dest[0] - self.pos[0])):
-            if dest[1] < self.pos[1]:
-                self.play_anim('move_up', True)
-            elif dest[1] > self.pos[1]:
-                self.play_anim('move_down', True)
-        else:
-            if dest[0] > self.pos[0]:
-                self.play_anim('move_right', True)
-            elif dest[0] < self.pos[0]:
-                self.play_anim('move_left', True)
+        if not pushed:
+            if (abs(dest[1] - self.pos[1]) >= abs(dest[0] - self.pos[0])):
+                if dest[1] < self.pos[1]:
+                    self.play_anim('move_up', True)
+                elif dest[1] > self.pos[1]:
+                    self.play_anim('move_down', True)
+            else:
+                if dest[0] > self.pos[0]:
+                    self.play_anim('move_right', True)
+                elif dest[0] < self.pos[0]:
+                    self.play_anim('move_left', True)
 
         self.pos = dest
         self.dest = ((dest[0] + 0.5)*SQUARE_SIZE - self.width/2, (dest[1] + 1)*SQUARE_SIZE - self.height)
