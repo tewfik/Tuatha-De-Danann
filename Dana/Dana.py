@@ -12,10 +12,14 @@ import network
 import models.world
 import models.entity
 
+#from shared.astar import Astar
+sys.path.append('../shared/')
+from astar import Astar
+
 # interval in seconds when players are able to choose their actions
 ACTION_CHOICE_TIMEOUT = 30
 # number of actions allowed for one player in one turn
-NB_ACTIONS = 1
+NB_ACTIONS = 6
 # interval in seconds after which Dana stops to wait clients
 TIMEOUT = 10
 # number of squares max that an entity is allowed to move
@@ -36,9 +40,10 @@ class Dana(threading.Thread):
     - `clients_queues`: dictionary of clients' queues. Format : clients_queues[client_id] = Queue object.
     - `spectators_queues`: dictionary of spectators' queues. Format : spectators_queues[client_id] = Queue object.
     - `next_action_id`: unique identifier to allocate to the next actions.
-    - `clients_actions`: actions choosen by each clients => clients_actions[client_id] = deque((action_id, action), ...).
     - `clients_config`: clients configuration item => clients_config['client_id'][item_name] = item_value.
+    - `clients_actions`: actions choosen by each clients => clients_actions[client_id] = deque((action_id, action), ...).
     - `actions_effects`: effects of actions => action_effects[action_id] = 'EFFECT:%d:pa:id:type:target_id:nb_damage'
+    - `move_flow`: details of move actions => move_flow[pa][client_id] = (dest_x, des_y).
     - `state`: state of the game (PLAYERS_CONNECTION | PLAYERS_CONNECTION_LOCK | ACTIONS_CHOICE | RENDER_FIGHT | WAIT_RENDER_OK).
     - `round`: round identifier. Start to zero and increment at each round.
     - `players_ready_event`: notice battle thread that all clients are ready.
@@ -65,6 +70,7 @@ class Dana(threading.Thread):
         self.spectators_queues = {}
         self.next_action_id = 1
         self.clients_actions = {}
+        self.move_flow = []
         self.actions_effects = {}
         self.state = 'PLAYERS_CONNECTION'
         self.round = 0
@@ -216,29 +222,152 @@ class Dana(threading.Thread):
         """
         Render the battle based on actions choice that clients have previously done.
         """
+        # precalculate clients movements
+        self.render_move()
+
         for count_actions in xrange(NB_ACTIONS):
             # send all actions for a given action turn to the clients
-            for client_actions in self.clients_actions.values():
+            for client_id, client_actions in self.clients_actions.items():
+                # if the client have to move or if he hasn't finished his movement
                 try:
-                    action_id, action = client_actions.popleft()
-
-                    ###############################################################################################################
-                    # TODO(tewfik): write a better
-                    if action.startswith('ATTACK') or action.startswith('MOVE'):
-                        action = action % (count_actions)
-                        self.send_to_all(action)
-
-                        if action.startswith('ATTACK'):
+                    move = self.move_flow[count_actions][client_id]
+                    x, y = move
+                except KeyError as e:
+                    move = (None, None)
+                    print 'client n° %d has no move to do.' % client_id
+                if move != (None, None):
+                    action = "MOVE:{pa}:{id}:{x}:{y}".format(pa=count_actions, id=client_id, x=x, y=y)
+                    print 'MOVE OK %s' % action
+                    self.send_to_all(action)
+                else:
+                    try:
+                        action_id, action = client_actions.popleft()
+                        if action.startswith('MOVE'):
+                            # move action have already been handled
+                            pass
+                        elif action.startswith('ATTACK'):
+                            action = action % (count_actions)
+                            self.send_to_all(action)
                             while len(self.actions_effects[action_id]) > 0:
                                 effect = self.actions_effects[action_id].popleft()
                                 self.send_to_all(effect % (count_actions))
-                    else:
-                        self.send_to_all(action)
-                    ###############################################################################################################
+                        else:
+                            print 'WTF %s' % action
+                            self.send_to_all(action)
 
-                except IndexError as e:
-                    print(e)
-                    print('|-> empty actions list for client')
+                    except IndexError as e:
+                        print(e)
+                        print('|-> empty actions list for client')
+
+
+    def get_move_actions(self):
+        """
+        Get the list of "move" actions.
+
+        Returns: the list of (client_id, src_pos, dest_pos, pa_start)
+                 where:
+                     - client_id is the client identifier.
+                     - src_pos is the tuple (x, y) which represent initial position before the move.
+                     - dest_pos is the tuple (x, y) which represent the position where the entity want to go.
+                     - pa_start is the action number where the move start.
+        """
+        move_actions = []
+        for client_id, client_actions in self.clients_actions.items():
+            for move_pa, (action_id, action) in enumerate(client_actions):
+                if action.startswith('MOVE:'):
+                    action_split = action.split(':')
+
+                    client_pos = self.world.get_position_by_object_id(client_id)
+                    client_dest = action_split[3], action_split[4]
+
+                    move_actions.append((client_id, client_pos, client_dest, move_pa))
+
+        return move_actions
+
+
+    def render_move(self):
+        """
+        Simulate and execute all "move" actions and prepare the request to send to Etain.
+        """
+        # list of (client_id, src_pos, dest_pos, pa_start)
+        # where:
+        #   client_id is the client identifier.
+        #   src_pos is the tuple (x, y) which represent initial position before the move.
+        #   dest_pos is the tuple (x, y) which represent the position where the entity want to go.
+        #   pa_start is the action number where the move start.
+        move_actions = self.get_move_actions()
+
+        # build move flow by actions number
+        self.move_flow = []
+
+        finished_move_actions = set()
+        for pa in xrange(NB_ACTIONS):
+            moves_by_pa = {}
+
+            for move_id, move in enumerate(move_actions):
+                str_client_id, str_src_pos, str_dest_pos, str_pa_start = move
+
+                client_id = int(str_client_id)
+                src_pos = self.world.get_position_by_object_id(client_id)
+                # src_pos = (int(str_src_pos[0]), int(str_src_pos[1]))
+                dest_pos = (int(str_dest_pos[0]), int(str_dest_pos[1]))
+                pa_start = int(str_pa_start)
+                # if the move has started and isn't finished, then calculate it
+
+                if move_id not in finished_move_actions and pa_start <= pa:
+                    # build A* arguments
+
+                    # we need a world representation which show where
+                    # the blocking squares are
+                    #
+                    # copy world representation
+                    world_representation = []
+                    for line in self.world.map:
+                        line_clone = []
+                        for item in line:
+                            line_clone.append(item)
+                        world_representation.append(line_clone)
+
+                    # and add entity as blocking square
+                    for entity_x, entity_y in self.world.entities_pos.values():
+                        if entity_y <= len(world_representation) and entity_x <= len(world_representation[0]):
+                            world_representation[entity_y][entity_x] = 1
+                        else:
+                            # ignore entity which are outside the screen
+                            pass
+
+                    free = [0]
+                    block = [1]
+
+                    # we have to re calculate the path to follow for
+                    # each pa to be able to adapt the path to other
+                    # entities' moves.
+                    print 'A START MAGIC'
+                    a_star_pos_list = Astar(world_representation, src_pos, dest_pos, free, block)
+                    pos = a_star_pos_list[0]  # first move of one square
+                    pos_x, pos_y = pos
+
+                    # collision detection
+                    if self.world.square_available(pos_x, pos_y):
+                        print 'client n° %d move to (%d, %d)' % (client_id, pos_x, pos_y)
+                        self.world.move(client_id, pos_x, pos_y)
+                        # generate move action of 1 square
+                        moves_by_pa[client_id] = (pos_x, pos_y)
+
+                        if pos == dest_pos:  # is the move finished ?
+                            print('move is finished')  #DEBUG
+                            finished_move_actions.add(move_id)
+                    else:
+                        # collision detected
+                        # generate "non-move" action
+                        moves_by_pa[client_id] = (None, None)
+                else:
+                    print("move is finished or isn't started yet")
+            # end for move in move_actions
+            print('fin iteration PA : moves_by_pa = ', moves_by_pa)
+            self.move_flow.append(moves_by_pa)
+        # end for pa in range(NB_ACTIONS)
+        print("move_flow", self.move_flow)
 
 
     def register_client(self, msg):
@@ -579,22 +708,19 @@ class Dana(threading.Thread):
         """
         An entity ask for move.
 
+        The move action is recorded and all moves will be evaluated
+        later dure the "render" phase in the self.render_move() method.
+
         Arguments:
         - `client_id`: client unique identifier.
         - `x`: x position
         - `y`: y position
         """
-        #TODO(tewfik): check that the client don't move more than which he is allowed to move.
         if not self.client_is_dead(client_id) and self.world.distance_from_square(client_id, x, y) <= NB_SQUARE_MOVE_MAX:
-            try:
-                self.world.move(client_id, x, y)
+            action_id = self.get_next_action_id()
 
-                action_id = self.get_next_action_id()
-
-                self.clients_actions[client_id].append((action_id, 'MOVE:%d:{id}:{x}:{y}'.format(id=client_id, x=x, y=y)))
-                print 'client_position = (%d, %d)' % self.world.entities_pos[client_id] # DEBUG client position
-            except models.world.ForbiddenMove as e:
-                print(e)
+            self.clients_actions[client_id].append((action_id, 'MOVE:%d:{id}:{x}:{y}'.format(id=client_id, x=x, y=y)))
+            print 'client_position = (%d, %d)' % self.world.entities_pos[client_id] # DEBUG client position
 
 
     def attack_request(self, client_id, name, x, y):
