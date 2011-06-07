@@ -97,7 +97,8 @@ class TCPHandler(SocketServer.BaseRequestHandler):
 
             # send the request to Dana
             if invalid_msg:
-                print('Invalid message : protocol error')
+                #print('Invalid message : protocol error')
+                pass
             else:
                 _dana_queue.put(tuple(data.split(":", 1)))
                 print('%s wrote: %s' % (self.client_address[0], data))

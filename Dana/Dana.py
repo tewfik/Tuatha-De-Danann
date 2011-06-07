@@ -394,6 +394,7 @@ class Dana(threading.Thread):
                 player = models.entity.LivingEntity(id=client_id, type='warrior', faction_id=1 if client_id % 2 == 0 else 2)
                 player.add_attack('attack', (20, 0, 0))
                 player.add_attack('pyrotechnic', (0, 15, 0), max_range=5)
+                player.add_attack('windblow', (0,0,0))
                 x = random.randint(10, 22)
                 y = 22
                 while not self.world.square_available(x, y):
@@ -745,11 +746,54 @@ class Dana(threading.Thread):
                 target_is_dead, nb_dmg = attack.hit(target)
 
                 self.clients_actions[client_id].append((action_id, 'ATTACK:%d:{id}:{name}:{x}:{y}'.format(id=client_id, name=name, x=x, y=y)))
-                self.add_effect(action_id, client_id, 'dmg', target.id, nb_dmg)
+
+                if name == 'windblow':
+                    push_x, push_y = self.windblow_attack(client_id, target.id)
+                    self.add_effect(action_id, client_id, 'push', target.id, str(push_x) + ':' + str(push_y))
+                else:
+                    self.add_effect(action_id, client_id, 'dmg', target.id, nb_dmg)
 
                 if target_is_dead:
                     self.client_die(id=target.id, killer_id=client_id, action_id=action_id)
         # TODO(tewfik): manage attack fail
+
+
+    def windblow_attack(self, attacker_id, target_id):
+        """
+        
+        Arguments:
+        - `attacker_id`:
+        - `target_id`:
+        """
+        x_attacker, y_attacker = self.world.get_position_by_object_id(attacker_id)
+        x_target, y_target = self.world.get_position_by_object_id(target_id)
+
+        dest_square = (None, None)
+
+        if x_attacker > x_target:
+            # pousse a gauche
+            if self.world.square_available(x_attacker - 2, y_attacker) and self.world.square_available(x_attacker - 3, y_attacker):
+                dest_square = (x_target - 2, y_target)
+        elif x_attacker < x_target:
+            # pousse a droite
+            if self.world.square_available(x_attacker + 2, y_attacker) and self.world.square_available(x_attacker + 3, y_attacker):
+                dest_square = (x_target + 2, y_target)
+        elif y_attacker > y_target:
+            # pousse haut
+            if self.world.square_available(x_attacker, y_attacker - 2) and self.world.square_available(x_attacker, y_attacker - 3):
+                dest_square = (x_target, y_target - 2)
+        else:
+            # pousse bas
+            if self.world.square_available(x_attacker, y_attacker + 2) and self.world.square_available(x_attacker, y_attacker + 3):
+                dest_square = (x_target, y_target + 2)
+
+        if dest_square == (None, None):
+            dest_square = (x_target, y_target)
+        else:
+            self.world.move(target_id, dest_square[0], dest_square[1])
+
+        return dest_square
+
 
 
 

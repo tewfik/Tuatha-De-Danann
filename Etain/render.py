@@ -317,7 +317,7 @@ class Render():
         elif type.lower() == 'dead':
             self.l_entities[target_id].die()
         elif type.lower() == 'push':
-            self.l_entities[target_id].move(dest=(params[0], params[1]), speed=32, pushed=True)
+            self.l_entities[target_id].move(dest=(int(params[0]), int(params[1])), speed=32, pushed=True)
         else:
             entity = self.l_entities[target_id]
             pos = (entity.pixel_pos[0] + entity.width / 2, entity.pixel_pos[1] + entity.height / 2)
