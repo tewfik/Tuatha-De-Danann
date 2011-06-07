@@ -24,6 +24,7 @@ class UI():
         - `render`: the main render object used for display.
         - `alt`: Boolean representing the state of the LEFT_ALT key.
         - `spec`: A boolean setting whever the client can play or is a spectator.
+        - `attack`: the name of the currently selected attack.
         - `fight`: A dictionnary which contains the actions to perform during render phase.
         - `pa`: the current action being executed.
         - `buffer_pa`: a list storing actions before sending them to Dana.
@@ -36,6 +37,7 @@ class UI():
         self.confirm = False
         self.alt = False
         self.spec = False
+        self.attack = "attack"
         self.fight = {}
         self.pa = 0
         self.buffer_pa = deque()
@@ -115,10 +117,12 @@ class UI():
                 self.render.menu = not self.render.menu
             elif not self.render.menu and event.button == 1:
                 if self.round_state == 'CHOICE' and not self.spec and self.render.l_entities[self.render.me].alive:
-                    if self.reachable(mouse_pos, MELEE_RANGE) and self.entity_on(mouse_pos) is not None:
-                        if self.entity_on(mouse_pos).alive and self.render.target is None:
-                            self.buffer_pa.append('ATTACK:attack:%d:%d' % mouse_pos)
-                            self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
+                    if self.mouse_over((WIDTH/2 - 29, HEIGHT - 26, 16,16), event.pos):
+                        self.attack = 'attack'
+                    elif self.mouse_over((WIDTH/2 - 8, HEIGHT - 26, 16,16), event.pos):
+                        self.attack = 'pyrotechnic'
+                    elif self.mouse_over((WIDTH/2 + 13, HEIGHT - 26, 16,16), event.pos):
+                        self.attack = 'windblow'
                     elif self.mouse_over((20, HEIGHT - 40, 90, 20), event.pos):
                         self.buffer_pa.clear()
                         self.render.path = None
@@ -128,6 +132,17 @@ class UI():
                             self.render.s_queue.put(self.buffer_pa.popleft())
                         self.render.s_queue.put("CONFIRM_CHOICE")
                         self.confirm = True
+                    elif self.entity_on(mouse_pos) is not None:
+                        if self.attack == 'attack' and self.reachable(mouse_pos, MELEE_RANGE) and self.render.target is None:
+                            self.buffer_pa.append('ATTACK:attack:%d:%d' % mouse_pos)
+                            self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
+                        elif self.attack == 'pyrotechnic' and self.reachable(mouse_pos, PYRO_RANGE) and self.render.target is None:
+                            self.buffer_pa.append('ATTACK:pyrotechnic:%d:%d' % mouse_pos)
+                            self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
+                        elif self.attack == 'windblow' and self.reachable(mouse_pos, WIND_RANGE) and self.render.target is None:
+                            #self.buffer_pa.append('ATTACK:windblow:%d:%d' % mouse_pos)
+                            self.buffer_pa.append('ATTACK:attack:%d:%d' % mouse_pos)
+                            self.render.target = self.render.l_entities.get_by_pos(mouse_pos)
                     elif self.render.path is None and self.reachable(mouse_pos, MOVE_DIST):
                         self.buffer_pa.append('MOVE:%d:%d' % mouse_pos)
                         start_pos = self.render.l_entities[self.render.me].pos
@@ -149,9 +164,13 @@ class UI():
                     pygame.event.post(pygame.event.Event(QUIT, {}))
         elif event.type == MOUSEMOTION and self.render.me is not None:
             mouse_pos = (event.pos[0] / SQUARE_SIZE, event.pos[1] / SQUARE_SIZE)
-            if self.reachable(mouse_pos, MELEE_RANGE) and self.entity_on(mouse_pos) is not None and self.round_state == 'CHOICE':
-                if self.entity_on(mouse_pos).alive:
+            if self.entity_on(mouse_pos) is not None and self.round_state == 'CHOICE':
+                if self.attack == 'attack' and self.reachable(mouse_pos, MELEE_RANGE):
                     self.render.use_cursor(SWORD)
+                elif self.attack == 'pyrotechnic' and self.reachable(mouse_pos, PYRO_RANGE):
+                    self.render.use_cursor(PYRO)
+                elif self.attack == 'windblow' and self.reachable(mouse_pos, WIND_RANGE):
+                    self.render.use_cursor(WIND)
             elif self.render.cursor != ARROW[0]:
                 self.render.use_cursor(ARROW)
 
@@ -293,6 +312,9 @@ class UI():
                         self.render.effect(type='blow', id=int(cmd[2]), target_id=uid)
                     elif cmd[3] == 'pyrotechnic':
                         self.render.effect(type='pyrotechnic', id=int(cmd[2]), target_id=uid)
+                    elif cmd[3] == 'windblow':
+                        self.render.effect(type='windblow', id=int(cmd[2]), target_id=uid)
+                        #self.render.l_entities[uid].move(dest=(), speed=32, pushed=True) #TODO(Mika): finish cmd according to protocole
                 except ValueError as e:
                     print(e)
             elif cmd[0] == 'EFFECT':
