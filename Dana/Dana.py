@@ -401,7 +401,7 @@ class Dana(threading.Thread):
                     x = random.randint(10, 22)
 
                 try:
-                    self.world.register(entity=player, entity_id=client_id, faction_id=1, x=x, y=y)
+                    self.world.register(entity=player, entity_id=client_id, faction_id=player.faction_id, x=x, y=y)
 
                     # confirm the registration of the client's queue => send its client_id
                     self.clients_queues[client_id].put(str(client_id))
