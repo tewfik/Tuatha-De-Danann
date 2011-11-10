@@ -541,7 +541,8 @@ class Dana(threading.Thread):
 
     def battle_is_finished(self):
         """
-        Return: True if the battle is finished.
+        Return: True if the battle is finished and the team number of
+                the winner.
         """
         faction1_lost = self.world.faction_lost(1)
         faction2_lost = self.world.faction_lost(2)

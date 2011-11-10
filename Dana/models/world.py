@@ -52,6 +52,8 @@ class World(object):
 
     def load_fixtures(self):
         """
+        Here is the place to define the entities which will be load on
+        the field before the battle.
         """
         epouvantail = entity.Entity(id=1001, type='scarecrow', faction_id=2, hp=30)
         self.register(epouvantail, entity_id=1001, faction_id=2, x=16, y=21)
